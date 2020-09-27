@@ -1,5 +1,5 @@
 import all from "it-all";
-import { concat, fromString, toString } from "uint8arrays";
+import { concat, toString } from "uint8arrays";
 
 import { initIpfs } from "../util/ipfs";
 import {initApi} from "../util/polkadot";
@@ -35,6 +35,13 @@ const viewMarket = async (opts: Options) => {
   Object.assign(market, extract(data));
 
   console.log(market);
+  //@ts-ignore
+  console.log('Yes share id:', (await api.rpc.predictionMarkets.marketOutcomeShareId(0,0)).toString());
+  //@ts-ignore
+  console.log('No share id:', (await api.rpc.predictionMarkets.marketOutcomeShareId(0,1)).toString());
+  //@ts-ignore
+  console.log('Invalid share id:', (await api.rpc.predictionMarkets.marketOutcomeShareId(0,2)).toString());
+
 
   process.exit(0);
 } 

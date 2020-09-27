@@ -213,10 +213,10 @@
   dependencies:
     "@types/node" "*"
 
-"@zeitgeistpm/type-definitions@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@zeitgeistpm/type-definitions/-/type-definitions-1.0.4.tgz#95c3632117114e2b910be46054842b1a63f522f5"
-  integrity sha512-MibTaUOrhdPJHtoSZCcPwt+Gp+ogwlZVVk6LCvGK5XHLDzlqs1NmNlfkwt4muST2SsKHY+bMO35+i2W7ZFUAKA==
+"@zeitgeistpm/type-definitions@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@zeitgeistpm/type-definitions/-/type-definitions-1.0.6.tgz#94e421d35a509b5cdfbb33d3d0e730a365acb97b"
+  integrity sha512-Jm2qFUIK+XrnGQdTcUhfK7NqOp1Q1yYI0/ySeNx6NzLdcRXoK3aoezycA4/jcR4pYOtiNRBKN02G1RsCbmkDHQ==
 
 abort-controller@^3.0.0:
   version "3.0.0"
