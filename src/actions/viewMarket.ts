@@ -7,13 +7,14 @@ import {initApi} from "../util/polkadot";
 import { hexToString } from "@polkadot/util";
 
 type Options = {
+  endpoint: string;
   marketId: string;
 };
 
 const viewMarket = async (opts: Options) => {
-  const { marketId } = opts;
+  const { endpoint, marketId } = opts;
 
-  const api = await initApi();
+  const api = await initApi(endpoint);
   const ipfs = initIpfs();
 
   const market = (await api.query.predictionMarkets.markets(marketId)).toJSON() as any;
@@ -36,11 +37,11 @@ const viewMarket = async (opts: Options) => {
 
   console.log(market);
   //@ts-ignore
-  console.log('Yes share id:', (await api.rpc.predictionMarkets.marketOutcomeShareId(0,0)).toString());
+  console.log('Invalid share id:', (await api.rpc.predictionMarkets.marketOutcomeShareId(0,0)).toString());
   //@ts-ignore
-  console.log('No share id:', (await api.rpc.predictionMarkets.marketOutcomeShareId(0,1)).toString());
+  console.log('Yes share id:', (await api.rpc.predictionMarkets.marketOutcomeShareId(0,1)).toString());
   //@ts-ignore
-  console.log('Invalid share id:', (await api.rpc.predictionMarkets.marketOutcomeShareId(0,2)).toString());
+  console.log('No share id:', (await api.rpc.predictionMarkets.marketOutcomeShareId(0,2)).toString());
 
 
   process.exit(0);

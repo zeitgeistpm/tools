@@ -2,6 +2,7 @@ import { initIpfs } from "../util/ipfs";
 import { initApi, signerFromSeed } from "../util/polkadot";
 
 type Options = {
+  endpoint: string;
   title: string
   info: string;
   oracle: string;
@@ -9,9 +10,9 @@ type Options = {
 };
 
 const createMarket = async (opts: Options) => {
-  const { title, info, oracle, seed } = opts;
+  const { endpoint, title, info, oracle, seed } = opts;
 
-  const api = await initApi();
+  const api = await initApi(endpoint);
   const ipfs = initIpfs();
 
   const { cid } = await ipfs.add({
@@ -25,8 +26,7 @@ const createMarket = async (opts: Options) => {
   const unsub = await api.tx.predictionMarkets.create(
     oracle,
     "Binary",
-    3,
-    10000,
+    200000,
     cid.toString(),
     "Permissionless",
   ).signAndSend(signer, (result) => {
