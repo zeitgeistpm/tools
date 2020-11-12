@@ -3,6 +3,17 @@ import program from "commander";
 import createMarket from "./actions/createMarket";
 import viewMarket from "./actions/viewMarket";
 
+/** Wrapper function to catch errors and exit. */
+const catchErrorsAndExit = async (fn: any, opts: any) => {
+  try {
+    await fn(opts);
+    process.exit(0); // exit OK
+  } catch (e) {
+    console.log(e);
+    process.exit(1); // exit ERR
+  }
+}
+
 program
   .command("createMarket")
   .option("--endpoint <string>", "The endpoint to connect the API to.", "wss://bp-rpc.zeitgeist.pm")
@@ -16,6 +27,6 @@ program
   .command("viewMarket")
   .option("--endpoint <string>", "The endpoint to connect the API to.", "wss://bp-rpc.zeitgeist.pm")
   .option("--marketId <index>", "The index of the market to view.", "0")
-  .action(viewMarket);
+  .action((opts: any) => catchErrorsAndExit(viewMarket, opts));
 
 program.parse(process.argv);

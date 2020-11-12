@@ -12,7 +12,7 @@ const typesFromDefs = (definitions: Record<string, { types: Record<string, any> 
     }), {});
 }
 
-export const initApi = (endpoint = 'ws://localhost:9944'): Promise<ApiPromise> => {
+export const initApi = (endpoint = 'wss://bp-rpc.zeitgeist.pm'): Promise<ApiPromise> => {
   return ApiPromise.create({
     provider: new WsProvider(endpoint),
     rpc: {

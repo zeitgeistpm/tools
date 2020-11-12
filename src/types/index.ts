@@ -7,7 +7,7 @@ export type MarketResponse = {
   creation: string;
   creator_fee: number;
   oracle: string;
-  end_block: number;
+  end: number;
   metadata: string;
   market_type: string;
   market_status: string;
@@ -22,7 +22,7 @@ export type ExtendedMarketResponse = {
   creation: string;
   creator_fee: number;
   oracle: string;
-  end_block: number;
+  end: number;
   metadata: string;
   market_type: string;
   market_status: string;
