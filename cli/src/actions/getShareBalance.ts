@@ -11,7 +11,7 @@ const getShareBalance = async (opts: Options) => {
 
   const balance = await models.Shares.balanceOf(marketId, shareIndex, account);
 
-  console.log(balance);
+  console.log(`Balance: ${balance}`);
 }
 
 export default getShareBalance;

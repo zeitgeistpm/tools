@@ -2,6 +2,7 @@ import program from "commander";
 
 import createMarket from "./actions/createMarket";
 import viewMarket from "./actions/viewMarket";
+import getShareBalance from "./actions/getShareBalance";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {

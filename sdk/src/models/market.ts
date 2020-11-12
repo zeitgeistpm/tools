@@ -1,10 +1,10 @@
+
 import { hexToString } from "@polkadot/util";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
 
 import { ExtendedMarketResponse, MarketId, MarketResponse, MarketCreation } from "../types";
-import { initIpfs } from "../util/ipfs";
-import { initApi } from "../util/polkadot";
+import { initApi, initIpfs } from "../util";
 
 /**
  * The Market class initializes all the market data.
@@ -126,11 +126,11 @@ class Market {
 
 
     //@ts-ignore
-    const invalidShareId = (await api.rpc.predictionMarkets.marketOutcomeShareId(0,0)).toString();
+    const invalidShareId = (await api.rpc.predictionMarkets.marketOutcomeShareId(marketId,0)).toString();
     //@ts-ignore
-    const yesShareId = (await api.rpc.predictionMarkets.marketOutcomeShareId(0,1)).toString();
+    const yesShareId = (await api.rpc.predictionMarkets.marketOutcomeShareId(marketId,1)).toString();
     //@ts-ignore
-    const noShareId = (await api.rpc.predictionMarkets.marketOutcomeShareId(0,2)).toString();
+    const noShareId = (await api.rpc.predictionMarkets.marketOutcomeShareId(marketId,2)).toString();
     
     Object.assign(market, {
       ...data,
