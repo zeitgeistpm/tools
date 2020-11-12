@@ -28,4 +28,8 @@ program
   .option("--endpoint <string>", "The endpoint to connect the API to.", "wss://bp-rpc.zeitgeist.pm")
   .action((marketId: number, opts: any) => catchErrorsAndExit(viewMarket, Object.assign(opts, { marketId })));
 
+program
+  .command("shareBalance <marketId> <shareIndex> <account>")
+  .action((marketId: number, shareIndex: number, account: string) => catchErrorsAndExit(getShareBalance, {marketId, shareIndex, account}))
+
 program.parse(process.argv);
