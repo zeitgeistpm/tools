@@ -1,7 +1,11 @@
 {
   "private": true,
   "workspaces": [
-    "cli",
-    "sdk"
-  ]
+    "packages/cli",
+    "packages/sdk"
+  ],
+  "name": "tools",
+  "devDependencies": {
+    "lerna": "^3.22.1"
+  }
 }

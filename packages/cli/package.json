@@ -2,18 +2,19 @@
   "name": "@zeitgeistpm/cli",
   "version": "1.0.0",
   "description": "Zeitgeist network command line tools.",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --outDir build",
-    "rebuild": "rm -rf build; yarn build",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "rebuild": "rm -rf dist; yarn dist",
     "start": "ts-node src/index start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@zeitgeistpm/sdk": "./sdk",
+    "@zeitgeistpm/sdk": "^1.0.0",
     "@zeitgeistpm/type-definitions": "^1.0.9",
     "commander": "^6.1.0"
   },
