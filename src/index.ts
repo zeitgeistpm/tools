@@ -24,9 +24,8 @@ program
   .action(createMarket);
 
 program
-  .command("viewMarket")
+  .command("viewMarket <marketId>")
   .option("--endpoint <string>", "The endpoint to connect the API to.", "wss://bp-rpc.zeitgeist.pm")
-  .option("--marketId <index>", "The index of the market to view.", "0")
-  .action((opts: any) => catchErrorsAndExit(viewMarket, opts));
+  .action((marketId: number, opts: any) => catchErrorsAndExit(viewMarket, Object.assign(opts, { marketId })));
 
 program.parse(process.argv);

@@ -1,5 +1,6 @@
-import { initIpfs } from "../util/ipfs";
-import { initApi, signerFromSeed } from "../util/polkadot";
+import { util } from "@zeitgeistpm/sdk";
+
+const { initApi, initIpfs, signerFromSeed } = util;
 
 type Options = {
   endpoint: string;
