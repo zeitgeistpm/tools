@@ -10,7 +10,7 @@ const viewMarket = async (opts: Options): Promise<void> => {
 
   const market = await models.Market.getRemote(Number(marketId));
 
-  console.log(JSON.stringify(market, null, 2));
+  console.log(market.toJSONString());
 };
 
 export default viewMarket;

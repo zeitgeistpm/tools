@@ -173,6 +173,12 @@ class Market {
     return new Market(market as ExtendedMarketResponse, api);
   }
 
+  toJSONString(): string {
+    const market = Object.assign({}, this);
+    delete market.api;
+    return JSON.stringify(market, null, 2);
+  }
+
   async buyCompleteSet(signer: KeyringPair, amount: number): Promise<boolean> {
     const unsub = await this.api.tx.predictionMarkets
       .buyCompleteSet(this.marketId, amount)
