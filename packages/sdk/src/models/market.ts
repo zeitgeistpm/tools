@@ -176,7 +176,27 @@ class Market {
   async buyCompleteSet(signer: KeyringPair, amount: number): Promise<boolean> {
     const unsub = await this.api.tx.predictionMarkets
       .buyCompleteSet(this.marketId, amount)
-      .signAndSend(signer, (result) => {});
+      .signAndSend(signer, (result) => {
+        const { status } = result;
+
+        if (status.isInBlock) {
+          unsub();
+        }
+      });
+
+    return true;
+  }
+
+  async sellCompleteSet(signer: KeyringPair, amount: number): Promise<boolean> {
+    const unsub = await this.api.tx.predictionMarkets
+      .sellCompleteSet(this.marketId, amount)
+      .signAndSend(signer, (result) => {
+        const { status } = result;
+
+        if (status.isInBlock) {
+          unsub();
+        }
+      });
 
     return true;
   }
