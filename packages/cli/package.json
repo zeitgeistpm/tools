@@ -2,8 +2,8 @@
   "name": "@zeitgeistpm/cli",
   "version": "1.0.0",
   "description": "Zeitgeist network command line tools.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "../../dist/cli/index.js",
+  "types": "../../dist/cli/index.d.ts",
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",

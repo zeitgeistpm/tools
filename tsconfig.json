@@ -1,11 +1,18 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "declaration": true
-    }
+    "references": [
+        {
+            "path": "./packages/sdk"
+        },
+        {
+            "path": "./packages/cli"
+        }
+    ],
+    "files": [],
+    "include": [
+        ".eslintrc.js"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/node_modules"
+    ]
 }

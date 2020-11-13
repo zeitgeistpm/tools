@@ -1,31 +1,32 @@
 {
-    "name": "@zeitgeistpm/sdk",
-    "version": "1.0.0",
-    "description": "Zeitgeist network javascript library.",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "scripts": {
-      "build": "tsc",
-      "build:watch": "tsc --watch",
-      "rebuild": "rm -rf dist; yarn dist",
-      "start": "ts-node src/index start",
-      "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-      "@polkadot/api": "^1.34.1",
-      "@polkadot/keyring": "^3.4.1",
-      "@polkadot/util": "^3.4.1",
-      "@zeitgeistpm/type-definitions": "^1.0.9",
-      "commander": "^6.1.0",
-      "ipfs-http-client": "^47.0.1",
-      "it-all": "^1.0.4",
-      "uint8arrays": "^1.1.0"
-    },
-    "devDependencies": {
-      "ts-node": "^9.0.0",
-      "typescript": "^4.0.3"
-    }
+  "name": "@zeitgeistpm/sdk",
+  "version": "1.0.0",
+  "description": "Zeitgeist network javascript library.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "lint": "tsc --noEmit && eslint '*/**/*.ts' --quiet",
+    "lint:fix": "tsc --noEmit && eslint '*/**/*.ts' --quiet --fix",
+    "rebuild": "rm -rf dist; yarn dist",
+    "start": "ts-node src/index start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@polkadot/api": "^1.34.1",
+    "@polkadot/keyring": "^3.4.1",
+    "@polkadot/util": "^3.4.1",
+    "@zeitgeistpm/type-definitions": "^1.0.9",
+    "commander": "^6.1.0",
+    "ipfs-http-client": "^47.0.1",
+    "it-all": "^1.0.4",
+    "uint8arrays": "^1.1.0"
+  },
+  "devDependencies": {
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.3"
   }
-  
+}

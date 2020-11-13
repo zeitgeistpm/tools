@@ -30,6 +30,7 @@ export type ExtendedMarketResponse = {
   reporter: string | null;
   categories: string[] | null;
   // new ones
+  marketId: number,
   title: string;
   description: string;
   metadataString: string;

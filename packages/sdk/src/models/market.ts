@@ -1,15 +1,23 @@
-
+import { ApiPromise } from "@polkadot/api";
+import { KeyringPair } from "@polkadot/keyring/types";
 import { hexToString } from "@polkadot/util";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
 
-import { ExtendedMarketResponse, MarketId, MarketResponse, MarketCreation } from "../types";
+import {
+  ExtendedMarketResponse,
+  MarketId,
+  MarketResponse,
+  MarketCreation,
+} from "../types";
 import { initApi, initIpfs } from "../util";
 
 /**
  * The Market class initializes all the market data.
  */
 class Market {
+  /** The unique identifier for this market. */
+  public marketId: number;
   /** The creator of the market. */
   public creator: string;
   /** The creation type of the market. Can be `Permissionless` or `Advised`. */
@@ -45,7 +53,10 @@ class Market {
   /** The `No` share hash id. */
   public noShareId: string;
 
-  constructor(market: ExtendedMarketResponse) {
+  /** Internally hold a reference to the API. */
+  private api: ApiPromise;
+
+  constructor(market: ExtendedMarketResponse, api: ApiPromise) {
     const {
       creator,
       creation,
@@ -58,6 +69,7 @@ class Market {
       reported_outcome,
       reporter,
       categories,
+      marketId,
       title,
       description,
       metadataString,
@@ -77,12 +89,15 @@ class Market {
     this.reportedOutcome = reported_outcome;
     this.reporter = reporter;
     this.categories = categories;
+    this.marketId = marketId;
     this.title = title;
     this.description = description;
     this.metadataString = metadataString;
     this.invalidShareId = invalidShareId;
     this.yesShareId = yesShareId;
     this.noShareId = noShareId;
+
+    this.api = api;
   }
 
   /**
@@ -93,7 +108,9 @@ class Market {
     const api = await initApi();
     const ipfs = initIpfs();
 
-    const market = (await api.query.predictionMarkets.markets(marketId)).toJSON() as MarketResponse;
+    const market = (
+      await api.query.predictionMarkets.markets(marketId)
+    ).toJSON() as MarketResponse;
 
     if (!market) {
       throw new Error(`Market with market id ${marketId} does not exist.`);
@@ -104,45 +121,65 @@ class Market {
 
     // Default to no metadata, but actually parse it below if it exists.
     let data = {
-      description: 'No metadata',
-      title: 'No metadata',
+      description: "No metadata",
+      title: "No metadata",
     };
 
     // Metadata exists, so parse it.
     if (hexToString(metadata)) {
       const raw = toString(concat(await all(ipfs.cat(metadataString))));
 
-      const extract = (data:string) => {
+      const extract = (data: string) => {
         const titlePattern = "title:";
         const infoPattern = "::info:";
         return {
-          description: data.slice(data.indexOf(infoPattern) + infoPattern.length),
+          description: data.slice(
+            data.indexOf(infoPattern) + infoPattern.length
+          ),
           title: data.slice(titlePattern.length, data.indexOf(infoPattern)),
-        }
-      }
+        };
+      };
 
       data = extract(raw);
     }
 
+    //@ts-ignore
+    const invalidShareId = await api.rpc.predictionMarkets.marketOutcomeShareId(
+      marketId,
+      0
+    );
 
     //@ts-ignore
-    const invalidShareId = (await api.rpc.predictionMarkets.marketOutcomeShareId(marketId,0)).toString();
+    const yesShareId = await api.rpc.predictionMarkets.marketOutcomeShareId(
+      marketId,
+      1
+    );
+
     //@ts-ignore
-    const yesShareId = (await api.rpc.predictionMarkets.marketOutcomeShareId(marketId,1)).toString();
-    //@ts-ignore
-    const noShareId = (await api.rpc.predictionMarkets.marketOutcomeShareId(marketId,2)).toString();
-    
+    const noShareId = await api.rpc.predictionMarkets.marketOutcomeShareId(
+      marketId,
+      2
+    );
+
     Object.assign(market, {
       ...data,
+      marketId,
       metadataString,
-      invalidShareId,
-      yesShareId,
-      noShareId,
+      invalidShareId: invalidShareId.toString(),
+      yesShareId: yesShareId.toString(),
+      noShareId: noShareId.toString(),
     });
 
-    return new Market(market as ExtendedMarketResponse);
+    return new Market(market as ExtendedMarketResponse, api);
+  }
+
+  async buyCompleteSet(signer: KeyringPair, amount: number): Promise<boolean> {
+    const unsub = await this.api.tx.predictionMarkets
+      .buyCompleteSet(this.marketId, amount)
+      .signAndSend(signer, (result) => {});
+
+    return true;
   }
 }
-
 
 export default Market;
