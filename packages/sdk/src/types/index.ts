@@ -14,7 +14,7 @@ export type MarketResponse = {
   reported_outcome: number | null;
   reporter: string | null;
   categories: string[] | null;
-}
+};
 
 // The extended market data from which a market may be created.
 export type ExtendedMarketResponse = {
@@ -30,16 +30,16 @@ export type ExtendedMarketResponse = {
   reporter: string | null;
   categories: string[] | null;
   // new ones
-  marketId: number,
+  marketId: number;
   title: string;
   description: string;
   metadataString: string;
   invalidShareId: string;
   yesShareId: string;
   noShareId: string;
-}
+};
 
 export enum MarketCreation {
   Permissioned = "Permissioned",
   Advised = "Advised",
-};
+}
