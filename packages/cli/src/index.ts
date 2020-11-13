@@ -3,6 +3,7 @@ import program from "commander";
 import createMarket from "./actions/createMarket";
 import viewMarket from "./actions/viewMarket";
 import buyCompleteSet from "./actions/buyCompleteSet";
+import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
 
 /** Wrapper function to catch errors and exit. */
@@ -59,9 +60,23 @@ program
     "The signer's seed. Default is `//Alice`.",
     "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
   )
-  .action((marketId: number, amount: number, opts: any) =>
+  .action((marketId: number, amount: number, opts: { seed: string }) =>
     catchErrorsAndExit(
       buyCompleteSet,
+      Object.assign(opts, { marketId, amount })
+    )
+  );
+
+program
+  .command("sellCompleteSet <marketId> <amount>")
+  .option(
+    "--seed <string>",
+    "The signer's seed. Default is `//Alice`.",
+    "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
+  )
+  .action((marketId: number, amount: number, opts: { seed: string }) =>
+    catchErrorsAndExit(
+      sellCompleteSet,
       Object.assign(opts, { marketId, amount })
     )
   );
