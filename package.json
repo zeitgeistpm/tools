@@ -16,6 +16,8 @@
     "prettier": "^2.1.2"
   },
   "scripts": {
-    "compile": "tsc --build --force tsconfig.json"
+    "clean": "rm packages/**/dist -rf",
+    "compile": "tsc --build --force tsconfig.json",
+    "cli": "node packages/cli/dist/index"
   }
 }
