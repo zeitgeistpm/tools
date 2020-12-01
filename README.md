@@ -1,11 +1,13 @@
 # tools
 
-Some tools to make working with Zeitgeist easier.
+![CI](https://github.com/zeitgeistpm/tools/workflows/CI/badge.svg)
+
+Zeitgeist JavaScript libraries and tools.
 
 ## @zeitgeist/cli
 
-The commandline interface is hosted at the root of this repository.
+The commandline interface that is built on top of `@zeitgeistpm/sdk`.
 
 ## @zeigeistpm/sdk
 
-The JavaScript library is hosted in the `sdk` folder.
+The main JavaScript library for interacting with the Zeitgeist network.
