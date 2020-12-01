@@ -10,7 +10,7 @@
     "build:watch": "tsc --watch",
     "rebuild": "rm -rf dist; yarn dist",
     "start": "ts-node src/index start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 0"
   },
   "author": "",
   "license": "ISC",
