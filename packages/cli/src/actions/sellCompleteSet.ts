@@ -1,18 +1,20 @@
-import { models } from "@zeitgeistpm/sdk";
-import { signerFromSeed } from "@zeitgeistpm/sdk/dist/util";
+import SDK, { util } from "@zeitgeistpm/sdk";
 
 type Options = {
+  endpoint: string;
   marketId: string;
   amount: string;
   seed: string;
 };
 
 const sellCompleteSet = async (opts: Options): Promise<void> => {
-  const { marketId, amount, seed } = opts;
+  const { endpoint, marketId, amount, seed } = opts;
 
-  const signer = signerFromSeed(seed);
+  const sdk = await SDK.initialize(endpoint);
 
-  const market = await models.Market.getRemote(Number(marketId));
+  const signer = util.signerFromSeed(seed);
+
+  const market = await sdk.models.fetchMarketData(Number(marketId));
   const res = await market.sellCompleteSet(signer, Number(amount));
 
   console.log(res);

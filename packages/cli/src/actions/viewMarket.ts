@@ -1,4 +1,4 @@
-import { models } from "@zeitgeistpm/sdk";
+import SDK from "@zeitgeistpm/sdk";
 
 type Options = {
   endpoint: string;
@@ -6,9 +6,11 @@ type Options = {
 };
 
 const viewMarket = async (opts: Options): Promise<void> => {
-  const { marketId } = opts;
+  const { endpoint, marketId } = opts;
 
-  const market = await models.Market.getRemote(Number(marketId));
+  const sdk = await SDK.initialize(endpoint);
+
+  const market = await sdk.models.fetchMarketData(Number(marketId));
 
   console.log(market.toJSONString());
 };

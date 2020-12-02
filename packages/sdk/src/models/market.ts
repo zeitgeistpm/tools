@@ -1,16 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
-import { hexToString } from "@polkadot/util";
-import all from "it-all";
-import { concat, toString } from "uint8arrays";
 
-import {
-  ExtendedMarketResponse,
-  MarketId,
-  MarketResponse,
-  MarketCreation,
-} from "../types";
-import { initApi, initIpfs } from "../util";
+import { ExtendedMarketResponse, MarketCreation } from "../types";
 
 /**
  * The Market class initializes all the market data.
@@ -98,79 +89,6 @@ class Market {
     this.noShareId = noShareId;
 
     this.api = api;
-  }
-
-  /**
-   * Gets a market from "remote", that is from querying Zeitgeist and IPFS.
-   * @param marketId The id of the market to retrieve.
-   */
-  static async getRemote(marketId: MarketId): Promise<Market> {
-    const api = await initApi();
-    const ipfs = initIpfs();
-
-    const market = (
-      await api.query.predictionMarkets.markets(marketId)
-    ).toJSON() as MarketResponse;
-
-    if (!market) {
-      throw new Error(`Market with market id ${marketId} does not exist.`);
-    }
-
-    const { metadata } = market;
-    const metadataString = hexToString(metadata);
-
-    // Default to no metadata, but actually parse it below if it exists.
-    let data = {
-      description: "No metadata",
-      title: "No metadata",
-    };
-
-    // Metadata exists, so parse it.
-    if (hexToString(metadata)) {
-      const raw = toString(concat(await all(ipfs.cat(metadataString))));
-
-      const extract = (data: string) => {
-        const titlePattern = "title:";
-        const infoPattern = "::info:";
-        return {
-          description: data.slice(
-            data.indexOf(infoPattern) + infoPattern.length
-          ),
-          title: data.slice(titlePattern.length, data.indexOf(infoPattern)),
-        };
-      };
-
-      data = extract(raw);
-    }
-
-    //@ts-ignore
-    const invalidShareId = await api.rpc.predictionMarkets.marketOutcomeShareId(
-      marketId,
-      0
-    );
-
-    //@ts-ignore
-    const yesShareId = await api.rpc.predictionMarkets.marketOutcomeShareId(
-      marketId,
-      1
-    );
-
-    //@ts-ignore
-    const noShareId = await api.rpc.predictionMarkets.marketOutcomeShareId(
-      marketId,
-      2
-    );
-
-    Object.assign(market, {
-      ...data,
-      marketId,
-      metadataString,
-      invalidShareId: invalidShareId.toString(),
-      yesShareId: yesShareId.toString(),
-      noShareId: noShareId.toString(),
-    });
-
-    return new Market(market as ExtendedMarketResponse, api);
   }
 
   toJSONString(): string {

@@ -1,5 +1,10 @@
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
+import { hexToString } from "@polkadot/util";
+import all from "it-all";
+import { concat, toString } from "uint8arrays";
+
+import { MarketId, MarketResponse, ExtendedMarketResponse } from "../types";
 import { initIpfs } from "../util";
 
 import Market from "./market";
@@ -58,5 +63,73 @@ export default class Models {
           }
         });
     });
+  }
+
+  async fetchMarketData(marketId: MarketId): Promise<Market> {
+    const ipfs = initIpfs();
+
+    const market = (
+      await this.api.query.predictionMarkets.markets(marketId)
+    ).toJSON() as MarketResponse;
+
+    if (!market) {
+      throw new Error(`Market with market id ${marketId} does not exist.`);
+    }
+
+    const { metadata } = market;
+    const metadataString = hexToString(metadata);
+
+    // Default to no metadata, but actually parse it below if it exists.
+    let data = {
+      description: "No metadata",
+      title: "No metadata",
+    };
+
+    // Metadata exists, so parse it.
+    if (hexToString(metadata)) {
+      const raw = toString(concat(await all(ipfs.cat(metadataString))));
+
+      const extract = (data: string) => {
+        const titlePattern = "title:";
+        const infoPattern = "::info:";
+        return {
+          description: data.slice(
+            data.indexOf(infoPattern) + infoPattern.length
+          ),
+          title: data.slice(titlePattern.length, data.indexOf(infoPattern)),
+        };
+      };
+
+      data = extract(raw);
+    }
+
+    //@ts-ignore
+    const invalidShareId = await this.api.rpc.predictionMarkets.marketOutcomeShareId(
+      marketId,
+      0
+    );
+
+    //@ts-ignore
+    const yesShareId = await this.api.rpc.predictionMarkets.marketOutcomeShareId(
+      marketId,
+      1
+    );
+
+    //@ts-ignore
+    const noShareId = await this.api.rpc.predictionMarkets.marketOutcomeShareId(
+      marketId,
+      2
+    );
+
+    Object.assign(market, {
+      ...data,
+      marketId,
+      metadataString,
+      invalidShareId: invalidShareId.toString(),
+      yesShareId: yesShareId.toString(),
+      noShareId: noShareId.toString(),
+    });
+
+    return new Market(market as ExtendedMarketResponse, this.api);
   }
 }
