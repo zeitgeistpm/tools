@@ -13,14 +13,17 @@ const createMarket = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
-  console.log("before waiting");
-  await new Promise((resolve) => setTimeout(() => resolve(), 200));
-  console.log("after waiting");
-
   const signer = util.signerFromSeed(seed);
-  console.log("sending from", signer.address);
+  console.log("Sending transaction from", signer.address);
 
-  await sdk.models.createNewMarket(signer, title, description, oracle);
+  const marketId = await sdk.models.createNewMarket(
+    signer,
+    title,
+    description,
+    oracle
+  );
+
+  console.log(`Market created! Market Id: ${marketId}`);
 };
 
 export default createMarket;
