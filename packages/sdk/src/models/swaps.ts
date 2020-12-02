@@ -13,6 +13,8 @@ type PoolResponse = {
  * providing liquidity to pools and swapping assets.
  */
 export default class Swap {
+  constructor() {}
+
   static async getRemote(poolId: PoolId): Promise<Swap> {
     const api = await initApi();
 

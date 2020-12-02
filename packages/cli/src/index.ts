@@ -18,29 +18,29 @@ const catchErrorsAndExit = async (fn: any, opts: any) => {
 };
 
 program
-  .command("createMarket")
+  .command("createMarket <title> <description> <oracle>")
   .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option("--title <string>", "Title of the prediction market.", "")
-  .option(
-    "--info <string>",
-    "Additional infomation about the prediction market.",
-    ""
-  )
-  .option(
-    "--oracle <string>",
-    "The designated oracle to resolve the prediction market.",
-    ""
   )
   .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
     "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
   )
-  .action(createMarket);
+  .action(
+    (
+      title: string,
+      description: string,
+      oracle: string,
+      opts: { endpoint: string; seed: string }
+    ) =>
+      catchErrorsAndExit(
+        createMarket,
+        Object.assign(opts, { title, description, oracle })
+      )
+  );
 
 program
   .command("viewMarket <marketId>")
