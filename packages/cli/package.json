@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@zeitgeistpm/sdk": "^1.0.0",
+    "@zeitgeistpm/sdk": "^0.0.1",
     "@zeitgeistpm/type-definitions": "^1.0.9",
     "commander": "^6.1.0"
   },
