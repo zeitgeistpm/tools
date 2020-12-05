@@ -1,4 +1,3 @@
-import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { initApi } from "../util";
 

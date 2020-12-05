@@ -20,7 +20,8 @@ export default class Models {
   }
 
   /**
-   * Creates a new market with the given parameters.
+   * Creates a new market with the given parameters. Returns the `marketId` that can be used
+   * to get the full data via `sdk.models.fetchMarket(marketId)`.
    * @param signer The signer who will send the transaction.
    * @param title The title of the new prediction market.
    * @param description The description / extra information for the market.
@@ -65,6 +66,10 @@ export default class Models {
     });
   }
 
+  /**
+   * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
+   * @param marketId The unique identifier for the market you want to fetch.
+   */
   async fetchMarketData(marketId: MarketId): Promise<Market> {
     const ipfs = initIpfs();
 
