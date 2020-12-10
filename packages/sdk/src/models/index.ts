@@ -5,22 +5,12 @@ import all from "it-all";
 import { concat, toString } from "uint8arrays";
 
 import { MarketId, MarketResponse, ExtendedMarketResponse } from "../types";
-import { initIpfs } from "../util";
+import { initIpfs, changeEndianness } from "../util";
 
 import Market from "./market";
 import Shares from "./shares";
 
 export { Market, Shares };
-
-const changeEndianness = (string) => {
-  const result = [];
-  let len = string.length - 2;
-  while (len >= 0) {
-    result.push(string.substr(len, 2));
-    len -= 2;
-  }
-  return result.join("");
-};
 
 export default class Models {
   private api: ApiPromise;
