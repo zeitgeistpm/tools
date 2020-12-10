@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
-import { hexToString } from "@polkadot/util";
+import { hexToNumber, hexToString } from "@polkadot/util";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
 
@@ -12,11 +12,45 @@ import Shares from "./shares";
 
 export { Market, Shares };
 
+const changeEndianness = (string) => {
+  const result = [];
+  let len = string.length - 2;
+  while (len >= 0) {
+    result.push(string.substr(len, 2));
+    len -= 2;
+  }
+  return result.join("");
+};
+
 export default class Models {
   private api: ApiPromise;
 
   constructor(api: ApiPromise) {
     this.api = api;
+  }
+
+  /**
+   * Gets all the market ids that exist in storage.
+   * Warning: This could take a while to finish.
+   */
+  async getAllMarketIds(): Promise<number[]> {
+    const keys = await this.api.query.predictionMarkets.markets.keys();
+
+    return keys.map((key) => {
+      const idStr = "0x" + changeEndianness(key.toString().slice(-32));
+      const id = hexToNumber(idStr);
+      return id;
+    });
+  }
+
+  /**
+   * Gets all markets that exist in storage.
+   * Warning: this could take a while to finish.
+   */
+  async getAllMarkets(): Promise<Market[]> {
+    const ids = await this.getAllMarketIds();
+
+    return Promise.all(ids.map((id) => this.fetchMarketData(id)));
   }
 
   /**
