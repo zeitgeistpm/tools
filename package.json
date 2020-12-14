@@ -18,6 +18,7 @@
   "scripts": {
     "clean": "rm packages/**/dist -rf",
     "compile": "tsc --build --force tsconfig.json",
+    "prepublish": "yarn compile",
     "cli": "node packages/cli/dist/index"
   }
 }
