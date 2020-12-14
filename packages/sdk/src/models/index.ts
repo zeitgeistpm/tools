@@ -55,6 +55,7 @@ export default class Models {
    * @param title The title of the new prediction market.
    * @param description The description / extra information for the market.
    * @param oracle The address that will be responsible for reporting the market.
+   * @param end Ending block or the ending unix timestamp of the market.
    * @param creationType "Permissionless" or "Advised"
    */
   async createNewMarket(
@@ -62,6 +63,7 @@ export default class Models {
     title: string,
     description: string,
     oracle: string,
+    end: number,
     creationType = "Permissionless"
   ): Promise<string> {
     const ipfs = initIpfs();
@@ -86,6 +88,9 @@ export default class Models {
 
             if (method == "MarketCreated") {
               _resolve(data[0].toString());
+            } else if (method == "ExtrinsicFailed") {
+              console.log("Extrinsic failed");
+              _resolve("");
             }
           });
 
@@ -95,13 +100,13 @@ export default class Models {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .create(oracle, "Binary", 500000, cid.toString(), creationType)
+          .create(oracle, "Binary", end, cid.toString(), creationType)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .create(oracle, "Binary", 500000, cid.toString(), creationType)
+          .create(oracle, "Binary", end, cid.toString(), creationType)
           .signAndSend(signer, (result) => callback(result, resolve, unsub));
       }
     });
