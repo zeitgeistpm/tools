@@ -1,11 +1,16 @@
 import { ApiPromise } from "@polkadot/api";
-import { KeyringPair } from "@polkadot/keyring/types";
+import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber, hexToString } from "@polkadot/util";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
 
-import { MarketId, MarketResponse, ExtendedMarketResponse } from "../types";
-import { initIpfs, changeEndianness } from "../util";
+import {
+  MarketId,
+  MarketResponse,
+  ExtendedMarketResponse,
+  KeyringPairOrExtSigner,
+} from "../types";
+import { initIpfs, changeEndianness, isExtSigner } from "../util";
 
 import Market from "./market";
 import Shares from "./shares";
@@ -46,14 +51,14 @@ export default class Models {
   /**
    * Creates a new market with the given parameters. Returns the `marketId` that can be used
    * to get the full data via `sdk.models.fetchMarket(marketId)`.
-   * @param signer The signer who will send the transaction.
+   * @param signer The actual signer provider to sign the transaction.
    * @param title The title of the new prediction market.
    * @param description The description / extra information for the market.
    * @param oracle The address that will be responsible for reporting the market.
    * @param creationType "Permissionless" or "Advised"
    */
   async createNewMarket(
-    signer: KeyringPair,
+    signer: KeyringPairOrExtSigner,
     title: string,
     description: string,
     oracle: string,
@@ -66,27 +71,39 @@ export default class Models {
     });
 
     return new Promise(async (resolve) => {
-      const unsub = await this.api.tx.predictionMarkets
-        .create(oracle, "Binary", 500000, cid.toString(), creationType)
-        .signAndSend(signer, (result) => {
-          const { events, status } = result;
+      const callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
 
-          if (status.isInBlock) {
-            console.log(
-              `Transaction included at blockHash ${status.asInBlock}`
-            );
+        if (status.isInBlock) {
+          console.log(`Transaction included at blockHash ${status.asInBlock}`);
 
-            events.forEach(({ phase, event: { data, method, section } }) => {
-              console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
 
-              if (method == "MarketCreated") {
-                resolve(data[0].toString());
-              }
-            });
+            if (method == "MarketCreated") {
+              _resolve(data[0].toString());
+            }
+          });
 
-            unsub();
-          }
-        });
+          _unsub();
+        }
+      };
+
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .create(oracle, "Binary", 500000, cid.toString(), creationType)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .create(oracle, "Binary", 500000, cid.toString(), creationType)
+          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+      }
     });
   }
 

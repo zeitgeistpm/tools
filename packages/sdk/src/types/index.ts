@@ -1,3 +1,6 @@
+import { KeyringPair } from "@polkadot/keyring/types";
+import { Signer } from "@polkadot/types/types";
+
 // Just a market identifier.
 export type MarketId = number;
 
@@ -43,3 +46,7 @@ export enum MarketCreation {
   Permissioned = "Permissioned",
   Advised = "Advised",
 }
+
+export type ExtSigner = { address: string; signer: Signer };
+
+export type KeyringPairOrExtSigner = KeyringPair | ExtSigner;

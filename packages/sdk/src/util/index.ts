@@ -1,5 +1,6 @@
 import { initIpfs } from "./ipfs";
 import { initApi, signerFromSeed } from "./polkadot";
+import { KeyringPairOrExtSigner, ExtSigner } from "../types";
 
 export { initApi, initIpfs, signerFromSeed };
 
@@ -11,4 +12,10 @@ export const changeEndianness = (string) => {
     len -= 2;
   }
   return result.join("");
+};
+
+export const isExtSigner = (
+  signer: KeyringPairOrExtSigner
+): signer is ExtSigner => {
+  return (signer as ExtSigner).signer !== undefined;
 };
