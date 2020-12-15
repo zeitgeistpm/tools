@@ -44,7 +44,7 @@ class Market {
   /** The `No` share hash id. */
   public noShareId: string;
 
-  /** Internally hold a reference to the API. */
+  /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
 
   constructor(market: ExtendedMarketResponse, api: ApiPromise) {

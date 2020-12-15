@@ -8,12 +8,15 @@ import {
   MarketId,
   MarketResponse,
   ExtendedMarketResponse,
+  PoolResponse,
   KeyringPairOrExtSigner,
+  PoolId,
 } from "../types";
 import { initIpfs, changeEndianness, isExtSigner } from "../util";
 
 import Market from "./market";
 import Shares from "./shares";
+import Swap from "./swaps";
 
 export { Market, Shares };
 
@@ -182,5 +185,13 @@ export default class Models {
     });
 
     return new Market(market as ExtendedMarketResponse, this.api);
+  }
+
+  async fetchPoolData(poolId: PoolId): Promise<Swap> {
+    const poolResponse = (
+      await this.api.query.swaps.pools(poolId)
+    ).toJSON() as PoolResponse;
+
+    return new Swap(poolResponse, this.api);
   }
 }

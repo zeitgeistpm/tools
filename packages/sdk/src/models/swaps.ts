@@ -1,29 +1,27 @@
-import { initApi } from "../util";
-
-type PoolId = number;
-type PoolResponse = {
-  assets: string[];
-  swap_fee: number;
-  total_weight: number;
-  weights: any;
-};
+import { ApiPromise } from "@polkadot/api";
+import { PoolResponse } from "../types";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
  * providing liquidity to pools and swapping assets.
  */
 export default class Swap {
-  constructor() {}
+  public assets;
+  public swapFee;
+  public totalWeight;
+  public weights;
 
-  static async getRemote(poolId: PoolId): Promise<Swap> {
-    const api = await initApi();
+  /** Internally hold a reference to the API that created it. */
+  private api: ApiPromise;
 
-    const pool = (await api.query.swaps.pools(poolId)).toJSON() as any;
+  constructor(details: PoolResponse, api: ApiPromise) {
+    const { assets, swap_fee, total_weight, weights } = details;
 
-    if (!pool) {
-      throw new Error(`Pool with pool id ${poolId} does not exist.`);
-    }
+    this.assets = assets;
+    this.swapFee = swap_fee;
+    this.totalWeight = total_weight;
+    this.weights = weights;
 
-    return new Swap();
+    this.api = api;
   }
 }

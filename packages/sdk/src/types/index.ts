@@ -47,6 +47,15 @@ export enum MarketCreation {
   Advised = "Advised",
 }
 
+export type PoolResponse = {
+  assets: string[];
+  swap_fee: number;
+  total_weight: number;
+  weights: any; // { string => number } TODO how to do repr this in TS?
+};
+
+export type PoolId = number;
+
 export type ExtSigner = { address: string; signer: Signer };
 
 export type KeyringPairOrExtSigner = KeyringPair | ExtSigner;
