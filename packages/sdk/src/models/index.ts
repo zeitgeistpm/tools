@@ -192,6 +192,6 @@ export default class Models {
       await this.api.query.swaps.pools(poolId)
     ).toJSON() as PoolResponse;
 
-    return new Swap(poolResponse, this.api);
+    return new Swap(poolId, poolResponse, this.api);
   }
 }
