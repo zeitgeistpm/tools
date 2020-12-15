@@ -101,22 +101,34 @@ class Market {
     return this.api.query.predictionMarkets.marketToSwapPool(this.marketId);
   };
 
-  deploySwapPool = async (signer: KeyringPair): Promise<any> => {
+  deploySwapPool = async (signer: KeyringPair): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId.isSome) {
       throw new Error("Pool already exists for this market.");
     }
 
-    const unsub = await this.api.tx.predictionMarkets
-      .deploySwapPoolForMarket(this.marketId)
-      .signAndSend(signer, (result) => {
-        const { status } = result;
-        console.log("status:", status);
+    return new Promise(async (resolve) => {
+      const unsub = await this.api.tx.predictionMarkets
+        .deploySwapPoolForMarket(this.marketId)
+        .signAndSend(signer, (result) => {
+          const { events, status } = result;
+          console.log("status:", status.toHuman());
 
-        if (status.isInBlock) {
-          unsub();
-        }
-      });
+          if (status.isInBlock) {
+            events.forEach(({ phase, event: { data, method, section } }) => {
+              console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+              if (method == "PoolCreated") {
+                resolve(data[0].toString());
+              }
+              if (method == "ExtrinsicFailed") {
+                resolve("");
+              }
+            });
+            unsub();
+          }
+        });
+    });
   };
 
   async buyCompleteSet(signer: KeyringPair, amount: number): Promise<boolean> {
