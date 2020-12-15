@@ -6,6 +6,7 @@ import deployPool from "./actions/deployPool";
 import viewMarket from "./actions/viewMarket";
 import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
+import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -96,11 +97,16 @@ program
 program
   .command("deployPool <marketId>")
   .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
     "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
   )
-  .action((marketId: number, opts: { seed: string }) =>
+  .action((marketId: number, opts: { endpoint: string; seed: string }) =>
     catchErrorsAndExit(deployPool, Object.assign(opts, { marketId }))
   );
 
@@ -108,6 +114,22 @@ program
   .command("shareBalance <marketId> <shareIndex> <account>")
   .action((marketId: number, shareIndex: number, account: string) =>
     catchErrorsAndExit(getShareBalance, { marketId, shareIndex, account })
+  );
+
+program
+  .command("wrapNativeCurrency <amount>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--seed <string>",
+    "The signer's seed. Default is `//Alice`.",
+    "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
+  )
+  .action((amount: string, opts: { endpoint: string; seed: string }) =>
+    catchErrorsAndExit(wrapNativeCurrency, Object.assign(opts, { amount }))
   );
 
 program.parse(process.argv);
