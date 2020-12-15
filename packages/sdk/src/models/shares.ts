@@ -69,6 +69,32 @@ class Shares {
     return totalSupply.toString();
   }
 
+  static wrapNativeCurrency = async (
+    signer: KeyringPair,
+    amount: string
+  ): Promise<string> => {
+    const api = await initApi();
+
+    const hash = await api.tx.shares
+      .wrapNativeCurrency(amount)
+      .signAndSend(signer);
+
+    return hash.toString();
+  };
+
+  static unwrapNativeCurrency = async (
+    signer: KeyringPair,
+    amount: string
+  ): Promise<string> => {
+    const api = await initApi();
+
+    const hash = await api.tx.shares
+      .unwrapNativeCurrency(amount)
+      .signAndSend(signer);
+
+    return hash.toString();
+  };
+
   static async transfer(
     signer: KeyringPair,
     marketId: number,

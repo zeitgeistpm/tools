@@ -97,6 +97,28 @@ class Market {
     return JSON.stringify(market, null, 2);
   }
 
+  getPoolId = async (): Promise<any> => {
+    return this.api.query.predictionMarkets.marketToSwapPool(this.marketId);
+  };
+
+  deploySwapPool = async (signer: KeyringPair): Promise<any> => {
+    const poolId = await this.getPoolId();
+    if (poolId.isSome) {
+      throw new Error("Pool already exists for this market.");
+    }
+
+    const unsub = await this.api.tx.predictionMarkets
+      .deploySwapPoolForMarket(this.marketId)
+      .signAndSend(signer, (result) => {
+        const { status } = result;
+        console.log("status:", status);
+
+        if (status.isInBlock) {
+          unsub();
+        }
+      });
+  };
+
   async buyCompleteSet(signer: KeyringPair, amount: number): Promise<boolean> {
     const unsub = await this.api.tx.predictionMarkets
       .buyCompleteSet(this.marketId, amount)
