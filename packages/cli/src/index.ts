@@ -4,6 +4,7 @@ import buyCompleteSet from "./actions/buyCompleteSet";
 import createMarket from "./actions/createMarket";
 import deployPool from "./actions/deployPool";
 import viewMarket from "./actions/viewMarket";
+import viewSwap from "./actions/viewSwap";
 import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
 import wrapNativeCurrency from "./actions/wrapNativeCurrency";
@@ -54,6 +55,17 @@ program
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(viewMarket, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("viewSwap <marketId")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(viewSwap, Object.assign(opts, { marketId }))
   );
 
 program

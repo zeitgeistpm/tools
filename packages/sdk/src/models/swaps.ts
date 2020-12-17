@@ -29,6 +29,12 @@ export default class Swap {
     this.api = api;
   }
 
+  toJSONString(): string {
+    const swap = Object.assign({}, this);
+    delete swap.api;
+    return JSON.stringify(swap, null, 2);
+  }
+
   joinPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,

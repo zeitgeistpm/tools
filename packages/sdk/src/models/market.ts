@@ -97,13 +97,15 @@ class Market {
     return JSON.stringify(market, null, 2);
   }
 
-  getPoolId = async (): Promise<any> => {
-    return this.api.query.predictionMarkets.marketToSwapPool(this.marketId);
+  getPoolId = async (): Promise<number | null> => {
+    return (
+      await this.api.query.predictionMarkets.marketToSwapPool(this.marketId)
+    ).toHuman() as number;
   };
 
   deploySwapPool = async (signer: KeyringPair): Promise<string> => {
     const poolId = await this.getPoolId();
-    if (poolId.isSome) {
+    if (!poolId) {
       throw new Error("Pool already exists for this market.");
     }
 
