@@ -43,6 +43,61 @@ export const initApi = (
           type: "Hash",
         },
       },
+      swaps: {
+        poolSharesId: {
+          description: "Gets the share identifier for the pool shares.",
+          params: [
+            {
+              name: "pool_id",
+              type: "u128",
+            },
+            {
+              name: "at",
+              type: "Hash",
+              isOptional: true,
+            },
+          ],
+          type: "Hash",
+        },
+        poolAccountId: {
+          description: "Gets the pool's account.",
+          params: [
+            {
+              name: "pool_id",
+              type: "u128",
+            },
+            {
+              name: "at",
+              type: "Hash",
+              isOptional: true,
+            },
+          ],
+          type: "AccountId",
+        },
+        getSpotPrice: {
+          description: "Gets the spot price for a pool's in and out assets.",
+          params: [
+            {
+              name: "pool_id",
+              type: "u128",
+            },
+            {
+              name: "asset_in",
+              type: "Hash",
+            },
+            {
+              name: "asset_out",
+              type: "Hash",
+            },
+            {
+              name: "at",
+              type: "Hash",
+              isOptional: true,
+            },
+          ],
+          type: "Balance",
+        },
+      },
     },
     types: typesFromDefs(zeitgeistDefinitions),
   });
