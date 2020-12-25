@@ -2,6 +2,7 @@ import { ApiPromise } from "@polkadot/api";
 import Models from "./models";
 import { initApi } from "./util";
 
+export * as consts from "./consts";
 export * as models from "./models";
 export * as types from "./types";
 export * as util from "./util";
@@ -23,5 +24,3 @@ export default class SDK {
     this.models = new Models(this.api);
   }
 }
-
-// test

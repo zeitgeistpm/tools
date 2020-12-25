@@ -1,4 +1,7 @@
 import { KeyringPair } from "@polkadot/keyring/types";
+import { AnyJson } from "@polkadot/types/types";
+
+import { NativeShareId } from "../consts";
 import { initApi } from "../util";
 
 /**
@@ -23,10 +26,21 @@ class Shares {
       marketId,
       sharesIndex
     );
-    const accountData = await api.query.shares.accounts(shareHash, account);
+    const accountData = await this._balanceOf(shareHash, account);
 
     //@ts-ignore
     return accountData.free.toString();
+  }
+
+  static async _balanceOf(
+    sharesHash: string,
+    account: string
+  ): Promise<AnyJson> {
+    const api = await initApi();
+
+    const accountData = await api.query.shares.accounts(sharesHash, account);
+
+    return accountData.toJSON();
   }
 
   /**
@@ -137,6 +151,10 @@ class Shares {
 
   static async noShareId(marketId: number): Promise<string> {
     return Shares.shareId(marketId, 2);
+  }
+
+  static nativeShareId(): string {
+    return NativeShareId;
   }
 }
 
