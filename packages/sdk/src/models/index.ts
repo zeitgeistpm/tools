@@ -21,10 +21,13 @@ import Swap from "./swaps";
 export { Market, Shares };
 
 export default class Models {
+  public shares: Shares;
+
   private api: ApiPromise;
 
   constructor(api: ApiPromise) {
     this.api = api;
+    this.shares = new Shares(this.api);
   }
 
   /**

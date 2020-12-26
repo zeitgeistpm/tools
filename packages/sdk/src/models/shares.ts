@@ -1,13 +1,21 @@
+import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { AnyJson } from "@polkadot/types/types";
 
 import { NativeShareId } from "../consts";
-import { initApi } from "../util";
+import { KeyringPairOrExtSigner } from "../types";
+import { initApi, isExtSigner } from "../util";
 
 /**
  * The Shares class provides an interface for getting shares related data.
  */
 class Shares {
+  private api: ApiPromise;
+
+  constructor(api: ApiPromise) {
+    this.api = api;
+  }
+
   /**
    * Gets the free balance of a particular account.
    * @param marketId The unique id of the market.
@@ -83,30 +91,82 @@ class Shares {
     return totalSupply.toString();
   }
 
-  static wrapNativeCurrency = async (
+  public static externWrapNativeCurrency = async (
     signer: KeyringPair,
     amount: string
   ): Promise<string> => {
     const api = await initApi();
 
-    const hash = await api.tx.shares
-      .wrapNativeCurrency(amount)
-      .signAndSend(signer);
-
-    return hash.toString();
+    return Shares._wrapNativeCurrency(api, signer, amount);
   };
 
-  static unwrapNativeCurrency = async (
+  /**
+   * Wraps some amount of native currency to wrapped currency.
+   * @param signer The signer provider that can sign the transaction.
+   * @param amount The amount of currency to wrap.
+   */
+  wrapNativeCurrency = async (
+    signer: KeyringPairOrExtSigner,
+    amount: string
+  ): Promise<string> => {
+    return Shares._wrapNativeCurrency(this.api, signer, amount);
+  };
+
+  private static _wrapNativeCurrency = async (
+    api: ApiPromise,
+    signer: KeyringPairOrExtSigner,
+    amount: string
+  ): Promise<string> => {
+    if (isExtSigner(signer)) {
+      return (
+        await api.tx.shares
+          .wrapNativeCurrency(amount)
+          .signAndSend(signer.address, { signer: signer.signer })
+      ).toString();
+    } else {
+      return (
+        await api.tx.shares.wrapNativeCurrency(amount).signAndSend(signer)
+      ).toString();
+    }
+  };
+
+  public static externUnwrapNativeCurrency = async (
     signer: KeyringPair,
     amount: string
   ): Promise<string> => {
     const api = await initApi();
 
-    const hash = await api.tx.shares
-      .unwrapNativeCurrency(amount)
-      .signAndSend(signer);
+    return Shares._unwrapNativeCurrency(api, signer, amount);
+  };
 
-    return hash.toString();
+  /**
+   * Unwraps some amount of wrapped currency to native currency.
+   * @param signer The signer provider that will sign the transaction.
+   * @param amount The amount of wrapped currency to unwrap.
+   */
+  unwrapNativeCurrency = async (
+    signer: KeyringPairOrExtSigner,
+    amount: string
+  ): Promise<string> => {
+    return Shares._unwrapNativeCurrency(this.api, signer, amount);
+  };
+
+  private static _unwrapNativeCurrency = async (
+    api: ApiPromise,
+    signer: KeyringPairOrExtSigner,
+    amount: string
+  ): Promise<string> => {
+    if (isExtSigner(signer)) {
+      return (
+        await api.tx.shares
+          .unwrapNativeCurrency(amount)
+          .signAndSend(signer.address, { signer: signer.signer })
+      ).toString();
+    } else {
+      return (
+        await api.tx.shares.unwrapNativeCurrency(amount).signAndSend(signer)
+      ).toString();
+    }
   };
 
   static async transfer(

@@ -1,4 +1,4 @@
-import SDK, { models, util } from "@zeitgeistpm/sdk";
+import SDK, { util } from "@zeitgeistpm/sdk";
 
 type Options = {
   amount: string;
@@ -14,7 +14,7 @@ const wrapNativeCurrency = async (opts: Options): Promise<void> => {
   const signer = util.signerFromSeed(seed);
   console.log("Sending transaction from", signer.address);
 
-  const res = await models.Shares.wrapNativeCurrency(signer, amount);
+  const res = await sdk.models.shares.wrapNativeCurrency(signer, amount);
 
   console.log(res);
   console.log("!!!");
