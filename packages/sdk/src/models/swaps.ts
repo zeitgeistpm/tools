@@ -29,10 +29,38 @@ export default class Swap {
     this.api = api;
   }
 
-  toJSONString(): string {
+  /**
+   * Returns this object as a nicely formatted JSON string.
+   */
+  public toJSONString(): string {
     const swap = Object.assign({}, this);
     delete swap.api;
     return JSON.stringify(swap, null, 2);
+  }
+
+  public async getSpotPrice(inAsset: string, outAsset: string): Promise<any> {
+    //@ts-ignore
+    const res = await this.api.rpc.swaps.getSpotPrice(
+      this.poolId,
+      inAsset,
+      outAsset
+    );
+
+    return res;
+  }
+
+  public async sharesId(): Promise<any> {
+    //@ts-ignore
+    const res = await this.api.rpc.swaps.poolSharesId(this.poolId);
+
+    return res;
+  }
+
+  public async accountId(): Promise<any> {
+    //@ts-ignore
+    const res = await this.api.rpc.swaps.poolAccountId(this.poolId);
+
+    return res;
   }
 
   joinPool = async (

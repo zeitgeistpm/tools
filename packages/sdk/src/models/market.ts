@@ -1,7 +1,13 @@
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
+import { ISubmittableResult } from "@polkadot/types/types";
 
-import { ExtendedMarketResponse, MarketCreation } from "../types";
+import {
+  ExtendedMarketResponse,
+  KeyringPairOrExtSigner,
+  MarketCreation,
+} from "../types";
+import { isExtSigner } from "../util";
 
 /**
  * The Market class initializes all the market data.
@@ -103,62 +109,114 @@ class Market {
     ).toHuman() as number;
   };
 
-  deploySwapPool = async (signer: KeyringPair): Promise<string> => {
+  deploySwapPool = async (signer: KeyringPairOrExtSigner): Promise<string> => {
     const poolId = await this.getPoolId();
     if (!poolId) {
       throw new Error("Pool already exists for this market.");
     }
 
     return new Promise(async (resolve) => {
-      const unsub = await this.api.tx.predictionMarkets
-        .deploySwapPoolForMarket(this.marketId)
-        .signAndSend(signer, (result) => {
-          const { events, status } = result;
-          console.log("status:", status.toHuman());
+      const callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
+        console.log("status:", status.toHuman());
 
-          if (status.isInBlock) {
-            events.forEach(({ phase, event: { data, method, section } }) => {
-              console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+        if (status.isInBlock) {
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
 
-              if (method == "PoolCreated") {
-                resolve(data[0].toString());
-              }
-              if (method == "ExtrinsicFailed") {
-                resolve("");
-              }
-            });
-            unsub();
-          }
-        });
+            if (method == "PoolCreated") {
+              _resolve(data[0].toString());
+            }
+            if (method == "ExtrinsicFailed") {
+              _resolve("");
+            }
+          });
+          _unsub();
+        }
+      };
+
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .deploySwapPoolForMarket(this.marketId)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .deploySwapPoolForMarket(this.marketId)
+          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+      }
     });
   };
 
-  async buyCompleteSet(signer: KeyringPair, amount: number): Promise<boolean> {
-    const unsub = await this.api.tx.predictionMarkets
-      .buyCompleteSet(this.marketId, amount)
-      .signAndSend(signer, (result) => {
-        const { status } = result;
+  async buyCompleteSet(
+    signer: KeyringPairOrExtSigner,
+    amount: number
+  ): Promise<boolean> {
+    const callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
 
-        if (status.isInBlock) {
-          unsub();
-        }
-      });
+      if (status.isInBlock) {
+        _unsub();
+      }
 
-    return true;
+      _resolve(true);
+    };
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .buyCompleteSet(this.marketId, amount)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .buyCompleteSet(this.marketId, amount)
+          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+      }
+    });
   }
 
-  async sellCompleteSet(signer: KeyringPair, amount: number): Promise<boolean> {
-    const unsub = await this.api.tx.predictionMarkets
-      .sellCompleteSet(this.marketId, amount)
-      .signAndSend(signer, (result) => {
-        const { status } = result;
+  async sellCompleteSet(
+    signer: KeyringPairOrExtSigner,
+    amount: number
+  ): Promise<boolean> {
+    const callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
 
-        if (status.isInBlock) {
-          unsub();
-        }
-      });
+      if (status.isInBlock) {
+        _unsub();
+      }
 
-    return true;
+      _resolve(true);
+    };
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .sellCompleteSet(this.marketId, amount)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .sellCompleteSet(this.marketId, amount)
+          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+      }
+    });
   }
 }
 
