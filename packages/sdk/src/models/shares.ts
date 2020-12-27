@@ -22,7 +22,7 @@ class Shares {
    * @param shareIndex The index of the share.
    * @param account The account to fetch the free balance of.
    */
-  static async balanceOf(
+  static async externBalanceOf(
     marketId: number,
     sharesIndex: number,
     account: string
@@ -34,18 +34,21 @@ class Shares {
       marketId,
       sharesIndex
     );
-    const accountData = await this._balanceOf(shareHash, account);
+    const accountData = await Shares._balanceOf(api, shareHash, account);
 
     //@ts-ignore
     return accountData.free.toString();
   }
 
+  async balanceOf(shareHash: string, account: string): Promise<AnyJson> {
+    return Shares._balanceOf(this.api, shareHash, account);
+  }
+
   static async _balanceOf(
+    api: ApiPromise,
     sharesHash: string,
     account: string
   ): Promise<AnyJson> {
-    const api = await initApi();
-
     const accountData = await api.query.shares.accounts(sharesHash, account);
 
     return accountData.toJSON();

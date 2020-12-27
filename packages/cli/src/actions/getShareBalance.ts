@@ -9,7 +9,11 @@ type Options = {
 const getShareBalance = async (opts: Options): Promise<void> => {
   const { account, marketId, shareIndex } = opts;
 
-  const balance = await models.Shares.balanceOf(marketId, shareIndex, account);
+  const balance = await models.Shares.externBalanceOf(
+    marketId,
+    shareIndex,
+    account
+  );
 
   console.log(`Balance: ${balance}`);
 };
