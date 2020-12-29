@@ -109,9 +109,12 @@ class Market {
     ).toHuman() as number;
   };
 
-  deploySwapPool = async (signer: KeyringPairOrExtSigner): Promise<string> => {
+  deploySwapPool = async (
+    signer: KeyringPairOrExtSigner,
+    weights: string[]
+  ): Promise<string> => {
     const poolId = await this.getPoolId();
-    if (!poolId) {
+    if (poolId) {
       throw new Error("Pool already exists for this market.");
     }
 
@@ -141,18 +144,18 @@ class Market {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .deploySwapPoolForMarket(this.marketId)
+          .deploySwapPoolForMarket(this.marketId, weights)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .deploySwapPoolForMarket(this.marketId)
+          .deploySwapPoolForMarket(this.marketId, weights)
           .signAndSend(signer, (result) => callback(result, resolve, unsub));
       }
     });
   };
-
+  0.3333333333;
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number

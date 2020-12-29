@@ -95,11 +95,16 @@ export const initApi = (
               isOptional: true,
             },
           ],
-          type: "Balance",
+          type: "BalanceInfo<Balance>",
         },
       },
     },
-    types: typesFromDefs(zeitgeistDefinitions),
+    types: {
+      ...typesFromDefs(zeitgeistDefinitions),
+      BalanceInfo: {
+        amount: "Balance",
+      },
+    },
   });
 };
 

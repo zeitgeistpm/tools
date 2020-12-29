@@ -7,6 +7,7 @@ import viewMarket from "./actions/viewMarket";
 import viewSwap from "./actions/viewSwap";
 import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
+import getSpotPrice from "./actions/getSpotPrice";
 import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 
 /** Wrapper function to catch errors and exit. */
@@ -124,8 +125,33 @@ program
 
 program
   .command("shareBalance <marketId> <shareIndex> <account>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
   .action((marketId: number, shareIndex: number, account: string) =>
     catchErrorsAndExit(getShareBalance, { marketId, shareIndex, account })
+  );
+
+program
+  .command("getSpotPrice <poolId> <assetIn> <assetOut>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action(
+    (
+      poolId: string,
+      assetIn: string,
+      assetOut: string,
+      opts: { endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        getSpotPrice,
+        Object.assign(opts, { poolId, assetIn, assetOut })
+      )
   );
 
 program
