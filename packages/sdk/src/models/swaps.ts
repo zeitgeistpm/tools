@@ -1,4 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
+import { ISubmittableResult } from "@polkadot/types/types";
+
 import { KeyringPairOrExtSigner, PoolResponse } from "../types";
 import { isExtSigner } from "../util";
 
@@ -113,7 +115,8 @@ export default class Swap {
     assetAmountIn: string,
     assetOut: string,
     minAmountOut: string,
-    maxPrice: string
+    maxPrice: string,
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
@@ -129,12 +132,12 @@ export default class Swap {
         signer.address,
         { signer: signer.signer },
         (result) => {
-          return;
+          callback(result, unsub);
         }
       );
     } else {
       const unsub = await tx.signAndSend(signer, (result) => {
-        return;
+        callback(result, unsub);
       });
     }
 
