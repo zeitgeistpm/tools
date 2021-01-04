@@ -68,20 +68,27 @@ export default class Swap {
   joinPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,
-    maxAmountsIn: string[]
+    maxAmountsIn: string[],
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const tx = this.api.tx.swaps.joinPool(
+      this.poolId,
+      poolAmountOut,
+      maxAmountsIn
+    );
+
     if (isExtSigner(signer)) {
-      const unsub = await this.api.tx.swaps
-        .joinPool(this.poolId, poolAmountOut, maxAmountsIn)
-        .signAndSend(signer.address, { signer: signer.signer }, (result) => {
-          return;
-        });
+      const unsub = await tx.signAndSend(
+        signer.address,
+        { signer: signer.signer },
+        (result) => {
+          callback(result, unsub);
+        }
+      );
     } else {
-      const unsub = await this.api.tx.swaps
-        .joinPool(this.poolId, poolAmountOut, maxAmountsIn)
-        .signAndSend(signer, (result) => {
-          return;
-        });
+      const unsub = await tx.signAndSend(signer, (result) => {
+        callback(result, unsub);
+      });
     }
 
     return true;
@@ -90,20 +97,27 @@ export default class Swap {
   exitPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountIn: string,
-    minAmountsOut: string[]
+    minAmountsOut: string[],
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const tx = this.api.tx.swaps.exitPool(
+      this.poolId,
+      poolAmountIn,
+      minAmountsOut
+    );
+
     if (isExtSigner(signer)) {
-      const unsub = await this.api.tx.swaps
-        .exitPool(this.poolId, poolAmountIn, minAmountsOut)
-        .signAndSend(signer.address, { signer: signer.signer }, (result) => {
-          return;
-        });
+      const unsub = await tx.signAndSend(
+        signer.address,
+        { signer: signer.signer },
+        (result) => {
+          callback(result, unsub);
+        }
+      );
     } else {
-      const unsub = await this.api.tx.swaps
-        .exitPool(this.poolId, poolAmountIn, minAmountsOut)
-        .signAndSend(signer, (result) => {
-          return;
-        });
+      const unsub = await tx.signAndSend(signer, (result) => {
+        callback(result, unsub);
+      });
     }
 
     return true;
@@ -150,7 +164,8 @@ export default class Swap {
     maxAmountIn: string,
     assetOut: string,
     assetAmountOut: string,
-    maxPrice: string
+    maxPrice: string,
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
@@ -166,12 +181,12 @@ export default class Swap {
         signer.address,
         { signer: signer.signer },
         (result) => {
-          return;
+          callback(result, unsub);
         }
       );
     } else {
       const unsub = await tx.signAndSend(signer, (result) => {
-        return;
+        callback(result, unsub);
       });
     }
 

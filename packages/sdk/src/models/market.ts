@@ -154,7 +154,7 @@ class Market {
       }
     });
   };
-  0.3333333333;
+
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number
