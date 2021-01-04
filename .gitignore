@@ -7,3 +7,4 @@ view.sh
 out
 test_seed
 scripts
+lerna-debug.log
