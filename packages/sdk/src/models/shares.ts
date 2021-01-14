@@ -40,11 +40,22 @@ class Shares {
     return accountData.free.toString();
   }
 
-  async balanceOf(shareHash: string, account: string): Promise<AnyJson> {
-    return Shares._balanceOf(this.api, shareHash, account);
+  static async externTotalSupply(
+    marketId: number,
+    sharesIndex: number
+  ): Promise<string> {
+    const api = await initApi();
+
+    //@ts-ignore
+    const shareHash = await api.rpc.predictionMarkets.marketOutcomeShareId(
+      marketId,
+      sharesIndex
+    );
+
+    return Shares._totalSupply(api, shareHash);
   }
 
-  static async _balanceOf(
+  private static async _balanceOf(
     api: ApiPromise,
     sharesHash: string,
     account: string
@@ -52,6 +63,23 @@ class Shares {
     const accountData = await api.query.shares.accounts(sharesHash, account);
 
     return accountData.toJSON();
+  }
+
+  private static async _totalSupply(
+    api: ApiPromise,
+    sharesHash: string
+  ): Promise<string> {
+    const totalSupply = await api.query.shares.totalSupply(sharesHash);
+
+    return totalSupply.toString();
+  }
+
+  async balanceOf(shareHash: string, account: string): Promise<AnyJson> {
+    return Shares._balanceOf(this.api, shareHash, account);
+  }
+
+  async totalSupply(shareHash: string): Promise<string> {
+    return Shares._totalSupply(this.api, shareHash);
   }
 
   /**
@@ -76,22 +104,6 @@ class Shares {
 
     //@ts-ignore
     return accountData.reserved.toString();
-  }
-
-  static async totalSupply(
-    marketId: number,
-    sharesIndex: number
-  ): Promise<string> {
-    const api = await initApi();
-
-    //@ts-ignore
-    const shareHash = await api.rpc.predictionMarkets.marketOutcomeShareId(
-      marketId,
-      sharesIndex
-    );
-    const totalSupply = await api.query.shares.totalSupply(shareHash);
-
-    return totalSupply.toString();
   }
 
   public static externWrapNativeCurrency = async (
