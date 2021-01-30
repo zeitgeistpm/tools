@@ -1,6 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { AnyJson } from "@polkadot/types/types";
+import { encodeAddress } from "@polkadot/util-crypto";
 
 import { NativeShareId } from "../consts";
 import { KeyringPairOrExtSigner } from "../types";
@@ -14,6 +15,43 @@ class Shares {
 
   constructor(api: ApiPromise) {
     this.api = api;
+  }
+
+  /**
+   * Gets all share identifiers that exist on chain. WARNING: This
+   * call might take a while to complete! Code accordingly.
+   * @returns string[] An array of all the ids as hex strings.
+   */
+  public async getAllShareIds(): Promise<string[]> {
+    const rawKeys = await this.api.query.shares.accounts.keys();
+    const shareIds = new Set();
+    for (const rawKey of rawKeys) {
+      const shareId = "0x" + rawKey.toString().slice(-160, -96);
+      shareIds.add(shareId);
+    }
+
+    return Array.from(shareIds) as string[];
+  }
+
+  /**
+   * Gets all share identifiers held by a particular account. WARNING:
+   * this call might take a while to complete! Code accordingly.
+   * @param account The account to query.
+   * @returns string[] An array of all the ids as hex strings.
+   */
+  public async getAllShareIdsHeldBy(account: string): Promise<string[]> {
+    const rawKeys = await this.api.query.shares.accounts.keys();
+    const myShares = [];
+    for (const key of rawKeys) {
+      const shareId = key.toString().slice(-160, -96);
+      const accountId = key.toString().slice(-64);
+      const gotAccount = encodeAddress("0x" + accountId, 42);
+      if (gotAccount == account) {
+        myShares.push("0x" + shareId);
+      }
+    }
+
+    return myShares;
   }
 
   /**
