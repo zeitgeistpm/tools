@@ -4,7 +4,7 @@
 
 Zeitgeist JavaScript libraries and tools.
 
-## @zeitgeist/cli
+## @zeitgeistpm/cli
 
 The commandline interface that is built on top of `@zeitgeistpm/sdk`.
 
