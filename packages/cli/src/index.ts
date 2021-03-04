@@ -31,7 +31,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
-    "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action(
     (
@@ -79,7 +79,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
-    "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action(
     (
@@ -98,7 +98,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
-    "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action((marketId: number, amount: number, opts: { seed: string }) =>
     catchErrorsAndExit(
@@ -117,7 +117,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
-    "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action((marketId: number, opts: { endpoint: string; seed: string }) =>
     catchErrorsAndExit(deployPool, Object.assign(opts, { marketId }))
@@ -164,7 +164,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
-    "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action((amount: string, opts: { endpoint: string; seed: string }) =>
     catchErrorsAndExit(wrapNativeCurrency, Object.assign(opts, { amount }))

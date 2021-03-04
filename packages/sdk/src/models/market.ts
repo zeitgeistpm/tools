@@ -110,54 +110,58 @@ class Market {
 
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
-    weights: string[]
+    weights: string[],
+    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId) {
       throw new Error("Pool already exists for this market.");
     }
 
+    const callback = (
+      result: ISubmittableResult,
+      _resolve: (value: string | PromiseLike<string>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "PoolCreated") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+        });
+        _unsub();
+      }
+    };
+
     return new Promise(async (resolve) => {
-      const callback = (
-        result: ISubmittableResult,
-        _resolve: (value: string | PromiseLike<string>) => void,
-        _unsub: () => void
-      ) => {
-        const { events, status } = result;
-        console.log("status:", status.toHuman());
-
-        if (status.isInBlock) {
-          events.forEach(({ phase, event: { data, method, section } }) => {
-            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-
-            if (method == "PoolCreated") {
-              _resolve(data[0].toString());
-            }
-            if (method == "ExtrinsicFailed") {
-              _resolve("");
-            }
-          });
-          _unsub();
-        }
-      };
-
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback(result, resolve, unsub)
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
-          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+          .signAndSend(signer, (result) => 
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
+          );
       }
     });
   };
 
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
-    amount: number
+    amount: number,
+    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> {
     const callback = (
       result: ISubmittableResult,
@@ -178,19 +182,22 @@ class Market {
         const unsub = await this.api.tx.predictionMarkets
           .buyCompleteSet(this.marketId, amount)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback(result, resolve, unsub)
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .buyCompleteSet(this.marketId, amount)
-          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+          .signAndSend(signer, (result) => 
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
+          );
       }
     });
   }
 
   async sellCompleteSet(
     signer: KeyringPairOrExtSigner,
-    amount: number
+    amount: number,
+    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> {
     const callback = (
       result: ISubmittableResult,
@@ -211,12 +218,14 @@ class Market {
         const unsub = await this.api.tx.predictionMarkets
           .sellCompleteSet(this.marketId, amount)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback(result, resolve, unsub)
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .sellCompleteSet(this.marketId, amount)
-          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+          .signAndSend(signer, (result) => 
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
+          );
       }
     });
   }
