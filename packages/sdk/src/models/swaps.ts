@@ -4,6 +4,11 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { KeyringPairOrExtSigner, PoolResponse } from "../types";
 import { isExtSigner } from "../util";
 
+import { Vec } from '@polkadot/types';
+import type { Balance, BalanceOf } from '@polkadot/types/interfaces';
+import BN from 'bn.js';
+import { TypeRegistry } from '@polkadot/types/create';
+
 /**
  * The Swap class provides an interface over the `Swaps` module for
  * providing liquidity to pools and swapping assets.
@@ -69,58 +74,87 @@ export default class Swap {
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,
     maxAmountsIn: string[],
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _unsub();
+      }
+
+      _resolve(true);
+    };
+
     const tx = this.api.tx.swaps.joinPool(
       this.poolId,
       poolAmountOut,
       maxAmountsIn
     );
 
-    if (isExtSigner(signer)) {
-      const unsub = await tx.signAndSend(
-        signer.address,
-        { signer: signer.signer },
-        (result) => {
-          callback(result, unsub);
-        }
-      );
-    } else {
-      const unsub = await tx.signAndSend(signer, (result) => {
-        callback(result, unsub);
-      });
-    }
-
-    return true;
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+        });
+      }
+    });
   };
 
   exitPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountIn: string,
     minAmountsOut: string[],
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _unsub();
+      }
+
+      _resolve(true);
+    };
+
+
     const tx = this.api.tx.swaps.exitPool(
       this.poolId,
       poolAmountIn,
       minAmountsOut
     );
 
-    if (isExtSigner(signer)) {
-      const unsub = await tx.signAndSend(
-        signer.address,
-        { signer: signer.signer },
-        (result) => {
-          callback(result, unsub);
-        }
-      );
-    } else {
-      const unsub = await tx.signAndSend(signer, (result) => {
-        callback(result, unsub);
-      });
-    }
-
-    return true;
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+        });
+      }
+    });
   };
 
   swapExactAmountIn = async (
@@ -130,8 +164,28 @@ export default class Swap {
     assetOut: string,
     minAmountOut: string,
     maxPrice: string,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _unsub();
+      }
+
+      _resolve(true);
+    };
+
+    console.log('------------', assetIn);
+    console.log('------------', assetAmountIn);
+    console.log('------------', assetOut);
+    console.log('------------', minAmountOut);
+    console.log('------------', maxPrice);
+
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
       assetIn,
@@ -141,21 +195,21 @@ export default class Swap {
       maxPrice
     );
 
-    if (isExtSigner(signer)) {
-      const unsub = await tx.signAndSend(
-        signer.address,
-        { signer: signer.signer },
-        (result) => {
-          callback(result, unsub);
-        }
-      );
-    } else {
-      const unsub = await tx.signAndSend(signer, (result) => {
-        callback(result, unsub);
-      });
-    }
-
-    return true;
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+        });
+      }
+    });
   };
 
   swapExactAmountOut = async (
@@ -165,8 +219,23 @@ export default class Swap {
     assetOut: string,
     assetAmountOut: string,
     maxPrice: string,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _unsub();
+      }
+
+      _resolve(true);
+    };
+
+
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
       assetIn,
@@ -176,20 +245,20 @@ export default class Swap {
       maxPrice
     );
 
-    if (isExtSigner(signer)) {
-      const unsub = await tx.signAndSend(
-        signer.address,
-        { signer: signer.signer },
-        (result) => {
-          callback(result, unsub);
-        }
-      );
-    } else {
-      const unsub = await tx.signAndSend(signer, (result) => {
-        callback(result, unsub);
-      });
-    }
-
-    return true;
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+        });
+      }
+    });
   };
 }
