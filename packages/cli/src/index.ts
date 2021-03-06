@@ -139,7 +139,7 @@ program
     "The signer's seed. Default is `//Alice`.",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
-  .action((poolId: number, amountOut: string, amountIn: string[], opts: { seed: string, endpoint: string }) =>
+  .action((poolId: number, amountOut: string, amountIn: string, opts: { seed: string, endpoint: string }) =>
     catchErrorsAndExit(joinPool, Object.assign(opts, { amountOut, amountIn, poolId }))
   );
 
@@ -155,7 +155,7 @@ program
     "The signer's seed. Default is `//Alice`.",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
-  .action((poolId: number, amountIn: string, amountOut: string[], opts: { seed: string, endpoint: string }) =>
+  .action((poolId: number, amountIn: string, amountOut: string, opts: { seed: string, endpoint: string }) =>
     catchErrorsAndExit(exitPool, Object.assign(opts, { amountIn, amountOut, poolId }))
   );
 

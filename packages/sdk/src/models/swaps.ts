@@ -179,13 +179,7 @@ export default class Swap {
 
       _resolve(true);
     };
-
-    console.log('------------', assetIn);
-    console.log('------------', assetAmountIn);
-    console.log('------------', assetOut);
-    console.log('------------', minAmountOut);
-    console.log('------------', maxPrice);
-
+    
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
       assetIn,
