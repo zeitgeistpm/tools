@@ -69,9 +69,9 @@ export default class Swap {
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,
     maxAmountsIn: string[],
-    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
-    const callback = (
+    const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
@@ -96,16 +96,16 @@ export default class Swap {
           signer.address,
           { signer: signer.signer },
           (result) => {
-            callback_low
-              ? callback_low(result, unsub)
-              : callback(result, resolve, unsub);
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
-          callback_low
-            ? callback_low(result, unsub)
-            : callback(result, resolve, unsub);
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
         });
       }
     });
@@ -115,9 +115,9 @@ export default class Swap {
     signer: KeyringPairOrExtSigner,
     poolAmountIn: string,
     minAmountsOut: string[],
-    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
-    const callback = (
+    const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
@@ -142,16 +142,16 @@ export default class Swap {
           signer.address,
           { signer: signer.signer },
           (result) => {
-            callback_low
-              ? callback_low(result, unsub)
-              : callback(result, resolve, unsub);
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
-          callback_low
-            ? callback_low(result, unsub)
-            : callback(result, resolve, unsub);
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
         });
       }
     });
@@ -164,9 +164,9 @@ export default class Swap {
     assetOut: string,
     minAmountOut: string,
     maxPrice: string,
-    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
-    const callback = (
+    const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
@@ -194,16 +194,16 @@ export default class Swap {
           signer.address,
           { signer: signer.signer },
           (result) => {
-            callback_low
-              ? callback_low(result, unsub)
-              : callback(result, resolve, unsub);
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
-          callback_low
-            ? callback_low(result, unsub)
-            : callback(result, resolve, unsub);
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
         });
       }
     });
@@ -216,9 +216,9 @@ export default class Swap {
     assetOut: string,
     assetAmountOut: string,
     maxPrice: string,
-    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
-    const callback = (
+    const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
@@ -246,16 +246,16 @@ export default class Swap {
           signer.address,
           { signer: signer.signer },
           (result) => {
-            callback_low
-              ? callback_low(result, unsub)
-              : callback(result, resolve, unsub);
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
-          callback_low
-            ? callback_low(result, unsub)
-            : callback(result, resolve, unsub);
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
         });
       }
     });
