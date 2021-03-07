@@ -71,27 +71,44 @@ export default class Swap {
     maxAmountsIn: string[],
     callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _unsub();
+        _resolve(true);
+      }
+    };
+
     const tx = this.api.tx.swaps.joinPool(
       this.poolId,
       poolAmountOut,
       maxAmountsIn
     );
 
-    if (isExtSigner(signer)) {
-      const unsub = await tx.signAndSend(
-        signer.address,
-        { signer: signer.signer },
-        (result) => {
-          callback(result, unsub);
-        }
-      );
-    } else {
-      const unsub = await tx.signAndSend(signer, (result) => {
-        callback(result, unsub);
-      });
-    }
-
-    return true;
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
   };
 
   exitPool = async (
@@ -100,27 +117,44 @@ export default class Swap {
     minAmountsOut: string[],
     callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _unsub();
+        _resolve(true);
+      }
+    };
+
     const tx = this.api.tx.swaps.exitPool(
       this.poolId,
       poolAmountIn,
       minAmountsOut
     );
 
-    if (isExtSigner(signer)) {
-      const unsub = await tx.signAndSend(
-        signer.address,
-        { signer: signer.signer },
-        (result) => {
-          callback(result, unsub);
-        }
-      );
-    } else {
-      const unsub = await tx.signAndSend(signer, (result) => {
-        callback(result, unsub);
-      });
-    }
-
-    return true;
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
   };
 
   swapExactAmountIn = async (
@@ -132,6 +166,19 @@ export default class Swap {
     maxPrice: string,
     callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _unsub();
+        _resolve(true);
+      }
+    };
+
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
       assetIn,
@@ -141,21 +188,25 @@ export default class Swap {
       maxPrice
     );
 
-    if (isExtSigner(signer)) {
-      const unsub = await tx.signAndSend(
-        signer.address,
-        { signer: signer.signer },
-        (result) => {
-          callback(result, unsub);
-        }
-      );
-    } else {
-      const unsub = await tx.signAndSend(signer, (result) => {
-        callback(result, unsub);
-      });
-    }
-
-    return true;
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
   };
 
   swapExactAmountOut = async (
@@ -167,6 +218,19 @@ export default class Swap {
     maxPrice: string,
     callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> => {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _unsub();
+        _resolve(true);
+      }
+    };
+
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
       assetIn,
@@ -176,20 +240,24 @@ export default class Swap {
       maxPrice
     );
 
-    if (isExtSigner(signer)) {
-      const unsub = await tx.signAndSend(
-        signer.address,
-        { signer: signer.signer },
-        (result) => {
-          callback(result, unsub);
-        }
-      );
-    } else {
-      const unsub = await tx.signAndSend(signer, (result) => {
-        callback(result, unsub);
-      });
-    }
-
-    return true;
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
   };
 }
