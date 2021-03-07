@@ -4,11 +4,6 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { KeyringPairOrExtSigner, PoolResponse } from "../types";
 import { isExtSigner } from "../util";
 
-import { Vec } from '@polkadot/types';
-import type { Balance, BalanceOf } from '@polkadot/types/interfaces';
-import BN from 'bn.js';
-import { TypeRegistry } from '@polkadot/types/create';
-
 /**
  * The Swap class provides an interface over the `Swaps` module for
  * providing liquidity to pools and swapping assets.
@@ -85,9 +80,8 @@ export default class Swap {
 
       if (status.isInBlock) {
         _unsub();
+        _resolve(true);
       }
-
-      _resolve(true);
     };
 
     const tx = this.api.tx.swaps.joinPool(
@@ -102,12 +96,16 @@ export default class Swap {
           signer.address,
           { signer: signer.signer },
           (result) => {
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+            callback_low
+              ? callback_low(result, unsub)
+              : callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
-          callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+          callback_low
+            ? callback_low(result, unsub)
+            : callback(result, resolve, unsub);
         });
       }
     });
@@ -128,11 +126,9 @@ export default class Swap {
 
       if (status.isInBlock) {
         _unsub();
+        _resolve(true);
       }
-
-      _resolve(true);
     };
-
 
     const tx = this.api.tx.swaps.exitPool(
       this.poolId,
@@ -146,12 +142,16 @@ export default class Swap {
           signer.address,
           { signer: signer.signer },
           (result) => {
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+            callback_low
+              ? callback_low(result, unsub)
+              : callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
-          callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+          callback_low
+            ? callback_low(result, unsub)
+            : callback(result, resolve, unsub);
         });
       }
     });
@@ -175,11 +175,10 @@ export default class Swap {
 
       if (status.isInBlock) {
         _unsub();
+        _resolve(true);
       }
-
-      _resolve(true);
     };
-    
+
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
       assetIn,
@@ -195,12 +194,16 @@ export default class Swap {
           signer.address,
           { signer: signer.signer },
           (result) => {
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+            callback_low
+              ? callback_low(result, unsub)
+              : callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
-          callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+          callback_low
+            ? callback_low(result, unsub)
+            : callback(result, resolve, unsub);
         });
       }
     });
@@ -224,11 +227,9 @@ export default class Swap {
 
       if (status.isInBlock) {
         _unsub();
+        _resolve(true);
       }
-
-      _resolve(true);
     };
-
 
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
@@ -245,12 +246,16 @@ export default class Swap {
           signer.address,
           { signer: signer.signer },
           (result) => {
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+            callback_low
+              ? callback_low(result, unsub)
+              : callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
-          callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub);
+          callback_low
+            ? callback_low(result, unsub)
+            : callback(result, resolve, unsub);
         });
       }
     });

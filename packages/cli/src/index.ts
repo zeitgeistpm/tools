@@ -139,8 +139,17 @@ program
     "The signer's seed. Default is `//Alice`.",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
-  .action((poolId: number, amountOut: string, amountIn: string, opts: { seed: string, endpoint: string }) =>
-    catchErrorsAndExit(joinPool, Object.assign(opts, { amountOut, amountIn, poolId }))
+  .action(
+    (
+      poolId: number,
+      amountOut: string,
+      amountIn: string,
+      opts: { seed: string; endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        joinPool,
+        Object.assign(opts, { amountOut, amountIn, poolId })
+      )
   );
 
 program
@@ -155,12 +164,23 @@ program
     "The signer's seed. Default is `//Alice`.",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
-  .action((poolId: number, amountIn: string, amountOut: string, opts: { seed: string, endpoint: string }) =>
-    catchErrorsAndExit(exitPool, Object.assign(opts, { amountIn, amountOut, poolId }))
+  .action(
+    (
+      poolId: number,
+      amountIn: string,
+      amountOut: string,
+      opts: { seed: string; endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        exitPool,
+        Object.assign(opts, { amountIn, amountOut, poolId })
+      )
   );
 
 program
-  .command("swapExactAmountIn <poolId> <assetIn> <assetAmountIn> <assetOut> <minAmountOut> <maxPrice>")
+  .command(
+    "swapExactAmountIn <poolId> <assetIn> <assetAmountIn> <assetOut> <minAmountOut> <maxPrice>"
+  )
   .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
@@ -171,12 +191,33 @@ program
     "The signer's seed. Default is `//Alice`.",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
-  .action((poolId: number, assetIn: string, assetAmountIn: string, assetOut: string, minAmountOut: string, maxPrice: string, opts: { seed: string, endpoint: string }) =>
-    catchErrorsAndExit(swapExactAmountIn, Object.assign(opts, { assetIn, assetAmountIn, assetOut, minAmountOut, maxPrice, poolId }))
+  .action(
+    (
+      poolId: number,
+      assetIn: string,
+      assetAmountIn: string,
+      assetOut: string,
+      minAmountOut: string,
+      maxPrice: string,
+      opts: { seed: string; endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        swapExactAmountIn,
+        Object.assign(opts, {
+          assetIn,
+          assetAmountIn,
+          assetOut,
+          minAmountOut,
+          maxPrice,
+          poolId,
+        })
+      )
   );
 
 program
-  .command("swapExactAmountOut <poolId> <assetIn> <maxAmountIn> <assetOut> <assetAmountOut> <maxPrice>")
+  .command(
+    "swapExactAmountOut <poolId> <assetIn> <maxAmountIn> <assetOut> <assetAmountOut> <maxPrice>"
+  )
   .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
@@ -187,8 +228,27 @@ program
     "The signer's seed. Default is `//Alice`.",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
-  .action((poolId: number, assetIn: string, maxAmountIn: string, assetOut: string, assetAmountOut: string, maxPrice: string, opts: { seed: string, endpoint: string }) =>
-    catchErrorsAndExit(swapExactAmountOut, Object.assign(opts, { assetIn, maxAmountIn, assetOut, assetAmountOut, maxPrice, poolId }))
+  .action(
+    (
+      poolId: number,
+      assetIn: string,
+      maxAmountIn: string,
+      assetOut: string,
+      assetAmountOut: string,
+      maxPrice: string,
+      opts: { seed: string; endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        swapExactAmountOut,
+        Object.assign(opts, {
+          assetIn,
+          maxAmountIn,
+          assetOut,
+          assetAmountOut,
+          maxPrice,
+          poolId,
+        })
+      )
   );
 
 program

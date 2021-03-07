@@ -4,12 +4,12 @@ type Options = {
   endpoint: string;
   amountIn: string;
   amountOut: string;
-  poolId: number,
+  poolId: number;
   seed: string;
 };
 
 const exitPool = async (opts: Options): Promise<void> => {
-  const { endpoint, amountIn, amountOut , poolId, seed } = opts;
+  const { endpoint, amountIn, amountOut, poolId, seed } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
@@ -17,7 +17,7 @@ const exitPool = async (opts: Options): Promise<void> => {
   console.log("Sending transaction from", signer.address);
 
   const pool = await sdk.models.fetchPoolData(poolId);
-  const res = await pool.exitPool(signer,amountIn, amountOut.split(','));
+  const res = await pool.exitPool(signer, amountIn, amountOut.split(","));
   console.log(res);
 };
 

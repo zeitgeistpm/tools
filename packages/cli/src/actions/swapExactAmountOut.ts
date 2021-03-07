@@ -7,12 +7,21 @@ type Options = {
   assetOut: string;
   assetAmountOut: string;
   maxPrice: string;
-  poolId: number,
+  poolId: number;
   seed: string;
 };
 
 const swapExactAmountOut = async (opts: Options): Promise<void> => {
-  const { endpoint, assetIn, maxAmountIn, assetOut, assetAmountOut, maxPrice, poolId, seed } = opts;
+  const {
+    endpoint,
+    assetIn,
+    maxAmountIn,
+    assetOut,
+    assetAmountOut,
+    maxPrice,
+    poolId,
+    seed,
+  } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
@@ -20,7 +29,14 @@ const swapExactAmountOut = async (opts: Options): Promise<void> => {
   console.log("Sending transaction from", signer.address);
 
   const pool = await sdk.models.fetchPoolData(poolId);
-  const res = await pool.swapExactAmountOut(signer,assetIn, maxAmountIn, assetOut, assetAmountOut, maxPrice);
+  const res = await pool.swapExactAmountOut(
+    signer,
+    assetIn,
+    maxAmountIn,
+    assetOut,
+    assetAmountOut,
+    maxPrice
+  );
   console.log(res);
 };
 
