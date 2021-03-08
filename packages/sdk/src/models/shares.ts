@@ -222,6 +222,16 @@ class Shares {
     }
   };
 
+  shareTransfer = async (
+    signer: KeyringPair,
+    marketId: number,
+    sharesIndex: number,
+    to: string,
+    amount: string
+  ): Promise<string> => {
+    return Shares.transfer(signer, marketId, sharesIndex, to, amount);
+  };
+
   static async transfer(
     signer: KeyringPair,
     marketId: number,

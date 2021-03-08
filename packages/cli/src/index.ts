@@ -13,6 +13,7 @@ import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
 import getSpotPrice from "./actions/getSpotPrice";
 import wrapNativeCurrency from "./actions/wrapNativeCurrency";
+import transfer from "./actions/transfer";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -296,6 +297,32 @@ program
   )
   .action((amount: string, opts: { endpoint: string; seed: string }) =>
     catchErrorsAndExit(wrapNativeCurrency, Object.assign(opts, { amount }))
+  );
+
+program
+  .command("transfer <marketId> <sharesIndex> <to> <amount>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--seed <string>",
+    "The signer's seed. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .action(
+    (
+      marketId: string,
+      sharesIndex: string,
+      to: string,
+      amount: string,
+      opts: { endpoint: string; seed: string }
+    ) =>
+      catchErrorsAndExit(
+        transfer,
+        Object.assign(opts, { marketId, sharesIndex, to, amount })
+      )
   );
 
 program.parse(process.argv);
