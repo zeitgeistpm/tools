@@ -18,7 +18,7 @@ import Market from "./market";
 import Shares from "./shares";
 import Swap from "./swaps";
 
-export { Market, Shares };
+export { Market, Shares, Swap };
 
 export default class Models {
   public shares: Shares;

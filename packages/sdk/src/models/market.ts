@@ -111,14 +111,14 @@ class Market {
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
     weights: string[],
-    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId) {
       throw new Error("Pool already exists for this market.");
     }
 
-    const callback = (
+    const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
       _unsub: () => void
@@ -146,13 +146,17 @@ class Market {
         const unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
-          .signAndSend(signer, (result) => 
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       }
     });
@@ -161,9 +165,9 @@ class Market {
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
-    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> {
-    const callback = (
+    const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
@@ -182,13 +186,17 @@ class Market {
         const unsub = await this.api.tx.predictionMarkets
           .buyCompleteSet(this.marketId, amount)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .buyCompleteSet(this.marketId, amount)
-          .signAndSend(signer, (result) => 
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       }
     });
@@ -197,9 +205,9 @@ class Market {
   async sellCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
-    callback_low?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<boolean> {
-    const callback = (
+    const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
@@ -218,13 +226,17 @@ class Market {
         const unsub = await this.api.tx.predictionMarkets
           .sellCompleteSet(this.marketId, amount)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .sellCompleteSet(this.marketId, amount)
-          .signAndSend(signer, (result) => 
-            callback_low ? callback_low(result, unsub) : callback(result, resolve, unsub)
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       }
     });
