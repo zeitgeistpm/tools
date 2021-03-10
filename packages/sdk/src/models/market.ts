@@ -176,9 +176,8 @@ class Market {
 
       if (status.isInBlock) {
         _unsub();
+        _resolve(true);
       }
-
-      _resolve(true);
     };
 
     return new Promise(async (resolve) => {
@@ -216,9 +215,8 @@ class Market {
 
       if (status.isInBlock) {
         _unsub();
+        _resolve(true);
       }
-
-      _resolve(true);
     };
 
     return new Promise(async (resolve) => {
@@ -233,6 +231,106 @@ class Market {
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .sellCompleteSet(this.marketId, amount)
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
+  }
+
+
+  async report(
+    signer: KeyringPairOrExtSigner,
+    amount: number,
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
+  ): Promise<string> {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: string | PromiseLike<string>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "MarketReported") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+        });
+        _unsub();
+      }
+    };
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .report(this.marketId, amount)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .report(this.marketId, amount)
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
+  }
+
+  
+  async dispute(
+    signer: KeyringPairOrExtSigner,
+    amount: number,
+    callback?: (result: ISubmittableResult, unsub: () => void) => void
+  ): Promise<string> {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: string | PromiseLike<string>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "MarketDisputed") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+        });
+        _unsub();
+      }
+    };
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .dispute(this.marketId, amount)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .dispute(this.marketId, amount)
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)
