@@ -15,4 +15,7 @@ module.exports = {
   rules: {
     "@typescript-eslint/ban-ts-comment": "off",
   },
+  "prettier/prettier": ["error", {
+   "endOfLine":"auto"
+  }],
 };

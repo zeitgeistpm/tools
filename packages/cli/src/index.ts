@@ -2,6 +2,8 @@ import program from "commander";
 
 import buyCompleteSet from "./actions/buyCompleteSet";
 import createMarket from "./actions/createMarket";
+import disputeMarket from './actions/disputeMarket';
+import reportMarket from './actions/reportMarket';
 import deployPool from "./actions/deployPool";
 import joinPool from "./actions/joinPool";
 import exitPool from "./actions/exitPool";
@@ -109,6 +111,35 @@ program
     catchErrorsAndExit(
       sellCompleteSet,
       Object.assign(opts, { marketId, amount })
+    )
+  );
+
+program
+  .command("report <marketId> <outcome>")
+  .option(
+    "--seed <string>",
+    "The signer's seed. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .action((marketId: number, outcome: number, opts: { seed: string }) =>
+    catchErrorsAndExit(
+      reportMarket,
+      Object.assign(opts, { marketId, outcome })
+    )
+  );
+
+
+program
+  .command("dispute <marketId> <outcome>")
+  .option(
+    "--seed <string>",
+    "The signer's seed. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .action((marketId: number, outcome: number, opts: { seed: string }) =>
+    catchErrorsAndExit(
+      disputeMarket,
+      Object.assign(opts, { marketId, outcome })
     )
   );
 
