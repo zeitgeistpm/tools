@@ -243,7 +243,7 @@ class Market {
 
   async report(
     signer: KeyringPairOrExtSigner,
-    amount: number,
+    outcome: number,
     callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
@@ -272,7 +272,7 @@ class Market {
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .report(this.marketId, amount)
+          .report(this.marketId, outcome)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -280,7 +280,7 @@ class Market {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .report(this.marketId, amount)
+          .report(this.marketId, outcome)
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)
@@ -293,7 +293,7 @@ class Market {
   
   async dispute(
     signer: KeyringPairOrExtSigner,
-    amount: number,
+    outcome: number,
     callback?: (result: ISubmittableResult, unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
@@ -322,7 +322,7 @@ class Market {
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .dispute(this.marketId, amount)
+          .dispute(this.marketId, outcome)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -330,7 +330,7 @@ class Market {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .dispute(this.marketId, amount)
+          .dispute(this.marketId, outcome)
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)

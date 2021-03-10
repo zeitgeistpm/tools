@@ -115,31 +115,31 @@ program
   );
 
 program
-  .command("report <marketId> <amount>")
+  .command("report <marketId> <outcome>")
   .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
-  .action((marketId: number, amount: number, opts: { seed: string }) =>
+  .action((marketId: number, outcome: number, opts: { seed: string }) =>
     catchErrorsAndExit(
       reportMarket,
-      Object.assign(opts, { marketId, amount })
+      Object.assign(opts, { marketId, outcome })
     )
   );
 
 
 program
-  .command("dispute <marketId> <amount>")
+  .command("dispute <marketId> <outcome>")
   .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
-  .action((marketId: number, amount: number, opts: { seed: string }) =>
+  .action((marketId: number, outcome: number, opts: { seed: string }) =>
     catchErrorsAndExit(
       disputeMarket,
-      Object.assign(opts, { marketId, amount })
+      Object.assign(opts, { marketId, outcome })
     )
   );
 
