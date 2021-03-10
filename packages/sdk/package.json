@@ -34,11 +34,5 @@
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   },
-  "jest": {
-    "globals": {
-       "marketId": true,
-       "poolId": false
-     }
-  },
   "gitHead": "ba141d35ca119a36d902bca285bba8305a646210"
 }
