@@ -89,8 +89,9 @@ export default class Swap {
     );
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await tx.signAndSend(
+        unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
@@ -100,12 +101,16 @@ export default class Swap {
           }
         );
       } else {
-        await tx.signAndSend(signer, (result) => {
+        unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result)
             : _callback(result, resolve);
         });
       }
+
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   };
 
@@ -133,8 +138,9 @@ export default class Swap {
     );
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await tx.signAndSend(
+        unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
@@ -144,12 +150,16 @@ export default class Swap {
           }
         );
       } else {
-        await tx.signAndSend(signer, (result) => {
+        unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result)
             : _callback(result, resolve);
         });
       }
+      
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   };
 
@@ -183,8 +193,9 @@ export default class Swap {
     );
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await tx.signAndSend(
+        unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
@@ -194,12 +205,16 @@ export default class Swap {
           }
         );
       } else {
-        await tx.signAndSend(signer, (result) => {
+        unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result)
             : _callback(result, resolve);
         });
       }
+      
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   };
 
@@ -233,8 +248,9 @@ export default class Swap {
     );
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await tx.signAndSend(
+        unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
@@ -244,12 +260,16 @@ export default class Swap {
           }
         );
       } else {
-        await tx.signAndSend(signer, (result) => {
+        unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result)
             : _callback(result, resolve);
         });
       }
+      
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   };
 }

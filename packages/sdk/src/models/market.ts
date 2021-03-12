@@ -140,8 +140,9 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -149,7 +150,7 @@ class Market {
               : _callback(result, resolve)
           );
       } else {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
           .signAndSend(signer, (result) =>
             callback
@@ -157,6 +158,10 @@ class Market {
               : _callback(result, resolve)
           );
       }
+
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   };
 
@@ -177,8 +182,9 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .buyCompleteSet(this.marketId, amount)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -186,7 +192,7 @@ class Market {
               : _callback(result, resolve)
           );
       } else {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .buyCompleteSet(this.marketId, amount)
           .signAndSend(signer, (result) =>
             callback
@@ -194,6 +200,10 @@ class Market {
               : _callback(result, resolve)
           );
       }
+      
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   }
 
@@ -214,8 +224,9 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .sellCompleteSet(this.marketId, amount)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -223,7 +234,7 @@ class Market {
               : _callback(result, resolve)
           );
       } else {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .sellCompleteSet(this.marketId, amount)
           .signAndSend(signer, (result) =>
             callback
@@ -231,6 +242,10 @@ class Market {
               : _callback(result, resolve)
           );
       }
+      
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   }
 
@@ -262,8 +277,9 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .report(this.marketId, outcome)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -271,7 +287,7 @@ class Market {
               : _callback(result, resolve)
           );
       } else {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .report(this.marketId, outcome)
           .signAndSend(signer, (result) =>
             callback
@@ -279,6 +295,10 @@ class Market {
               : _callback(result, resolve)
           );
       }
+
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   }
 
@@ -310,8 +330,9 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .dispute(this.marketId, outcome)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -319,7 +340,7 @@ class Market {
               : _callback(result, resolve)
           );
       } else {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .dispute(this.marketId, outcome)
           .signAndSend(signer, (result) =>
             callback
@@ -327,6 +348,10 @@ class Market {
               : _callback(result, resolve)
           );
       }
+      
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   }
 
@@ -346,8 +371,9 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
+      let unsub;
       if (isExtSigner(signer)) {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .redeemShares(this.marketId)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -355,7 +381,7 @@ class Market {
               : _callback(result, resolve)
           );
       } else {
-        await this.api.tx.predictionMarkets
+        unsub = await this.api.tx.predictionMarkets
           .redeemShares(this.marketId)
           .signAndSend(signer, (result) =>
             callback
@@ -363,6 +389,10 @@ class Market {
               : _callback(result, resolve)
           );
       }
+      
+      setTimeout(() => {
+        unsub();
+      }, 20000);
     });
   }
 }

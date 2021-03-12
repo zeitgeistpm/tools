@@ -1,5 +1,3 @@
-import { predictionMarkets } from "@zeitgeistpm/type-definitions";
-
 export const MockApi = {
   config: 'mock',
   status: {
