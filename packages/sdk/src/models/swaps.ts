@@ -69,17 +69,23 @@ export default class Swap {
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,
     maxAmountsIn: string[],
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
         _resolve(true);
       }
+      
+      if (_unsub)
+        _unsub();
+      else
+        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
     };
 
     const tx = this.api.tx.swaps.joinPool(
@@ -96,21 +102,17 @@ export default class Swap {
           { signer: signer.signer },
           (result) => {
             callback
-              ? callback(result)
-              : _callback(result, resolve);
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           }
         );
       } else {
         unsub = await tx.signAndSend(signer, (result) => {
           callback
-            ? callback(result)
-            : _callback(result, resolve);
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub)
         });
       }
-
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   };
 
@@ -118,17 +120,23 @@ export default class Swap {
     signer: KeyringPairOrExtSigner,
     poolAmountIn: string,
     minAmountsOut: string[],
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
         _resolve(true);
       }
+
+      if (_unsub)
+        _unsub();
+      else
+        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
     };
 
     const tx = this.api.tx.swaps.exitPool(
@@ -145,21 +153,17 @@ export default class Swap {
           { signer: signer.signer },
           (result) => {
             callback
-              ? callback(result)
-              : _callback(result, resolve);
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           }
         );
       } else {
         unsub = await tx.signAndSend(signer, (result) => {
           callback
-            ? callback(result)
-            : _callback(result, resolve);
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub)
         });
       }
-      
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   };
 
@@ -170,17 +174,23 @@ export default class Swap {
     assetOut: string,
     minAmountOut: string,
     maxPrice: string,
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
         _resolve(true);
       }
+
+      if (_unsub)
+        _unsub();
+      else
+        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
     };
 
     const tx = this.api.tx.swaps.swapExactAmountIn(
@@ -200,21 +210,17 @@ export default class Swap {
           { signer: signer.signer },
           (result) => {
             callback
-              ? callback(result)
-              : _callback(result, resolve);
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           }
         );
       } else {
         unsub = await tx.signAndSend(signer, (result) => {
           callback
-            ? callback(result)
-            : _callback(result, resolve);
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub)
         });
       }
-      
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   };
 
@@ -225,17 +231,23 @@ export default class Swap {
     assetOut: string,
     assetAmountOut: string,
     maxPrice: string,
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
         _resolve(true);
       }
+
+      if (_unsub)
+        _unsub();
+      else
+        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
     };
 
     const tx = this.api.tx.swaps.swapExactAmountOut(
@@ -255,21 +267,17 @@ export default class Swap {
           { signer: signer.signer },
           (result) => {
             callback
-              ? callback(result)
-              : _callback(result, resolve);
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           }
         );
       } else {
         unsub = await tx.signAndSend(signer, (result) => {
           callback
-            ? callback(result)
-            : _callback(result, resolve);
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub)
         });
       }
-      
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   };
 }

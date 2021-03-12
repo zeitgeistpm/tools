@@ -4,8 +4,8 @@ import {MockApi} from "./mockApi";
 let sdk;
 
 beforeAll(async () => {
-  sdk = await SDK.mock(MockApi);
-  // sdk = await SDK.initialize();
+  // sdk = await SDK.mock(MockApi);
+  sdk = await SDK.initialize();
 });
 
 afterAll(async() => {

@@ -81,7 +81,8 @@ export default class Models {
     return new Promise(async (resolve) => {
       const callback = (
         result: ISubmittableResult,
-        _resolve: (value: string | PromiseLike<string>) => void
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
       ) => {
         const { events, status } = result;
 
@@ -97,6 +98,11 @@ export default class Models {
               console.log("Extrinsic failed");
               _resolve("");
             }
+            
+            if (_unsub)
+              _unsub();
+            else
+              console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
           });
         }
       };
@@ -106,17 +112,13 @@ export default class Models {
         unsub = await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback(result, resolve)
+            callback(result, resolve, unsub)
           );
       } else {
         unsub = await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
-          .signAndSend(signer, (result) => callback(result, resolve));
+          .signAndSend(signer, (result) => callback(result, resolve, unsub));
       }
-
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   }
 

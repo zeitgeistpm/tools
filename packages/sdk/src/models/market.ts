@@ -111,7 +111,7 @@ class Market {
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
     weights: string[],
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId) {
@@ -121,6 +121,7 @@ class Market {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
+      _unsub: () => void
     ) => {
       const { events, status } = result;
       console.log("status:", status.toHuman());
@@ -135,6 +136,11 @@ class Market {
           if (method == "ExtrinsicFailed") {
             _resolve("");
           }
+
+          if (_unsub)
+            _unsub();
+          else
+            console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
         });
       }
     };
@@ -146,39 +152,41 @@ class Market {
           .deploySwapPoolForMarket(this.marketId, weights)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
           .signAndSend(signer, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       }
-
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   };
 
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void,
   ): Promise<boolean> {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
         _resolve(true);
       }
+
+      if (_unsub)
+        _unsub();
+      else
+        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
     };
 
     return new Promise(async (resolve) => {
@@ -188,39 +196,41 @@ class Market {
           .buyCompleteSet(this.marketId, amount)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         unsub = await this.api.tx.predictionMarkets
           .buyCompleteSet(this.marketId, amount)
           .signAndSend(signer, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       }
-      
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   }
 
   async sellCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
         _resolve(true);
       }
+
+      if (_unsub)
+        _unsub();
+      else
+        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
     };
 
     return new Promise(async (resolve) => {
@@ -230,22 +240,18 @@ class Market {
           .sellCompleteSet(this.marketId, amount)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         unsub = await this.api.tx.predictionMarkets
           .sellCompleteSet(this.marketId, amount)
           .signAndSend(signer, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       }
-      
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   }
 
@@ -253,11 +259,12 @@ class Market {
   async report(
     signer: KeyringPairOrExtSigner,
     outcome: number,
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: string | PromiseLike<string>) => void
+      _resolve: (value: string | PromiseLike<string>) => void,
+      _unsub: () => void
     ) => {
       const { events, status } = result;
       console.log("status:", status.toHuman());
@@ -272,6 +279,11 @@ class Market {
           if (method == "ExtrinsicFailed") {
             _resolve("");
           }
+
+          if (_unsub)
+            _unsub();
+          else
+            console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
         });
       }
     };
@@ -283,22 +295,18 @@ class Market {
           .report(this.marketId, outcome)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         unsub = await this.api.tx.predictionMarkets
           .report(this.marketId, outcome)
           .signAndSend(signer, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       }
-
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   }
 
@@ -306,11 +314,12 @@ class Market {
   async dispute(
     signer: KeyringPairOrExtSigner,
     outcome: number,
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: string | PromiseLike<string>) => void
+      _resolve: (value: string | PromiseLike<string>) => void,
+      _unsub: () => void
     ) => {
       const { events, status } = result;
       console.log("status:", status.toHuman());
@@ -325,6 +334,11 @@ class Market {
           if (method == "ExtrinsicFailed") {
             _resolve("");
           }
+
+          if (_unsub)
+            _unsub();
+          else
+            console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
         });
       }
     };
@@ -336,38 +350,40 @@ class Market {
           .dispute(this.marketId, outcome)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         unsub = await this.api.tx.predictionMarkets
           .dispute(this.marketId, outcome)
           .signAndSend(signer, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       }
-      
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   }
 
   async redeemShares(
     signer: KeyringPairOrExtSigner,
-    callback?: (result: ISubmittableResult) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void,
   ): Promise<boolean> {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
         _resolve(true);
       }
+
+      if (_unsub)
+        _unsub();
+      else
+        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
     };
 
     return new Promise(async (resolve) => {
@@ -377,22 +393,18 @@ class Market {
           .redeemShares(this.marketId)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         unsub = await this.api.tx.predictionMarkets
           .redeemShares(this.marketId)
           .signAndSend(signer, (result) =>
             callback
-              ? callback(result)
-              : _callback(result, resolve)
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       }
-      
-      setTimeout(() => {
-        unsub();
-      }, 20000);
     });
   }
 }
