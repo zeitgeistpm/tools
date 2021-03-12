@@ -19,6 +19,10 @@ export default class SDK {
     return new SDK(api);
   }
 
+  static async mock(mockedAPI) {
+    return new SDK(mockedAPI as any);
+  }
+
   constructor(api: ApiPromise) {
     this.api = api;
     this.models = new Models(this.api);

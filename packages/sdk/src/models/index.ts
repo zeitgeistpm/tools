@@ -35,7 +35,7 @@ export default class Models {
    * Warning: This could take a while to finish.
    */
   async getAllMarketIds(): Promise<number[]> {
-    const keys = await this.api.query.predictionMarkets.markets.keys();
+    const keys = this.api['config'] !== 'mock' ? (await this.api.query.predictionMarkets.markets.keys()) : (await this.api.query.predictionMarkets.marketIds.keys());
 
     return keys.map((key) => {
       const idStr = "0x" + changeEndianness(key.toString().slice(-32));
@@ -81,8 +81,7 @@ export default class Models {
     return new Promise(async (resolve) => {
       const callback = (
         result: ISubmittableResult,
-        _resolve: (value: string | PromiseLike<string>) => void,
-        _unsub: () => void
+        _resolve: (value: string | PromiseLike<string>) => void
       ) => {
         const { events, status } = result;
 
@@ -99,21 +98,19 @@ export default class Models {
               _resolve("");
             }
           });
-
-          _unsub();
         }
       };
 
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
+        await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback(result, resolve, unsub)
+            callback(result, resolve)
           );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
+        await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
-          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+          .signAndSend(signer, (result) => callback(result, resolve));
       }
     });
   }

@@ -69,17 +69,15 @@ export default class Swap {
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,
     maxAmountsIn: string[],
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void,
-      _unsub: () => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
     };
@@ -92,20 +90,20 @@ export default class Swap {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await tx.signAndSend(
+        await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
             callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub);
+              ? callback(result)
+              : _callback(result, resolve);
           }
         );
       } else {
-        const unsub = await tx.signAndSend(signer, (result) => {
+        await tx.signAndSend(signer, (result) => {
           callback
-            ? callback(result, unsub)
-            : _callback(result, resolve, unsub);
+            ? callback(result)
+            : _callback(result, resolve);
         });
       }
     });
@@ -115,17 +113,15 @@ export default class Swap {
     signer: KeyringPairOrExtSigner,
     poolAmountIn: string,
     minAmountsOut: string[],
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void,
-      _unsub: () => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
     };
@@ -138,20 +134,20 @@ export default class Swap {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await tx.signAndSend(
+        await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
             callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub);
+              ? callback(result)
+              : _callback(result, resolve);
           }
         );
       } else {
-        const unsub = await tx.signAndSend(signer, (result) => {
+        await tx.signAndSend(signer, (result) => {
           callback
-            ? callback(result, unsub)
-            : _callback(result, resolve, unsub);
+            ? callback(result)
+            : _callback(result, resolve);
         });
       }
     });
@@ -164,17 +160,15 @@ export default class Swap {
     assetOut: string,
     minAmountOut: string,
     maxPrice: string,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void,
-      _unsub: () => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
     };
@@ -190,20 +184,20 @@ export default class Swap {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await tx.signAndSend(
+        await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
             callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub);
+              ? callback(result)
+              : _callback(result, resolve);
           }
         );
       } else {
-        const unsub = await tx.signAndSend(signer, (result) => {
+        await tx.signAndSend(signer, (result) => {
           callback
-            ? callback(result, unsub)
-            : _callback(result, resolve, unsub);
+            ? callback(result)
+            : _callback(result, resolve);
         });
       }
     });
@@ -216,17 +210,15 @@ export default class Swap {
     assetOut: string,
     assetAmountOut: string,
     maxPrice: string,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void,
-      _unsub: () => void
+      _resolve: (value: boolean | PromiseLike<boolean>) => void
     ) => {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
     };
@@ -242,20 +234,20 @@ export default class Swap {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await tx.signAndSend(
+        await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
             callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub);
+              ? callback(result)
+              : _callback(result, resolve);
           }
         );
       } else {
-        const unsub = await tx.signAndSend(signer, (result) => {
+        await tx.signAndSend(signer, (result) => {
           callback
-            ? callback(result, unsub)
-            : _callback(result, resolve, unsub);
+            ? callback(result)
+            : _callback(result, resolve);
         });
       }
     });
