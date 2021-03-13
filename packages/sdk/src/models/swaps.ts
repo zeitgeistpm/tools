@@ -2,7 +2,7 @@ import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 import { KeyringPairOrExtSigner, PoolResponse } from "../types";
-import { isExtSigner } from "../util";
+import { isExtSigner, unsubOrWarns } from "../util";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
@@ -82,10 +82,7 @@ export default class Swap {
         _resolve(true);
       }
       
-      if (_unsub)
-        _unsub();
-      else
-        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.joinPool(
@@ -133,10 +130,7 @@ export default class Swap {
         _resolve(true);
       }
 
-      if (_unsub)
-        _unsub();
-      else
-        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.exitPool(
@@ -187,10 +181,7 @@ export default class Swap {
         _resolve(true);
       }
 
-      if (_unsub)
-        _unsub();
-      else
-        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.swapExactAmountIn(
@@ -244,10 +235,7 @@ export default class Swap {
         _resolve(true);
       }
 
-      if (_unsub)
-        _unsub();
-      else
-        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.swapExactAmountOut(

@@ -6,8 +6,7 @@ import {
   KeyringPairOrExtSigner,
   MarketCreation,
 } from "../types";
-import { isExtSigner } from "../util";
-
+import { isExtSigner, unsubOrWarns } from "../util";
 /**
  * The Market class initializes all the market data.
  */
@@ -137,10 +136,7 @@ class Market {
             _resolve("");
           }
 
-          if (_unsub)
-            _unsub();
-          else
-            console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+          unsubOrWarns(_unsub);
         });
       }
     };
@@ -183,10 +179,7 @@ class Market {
         _resolve(true);
       }
 
-      if (_unsub)
-        _unsub();
-      else
-        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+      unsubOrWarns(_unsub);
     };
 
     return new Promise(async (resolve) => {
@@ -227,10 +220,7 @@ class Market {
         _resolve(true);
       }
 
-      if (_unsub)
-        _unsub();
-      else
-        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+      unsubOrWarns(_unsub);
     };
 
     return new Promise(async (resolve) => {
@@ -280,10 +270,7 @@ class Market {
             _resolve("");
           }
 
-          if (_unsub)
-            _unsub();
-          else
-            console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+          unsubOrWarns(_unsub);
         });
       }
     };
@@ -335,10 +322,7 @@ class Market {
             _resolve("");
           }
 
-          if (_unsub)
-            _unsub();
-          else
-            console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+          unsubOrWarns(_unsub);
         });
       }
     };
@@ -380,10 +364,7 @@ class Market {
         _resolve(true);
       }
 
-      if (_unsub)
-        _unsub();
-      else
-        console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+      unsubOrWarns(_unsub);
     };
 
     return new Promise(async (resolve) => {

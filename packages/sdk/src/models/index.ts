@@ -3,6 +3,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber, hexToString } from "@polkadot/util";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
+import { unsubOrWarns } from "../util";
 
 import {
   MarketId,
@@ -99,10 +100,7 @@ export default class Models {
               _resolve("");
             }
             
-            if (_unsub)
-              _unsub();
-            else
-              console.warn('Failing to unsubscribe from subscriptions could lead to memory bloat');
+            unsubOrWarns(_unsub);
           });
         }
       };
