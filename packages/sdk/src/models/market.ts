@@ -6,8 +6,7 @@ import {
   KeyringPairOrExtSigner,
   MarketCreation,
 } from "../types";
-import { isExtSigner } from "../util";
-
+import { isExtSigner, unsubOrWarns } from "../util";
 /**
  * The Market class initializes all the market data.
  */
@@ -111,7 +110,7 @@ class Market {
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
     weights: string[],
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId) {
@@ -136,8 +135,9 @@ class Market {
           if (method == "ExtrinsicFailed") {
             _resolve("");
           }
+
+          unsubOrWarns(_unsub);
         });
-        _unsub();
       }
     };
 
@@ -165,7 +165,7 @@ class Market {
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void,
   ): Promise<boolean> {
     const _callback = (
       result: ISubmittableResult,
@@ -175,9 +175,10 @@ class Market {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
+
+      unsubOrWarns(_unsub);
     };
 
     return new Promise(async (resolve) => {
@@ -204,7 +205,7 @@ class Market {
   async sellCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> {
     const _callback = (
       result: ISubmittableResult,
@@ -214,9 +215,10 @@ class Market {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
+
+      unsubOrWarns(_unsub);
     };
 
     return new Promise(async (resolve) => {
@@ -244,7 +246,7 @@ class Market {
   async report(
     signer: KeyringPairOrExtSigner,
     outcome: number,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
       result: ISubmittableResult,
@@ -264,8 +266,9 @@ class Market {
           if (method == "ExtrinsicFailed") {
             _resolve("");
           }
+
+          unsubOrWarns(_unsub);
         });
-        _unsub();
       }
     };
 
@@ -294,7 +297,7 @@ class Market {
   async dispute(
     signer: KeyringPairOrExtSigner,
     outcome: number,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
       result: ISubmittableResult,
@@ -314,8 +317,9 @@ class Market {
           if (method == "ExtrinsicFailed") {
             _resolve("");
           }
+
+          unsubOrWarns(_unsub);
         });
-        _unsub();
       }
     };
 
@@ -331,6 +335,45 @@ class Market {
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .dispute(this.marketId, outcome)
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
+  }
+
+  async redeemShares(
+    signer: KeyringPairOrExtSigner,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void,
+  ): Promise<boolean> {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _resolve(true);
+      }
+
+      unsubOrWarns(_unsub);
+    };
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .redeemShares(this.marketId)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .redeemShares(this.marketId)
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)

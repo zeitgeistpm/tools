@@ -1,8 +1,8 @@
 import { initIpfs } from "./ipfs";
-import { initApi, signerFromSeed } from "./polkadot";
+import { initApi, signerFromSeed, unsubOrWarns } from "./polkadot";
 import { KeyringPairOrExtSigner, ExtSigner } from "../types";
 
-export { initApi, initIpfs, signerFromSeed };
+export { initApi, initIpfs, signerFromSeed, unsubOrWarns };
 
 export const changeEndianness = (string) => {
   const result = [];

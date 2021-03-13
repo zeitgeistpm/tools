@@ -3,6 +3,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber, hexToString } from "@polkadot/util";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
+import { unsubOrWarns } from "../util";
 
 import {
   MarketId,
@@ -35,7 +36,7 @@ export default class Models {
    * Warning: This could take a while to finish.
    */
   async getAllMarketIds(): Promise<number[]> {
-    const keys = await this.api.query.predictionMarkets.markets.keys();
+    const keys = this.api['config'] !== 'mock' ? (await this.api.query.predictionMarkets.markets.keys()) : (await this.api.query.predictionMarkets.marketIds.keys());
 
     return keys.map((key) => {
       const idStr = "0x" + changeEndianness(key.toString().slice(-32));
@@ -98,9 +99,9 @@ export default class Models {
               console.log("Extrinsic failed");
               _resolve("");
             }
+            
+            unsubOrWarns(_unsub);
           });
-
-          _unsub();
         }
       };
 

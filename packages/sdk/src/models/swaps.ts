@@ -2,7 +2,7 @@ import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 import { KeyringPairOrExtSigner, PoolResponse } from "../types";
-import { isExtSigner } from "../util";
+import { isExtSigner, unsubOrWarns } from "../util";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
@@ -69,7 +69,7 @@ export default class Swap {
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,
     maxAmountsIn: string[],
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
@@ -79,9 +79,10 @@ export default class Swap {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
+      
+      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.joinPool(
@@ -98,14 +99,14 @@ export default class Swap {
           (result) => {
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub);
+              : _callback(result, resolve, unsub)
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
-            : _callback(result, resolve, unsub);
+            : _callback(result, resolve, unsub)
         });
       }
     });
@@ -115,7 +116,7 @@ export default class Swap {
     signer: KeyringPairOrExtSigner,
     poolAmountIn: string,
     minAmountsOut: string[],
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
@@ -125,9 +126,10 @@ export default class Swap {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
+
+      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.exitPool(
@@ -144,14 +146,14 @@ export default class Swap {
           (result) => {
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub);
+              : _callback(result, resolve, unsub)
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
-            : _callback(result, resolve, unsub);
+            : _callback(result, resolve, unsub)
         });
       }
     });
@@ -164,7 +166,7 @@ export default class Swap {
     assetOut: string,
     minAmountOut: string,
     maxPrice: string,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
@@ -174,9 +176,10 @@ export default class Swap {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
+
+      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.swapExactAmountIn(
@@ -196,14 +199,14 @@ export default class Swap {
           (result) => {
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub);
+              : _callback(result, resolve, unsub)
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
-            : _callback(result, resolve, unsub);
+            : _callback(result, resolve, unsub)
         });
       }
     });
@@ -216,7 +219,7 @@ export default class Swap {
     assetOut: string,
     assetAmountOut: string,
     maxPrice: string,
-    callback?: (result: ISubmittableResult, unsub: () => void) => void
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
@@ -226,9 +229,10 @@ export default class Swap {
       const { status } = result;
 
       if (status.isInBlock) {
-        _unsub();
         _resolve(true);
       }
+
+      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.swapExactAmountOut(
@@ -248,14 +252,14 @@ export default class Swap {
           (result) => {
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub);
+              : _callback(result, resolve, unsub)
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
-            : _callback(result, resolve, unsub);
+            : _callback(result, resolve, unsub)
         });
       }
     });

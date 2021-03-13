@@ -16,6 +16,7 @@ import getShareBalance from "./actions/getShareBalance";
 import getSpotPrice from "./actions/getSpotPrice";
 import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 import transfer from "./actions/transfer";
+import redeemShares from "./actions/redeemShares";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -140,6 +141,20 @@ program
     catchErrorsAndExit(
       disputeMarket,
       Object.assign(opts, { marketId, outcome })
+    )
+  );
+
+program
+  .command("redeem <marketId>")
+  .option(
+    "--seed <string>",
+    "The signer's seed. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .action((marketId: number, opts: { seed: string }) =>
+    catchErrorsAndExit(
+      redeemShares,
+      Object.assign(opts, { marketId })
     )
   );
 

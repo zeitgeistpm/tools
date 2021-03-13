@@ -1,6 +1,7 @@
 import SDK, { util } from "../src/index";
 import { Market } from "../src/models";
 import Swap from "../src/models/swaps";
+import {MockApi} from "./mockApi";
 
 let sdk, signer, market, marketId, pool, poolId;
 
@@ -10,7 +11,8 @@ function sleep(ms) {
 
 beforeAll(async () => {
   await sleep(5000);
-  sdk = await SDK.initialize();
+  sdk = await SDK.mock(MockApi);
+  // sdk = await SDK.initialize();
   signer = util.signerFromSeed('clean useful exotic shoe day rural hotel pitch manual happy inherit concert');
   marketId = await sdk.models.createNewMarket(signer, 'test', 'new market for test', '5FzstFvrLWWjEbmPuibFHnvJ1UC9zYaRSQXLjdHPhTNxoiQn', Number(new Date().getTime() + 10000));
   market = await sdk.models.fetchMarketData(parseInt(marketId));
