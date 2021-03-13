@@ -92,9 +92,8 @@ export default class Swap {
     );
 
     return new Promise(async (resolve) => {
-      let unsub;
       if (isExtSigner(signer)) {
-        unsub = await tx.signAndSend(
+        const unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
@@ -104,7 +103,7 @@ export default class Swap {
           }
         );
       } else {
-        unsub = await tx.signAndSend(signer, (result) => {
+        const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
             : _callback(result, resolve, unsub)
@@ -140,9 +139,8 @@ export default class Swap {
     );
 
     return new Promise(async (resolve) => {
-      let unsub;
       if (isExtSigner(signer)) {
-        unsub = await tx.signAndSend(
+        const unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
@@ -152,7 +150,7 @@ export default class Swap {
           }
         );
       } else {
-        unsub = await tx.signAndSend(signer, (result) => {
+        const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
             : _callback(result, resolve, unsub)
@@ -194,9 +192,8 @@ export default class Swap {
     );
 
     return new Promise(async (resolve) => {
-      let unsub;
       if (isExtSigner(signer)) {
-        unsub = await tx.signAndSend(
+        const unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
@@ -206,7 +203,7 @@ export default class Swap {
           }
         );
       } else {
-        unsub = await tx.signAndSend(signer, (result) => {
+        const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
             : _callback(result, resolve, unsub)
@@ -248,9 +245,8 @@ export default class Swap {
     );
 
     return new Promise(async (resolve) => {
-      let unsub;
       if (isExtSigner(signer)) {
-        unsub = await tx.signAndSend(
+        const unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
           (result) => {
@@ -260,7 +256,7 @@ export default class Swap {
           }
         );
       } else {
-        unsub = await tx.signAndSend(signer, (result) => {
+        const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
             : _callback(result, resolve, unsub)

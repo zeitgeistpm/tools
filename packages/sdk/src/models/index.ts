@@ -105,15 +105,14 @@ export default class Models {
         }
       };
 
-      let unsub;
       if (isExtSigner(signer)) {
-        unsub = await this.api.tx.predictionMarkets
+        const unsub = await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback(result, resolve, unsub)
           );
       } else {
-        unsub = await this.api.tx.predictionMarkets
+        const unsub = await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
           .signAndSend(signer, (result) => callback(result, resolve, unsub));
       }

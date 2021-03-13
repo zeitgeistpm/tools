@@ -40,27 +40,42 @@ export const MockApi = {
     predictionMarkets: {
       report: (marketId, outcome) => ({
         signAndSend: (param1, callback : (param) => void) => {
-          callback(MockApi.cb("MarketReported"));
+          setTimeout(() => {
+            callback(MockApi.cb("MarketReported"));
+          }, 500);
+          return () => {};
         }
       }),
       dispute: (marketId, outcome) => ({
         signAndSend: (param1, callback : (param) => void) => {
-          callback(MockApi.cb("MarketDisputed"));
+          setTimeout(() => {
+            callback(MockApi.cb("MarketDisputed"));
+          }, 500);
+          return () => {};
         }
       }),
       deploySwapPoolForMarket: (marketId, weights) => ({
         signAndSend: (param1, callback : (param) => void) => {
-          callback(MockApi.cb("PoolCreated"))
+          setTimeout(() => {
+            callback(MockApi.cb("PoolCreated"))
+          }, 500);
+          return () => {};
         }
       }),
       buyCompleteSet: (marketId, amount) => ({
         signAndSend: (param1, callback : (param) => void) => {
-          callback(MockApi.cb(""))
+          setTimeout(() => {
+            callback(MockApi.cb(""))
+          }, 500);
+          return () => {};
         }
       }),
       create: (param1, param2, param3, param4, param5) => ({
         signAndSend: (param1, callback : (param) => void) => {
-          callback(MockApi.cb("MarketCreated"));
+          setTimeout(() => {
+            callback(MockApi.cb("MarketCreated"));
+          }, 500);
+          return () => {};
         }
       })
     }
