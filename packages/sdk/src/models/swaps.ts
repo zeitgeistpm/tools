@@ -40,12 +40,17 @@ export default class Swap {
     return JSON.stringify(swap, null, 2);
   }
 
-  public async getSpotPrice(inAsset: string, outAsset: string): Promise<any> {
+  public async getSpotPrice(
+    inAsset: string,
+    outAsset: string,
+    blockHash = null
+  ): Promise<any> {
     //@ts-ignore
     const res = await this.api.rpc.swaps.getSpotPrice(
       this.poolId,
       inAsset,
-      outAsset
+      outAsset,
+      blockHash
     );
 
     return res;
@@ -81,7 +86,7 @@ export default class Swap {
       if (status.isInBlock) {
         _resolve(true);
       }
-      
+
       unsubOrWarns(_unsub);
     };
 
@@ -99,14 +104,14 @@ export default class Swap {
           (result) => {
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
+              : _callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
-            : _callback(result, resolve, unsub)
+            : _callback(result, resolve, unsub);
         });
       }
     });
@@ -146,14 +151,14 @@ export default class Swap {
           (result) => {
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
+              : _callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
-            : _callback(result, resolve, unsub)
+            : _callback(result, resolve, unsub);
         });
       }
     });
@@ -199,14 +204,14 @@ export default class Swap {
           (result) => {
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
+              : _callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
-            : _callback(result, resolve, unsub)
+            : _callback(result, resolve, unsub);
         });
       }
     });
@@ -252,14 +257,14 @@ export default class Swap {
           (result) => {
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
+              : _callback(result, resolve, unsub);
           }
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
           callback
             ? callback(result, unsub)
-            : _callback(result, resolve, unsub)
+            : _callback(result, resolve, unsub);
         });
       }
     });

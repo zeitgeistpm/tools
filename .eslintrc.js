@@ -14,8 +14,12 @@ module.exports = {
   },
   rules: {
     "@typescript-eslint/ban-ts-comment": "off",
+    curly: 2,
+    "prettier/prettier": [
+      "error",
+      {
+        endOfLine: "auto",
+      },
+    ],
   },
-  "prettier/prettier": ["error", {
-   "endOfLine":"auto"
-  }],
 };

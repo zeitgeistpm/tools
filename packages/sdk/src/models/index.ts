@@ -36,7 +36,10 @@ export default class Models {
    * Warning: This could take a while to finish.
    */
   async getAllMarketIds(): Promise<number[]> {
-    const keys = this.api['config'] !== 'mock' ? (await this.api.query.predictionMarkets.markets.keys()) : (await this.api.query.predictionMarkets.marketIds.keys());
+    const keys =
+      this.api["config"] !== "mock"
+        ? await this.api.query.predictionMarkets.markets.keys()
+        : await this.api.query.predictionMarkets.marketIds.keys();
 
     return keys.map((key) => {
       const idStr = "0x" + changeEndianness(key.toString().slice(-32));
@@ -71,7 +74,8 @@ export default class Models {
     description: string,
     oracle: string,
     end: number,
-    creationType = "Permissionless"
+    creationType = "Permissionless",
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = initIpfs();
 
@@ -80,7 +84,7 @@ export default class Models {
     });
 
     return new Promise(async (resolve) => {
-      const callback = (
+      const _callback = (
         result: ISubmittableResult,
         _resolve: (value: string | PromiseLike<string>) => void,
         _unsub: () => void
@@ -99,7 +103,7 @@ export default class Models {
               console.log("Extrinsic failed");
               _resolve("");
             }
-            
+
             unsubOrWarns(_unsub);
           });
         }
@@ -109,12 +113,18 @@ export default class Models {
         const unsub = await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback(result, resolve, unsub)
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
-          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
       }
     });
   }
@@ -197,5 +207,15 @@ export default class Models {
     ).toJSON() as PoolResponse;
 
     return new Swap(poolId, poolResponse, this.api);
+  }
+
+  async getAssetsPrices(blockNumber: any): Promise<any> {
+    const markets = await this.getAllMarkets();
+    let priceData = {};
+    for (const market of markets) {
+      const assetPrices = await market.getAssetsPrices(blockNumber);
+      priceData = { ...priceData, ...assetPrices };
+    }
+    return priceData;
   }
 }
