@@ -207,25 +207,12 @@ export default class Models {
   }
 
   async getAssetsPrices(blockNumber: any): Promise<any> {
-    const blockHash = await this.api.rpc.chain.getBlockHash(blockNumber);
     const markets = await this.getAllMarkets();
-    var assetPrices = {};
+    let priceData = {};
     for (const market of markets) {
-      const poolId = await market.getPoolId();
-      if (poolId != null) {
-        const pool = await this.fetchPoolData(poolId);
-        const outAsset = "0x" + "00".repeat(32);
-        for (const inAsset of pool.assets) {
-          if (inAsset != outAsset) {
-            try {
-              const price = await pool.getSpotPrice(inAsset, outAsset, blockHash);
-              assetPrices[inAsset] = price.amount.toString()
-            } catch (error) {}
-          }
-        }
-      }
+      const assetPrices = await market.getAssetsPrices(blockNumber);
+      priceData = {...priceData, ...assetPrices};
     }
-    
-    return assetPrices;
+    return priceData;
   }
 }

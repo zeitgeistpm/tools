@@ -1,10 +1,12 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
+import Swap from "./swaps";
 import {
   ExtendedMarketResponse,
   KeyringPairOrExtSigner,
   MarketCreation,
+  PoolResponse,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 /**
@@ -107,6 +109,18 @@ class Market {
     ).toHuman() as number;
   };
 
+  getPool = async (): Promise<Swap> => {
+    const poolId = await this.getPoolId();
+    if (poolId == null)
+      return null;
+
+    const poolResponse = (
+      await this.api.query.swaps.pools(poolId)
+    ).toJSON() as PoolResponse;
+
+    return new Swap(poolId, poolResponse, this.api);
+  }
+
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
     weights: string[],
@@ -161,6 +175,25 @@ class Market {
       }
     });
   };
+
+  async getAssetsPrices(blockNumber: any): Promise<any> {
+    let assetPrices = {};
+    const blockHash = await this.api.rpc.chain.getBlockHash(blockNumber);
+    const pool = await this.getPool();
+
+    if (pool != null) {
+      const outAsset = "0x" + "00".repeat(32);
+      for (const inAsset of pool.assets) {
+        if (inAsset != outAsset) {
+          try {
+            const price = await pool.getSpotPrice(inAsset, outAsset, blockHash);
+            assetPrices[inAsset] = price.amount.toString()
+          } catch (error) {}
+        }
+      }
+    }
+    return assetPrices;
+  }
 
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
