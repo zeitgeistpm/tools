@@ -36,7 +36,10 @@ export default class Models {
    * Warning: This could take a while to finish.
    */
   async getAllMarketIds(): Promise<number[]> {
-    const keys = this.api['config'] !== 'mock' ? (await this.api.query.predictionMarkets.markets.keys()) : (await this.api.query.predictionMarkets.marketIds.keys());
+    const keys =
+      this.api["config"] !== "mock"
+        ? await this.api.query.predictionMarkets.markets.keys()
+        : await this.api.query.predictionMarkets.marketIds.keys();
 
     return keys.map((key) => {
       const idStr = "0x" + changeEndianness(key.toString().slice(-32));
@@ -100,7 +103,7 @@ export default class Models {
               console.log("Extrinsic failed");
               _resolve("");
             }
-            
+
             unsubOrWarns(_unsub);
           });
         }
@@ -211,7 +214,7 @@ export default class Models {
     let priceData = {};
     for (const market of markets) {
       const assetPrices = await market.getAssetsPrices(blockNumber);
-      priceData = {...priceData, ...assetPrices};
+      priceData = { ...priceData, ...assetPrices };
     }
     return priceData;
   }

@@ -8,6 +8,7 @@ import {
   MarketCreation,
   PoolResponse,
 } from "../types";
+import { NativeShareId } from "../consts";
 import { isExtSigner, unsubOrWarns } from "../util";
 /**
  * The Market class initializes all the market data.
@@ -111,15 +112,20 @@ class Market {
 
   getPool = async (): Promise<Swap> => {
     const poolId = await this.getPoolId();
-    if (poolId == null)
+    if (poolId == null) {
       return null;
+    }
+
+    if (poolId == null) {
+      return null;
+    }
 
     const poolResponse = (
       await this.api.query.swaps.pools(poolId)
     ).toJSON() as PoolResponse;
 
     return new Swap(poolId, poolResponse, this.api);
-  }
+  };
 
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
@@ -177,17 +183,17 @@ class Market {
   };
 
   async getAssetsPrices(blockNumber: any): Promise<any> {
-    let assetPrices = {};
+    const assetPrices = {};
     const blockHash = await this.api.rpc.chain.getBlockHash(blockNumber);
     const pool = await this.getPool();
 
     if (pool != null) {
-      const outAsset = "0x" + "00".repeat(32);
+      const outAsset = NativeShareId;
       for (const inAsset of pool.assets) {
         if (inAsset != outAsset) {
           try {
             const price = await pool.getSpotPrice(inAsset, outAsset, blockHash);
-            assetPrices[inAsset] = price.amount.toString()
+            assetPrices[inAsset] = price.amount.toString();
           } catch (error) {}
         }
       }
@@ -198,7 +204,7 @@ class Market {
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> {
     const _callback = (
       result: ISubmittableResult,
@@ -275,7 +281,6 @@ class Market {
     });
   }
 
-
   async report(
     signer: KeyringPairOrExtSigner,
     outcome: number,
@@ -326,7 +331,6 @@ class Market {
     });
   }
 
-  
   async dispute(
     signer: KeyringPairOrExtSigner,
     outcome: number,
@@ -379,7 +383,7 @@ class Market {
 
   async redeemShares(
     signer: KeyringPairOrExtSigner,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> {
     const _callback = (
       result: ISubmittableResult,
