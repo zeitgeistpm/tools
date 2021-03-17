@@ -71,7 +71,8 @@ export default class Models {
     description: string,
     oracle: string,
     end: number,
-    creationType = "Permissionless"
+    creationType = "Permissionless",
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = initIpfs();
 
@@ -80,7 +81,7 @@ export default class Models {
     });
 
     return new Promise(async (resolve) => {
-      const callback = (
+      const _callback = (
         result: ISubmittableResult,
         _resolve: (value: string | PromiseLike<string>) => void,
         _unsub: () => void
@@ -109,12 +110,18 @@ export default class Models {
         const unsub = await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
-            callback(result, resolve, unsub)
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
           .create(oracle, "Binary", end, cid.toString(), creationType)
-          .signAndSend(signer, (result) => callback(result, resolve, unsub));
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
       }
     });
   }
@@ -197,5 +204,28 @@ export default class Models {
     ).toJSON() as PoolResponse;
 
     return new Swap(poolId, poolResponse, this.api);
+  }
+
+  async getAssetsPrices(blockNumber: any): Promise<any> {
+    const blockHash = await this.api.rpc.chain.getBlockHash(blockNumber);
+    const markets = await this.getAllMarkets();
+    var assetPrices = {};
+    for (const market of markets) {
+      const poolId = await market.getPoolId();
+      if (poolId != null) {
+        const pool = await this.fetchPoolData(poolId);
+        const outAsset = "0x" + "00".repeat(32);
+        for (const inAsset of pool.assets) {
+          if (inAsset != outAsset) {
+            try {
+              const price = await pool.getSpotPrice(inAsset, outAsset, blockHash);
+              assetPrices[inAsset] = price.amount.toString()
+            } catch (error) {}
+          }
+        }
+      }
+    }
+    
+    return assetPrices;
   }
 }
