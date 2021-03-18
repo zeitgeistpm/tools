@@ -104,6 +104,17 @@ class Market {
     return JSON.stringify(market, null, 2);
   }
 
+  async getEndTimestamp(): Promise<number> {
+    if (`${this.end}`.length >= 13) {
+      return this.end;
+    }
+    const now = (await this.api.query.timestamp.now()).toNumber();
+    const head = await this.api.rpc.chain.getHeader();
+    const blockNum = head.number.toNumber();
+    const diffInMs = 6000 * (this.end - blockNum);
+    return now + diffInMs;
+  }
+
   getPoolId = async (): Promise<number | null> => {
     return (
       await this.api.query.predictionMarkets.marketToSwapPool(this.marketId)
