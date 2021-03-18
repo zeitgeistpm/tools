@@ -19,7 +19,7 @@ export default class SDK {
     return new SDK(api);
   }
 
-  static async mock(mockedAPI) {
+  static mock(mockedAPI): SDK {
     return new SDK(mockedAPI as any);
   }
 

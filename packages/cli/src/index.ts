@@ -2,8 +2,8 @@ import program from "commander";
 
 import buyCompleteSet from "./actions/buyCompleteSet";
 import createMarket from "./actions/createMarket";
-import disputeMarket from './actions/disputeMarket';
-import reportMarket from './actions/reportMarket';
+import disputeMarket from "./actions/disputeMarket";
+import reportMarket from "./actions/reportMarket";
 import deployPool from "./actions/deployPool";
 import joinPool from "./actions/joinPool";
 import exitPool from "./actions/exitPool";
@@ -124,12 +124,8 @@ program
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action((marketId: number, outcome: number, opts: { seed: string }) =>
-    catchErrorsAndExit(
-      reportMarket,
-      Object.assign(opts, { marketId, outcome })
-    )
+    catchErrorsAndExit(reportMarket, Object.assign(opts, { marketId, outcome }))
   );
-
 
 program
   .command("dispute <marketId> <outcome>")
@@ -153,10 +149,7 @@ program
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action((marketId: number, opts: { seed: string }) =>
-    catchErrorsAndExit(
-      redeemShares,
-      Object.assign(opts, { marketId })
-    )
+    catchErrorsAndExit(redeemShares, Object.assign(opts, { marketId }))
   );
 
 program
@@ -356,7 +349,6 @@ program
   .action((blockNumber: string, opts: { endpoint: string }) =>
     catchErrorsAndExit(getAssetsPrices, Object.assign(opts, { blockNumber }))
   );
-
 
 program
   .command("transfer <marketId> <sharesIndex> <to> <amount>")
