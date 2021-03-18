@@ -2,7 +2,7 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import Keyring from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 
-import * as zeitgeistDefinitions from "@zeitgeistpm/type-definitions";
+import * as zeitgeistDefinitions from "@zeitgeistpm/type-defs";
 
 const typesFromDefs = (
   definitions: Record<string, { types: Record<string, any> }>
