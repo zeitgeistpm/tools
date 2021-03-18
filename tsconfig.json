@@ -5,6 +5,9 @@
         },
         {
             "path": "./packages/cli"
+        },
+        {
+            "path": "./packages/type-defs"
         }
     ],
     "files": [],

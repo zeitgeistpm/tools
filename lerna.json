@@ -1,7 +1,8 @@
 {
   "packages": [
     "packages/cli",
-    "packages/sdk"
+    "packages/sdk",
+    "packages/type-defs"
   ],
   "version": "0.1.28",
   "npmClient": "yarn",
