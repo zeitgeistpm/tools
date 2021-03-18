@@ -1,0 +1,15 @@
+{
+  "name": "@zeitgeistpm/type-defs",
+  "version": "0.1.0",
+  "description": "Zeitgeist's type definitions for polkadot-js",
+  "main": "./dist/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "rebuild": "rm -rf dist; yarn dist",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "author": "",
+  "license": "ISC"
+}
