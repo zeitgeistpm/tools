@@ -34,7 +34,7 @@ export default {
     },
     MarketId: "u128",
     MarketType: {
-      _enum: ["Binary", "Categorical", "Scalar"],
+      _enum: ["Categorical", "Scalar"],
     },
     MarketStatus: {
       _enum: [
@@ -52,7 +52,7 @@ export default {
       creation: "MarketCreation",
       creator_fee: "u8",
       oracle: "AccountId",
-      end: "u64",
+      end: "MarketEnd",
       metadata: "Vec<u8>",
       market_type: "MarketType",
       market_status: "MarketStatus",
