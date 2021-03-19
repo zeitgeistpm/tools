@@ -47,6 +47,12 @@ export enum MarketCreation {
   Advised = "Advised",
 }
 
+export type MarketDispute = {
+  at: number;
+  by: string;
+  outcome: number;
+}
+
 export type PoolResponse = {
   assets: string[];
   swap_fee: number;
