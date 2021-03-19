@@ -7,45 +7,42 @@ export type MarketId = number;
 // The market type as returned by the API call to `predictionMarkets.markets`.
 export type MarketResponse = {
   creator: string;
-  creation: string;
+  creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  end: number;
+  end: MarketEnd;
   metadata: string;
   market_type: string;
   market_status: string;
   reported_outcome: number | null;
   reporter: string | null;
-  categories: string[] | null;
+  categories: number | null;
 };
 
 // The extended market data from which a market may be created.
 export type ExtendedMarketResponse = {
   creator: string;
-  creation: string;
+  creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  end: number;
+  end: MarketEnd;
   metadata: string;
   market_type: string;
   market_status: string;
   reported_outcome: number | null;
   reporter: string | null;
-  categories: string[] | null;
+  categories: number | null;
   // new ones
   marketId: number;
   title: string;
   description: string;
   metadataString: string;
-  invalidShareId: string;
-  yesShareId: string;
-  noShareId: string;
+  shareIds: string[];
 };
 
-export enum MarketCreation {
-  Permissioned = "Permissioned",
-  Advised = "Advised",
-}
+export type MarketEnd = { Block: number } | { Timestamp: number };
+
+export type MarketCreation = "Permissioned" | "Advised";
 
 export type PoolResponse = {
   assets: string[];

@@ -111,7 +111,13 @@ export default class Models {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .create(oracle, "Binary", end, cid.toString(), creationType)
+          .createCategoricalMarket(
+            oracle,
+            { Block: 100000 },
+            cid.toString(),
+            creationType,
+            2
+          )
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -119,7 +125,13 @@ export default class Models {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .create(oracle, "Binary", end, cid.toString(), creationType)
+          .createCategoricalMarket(
+            oracle,
+            { Block: 100000 },
+            cid.toString(),
+            creationType,
+            2
+          )
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)
@@ -171,31 +183,21 @@ export default class Models {
       data = extract(raw);
     }
 
-    //@ts-ignore
-    const invalidShareId = await this.api.rpc.predictionMarkets.marketOutcomeShareId(
-      marketId,
-      0
-    );
-
-    //@ts-ignore
-    const yesShareId = await this.api.rpc.predictionMarkets.marketOutcomeShareId(
-      marketId,
-      1
-    );
-
-    //@ts-ignore
-    const noShareId = await this.api.rpc.predictionMarkets.marketOutcomeShareId(
-      marketId,
-      2
+    const shareIds = await Promise.all(
+      [...Array(market.categories).keys()].map((id: number) => {
+        //@ts-ignore
+        return this.api.rpc.predictionMarkets.marketOutcomeShareId(
+          marketId,
+          id
+        );
+      })
     );
 
     Object.assign(market, {
       ...data,
       marketId,
       metadataString,
-      invalidShareId: invalidShareId.toString(),
-      yesShareId: yesShareId.toString(),
-      noShareId: noShareId.toString(),
+      shareIds: shareIds.map((id) => id.toString()),
     });
 
     return new Market(market as ExtendedMarketResponse, this.api);

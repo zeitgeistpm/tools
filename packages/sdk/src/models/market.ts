@@ -6,6 +6,7 @@ import {
   ExtendedMarketResponse,
   KeyringPairOrExtSigner,
   MarketCreation,
+  MarketEnd,
   PoolResponse,
 } from "../types";
 import { NativeShareId } from "../consts";
@@ -25,7 +26,7 @@ class Market {
   /** The oracle that is designated to report on the market. */
   public oracle: string;
   /** The end block or timestamp for this market. */
-  public end: number;
+  public end: MarketEnd;
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
@@ -37,19 +38,15 @@ class Market {
   /** The reporter of the market. Null if the market was not reported yet. */
   public reporter: string | null;
   /** The categories of a categorical market. Null if not a categorical market. */
-  public categories: string[] | null;
+  public categories: number | null;
   /** The title of the market. */
   public title: string;
   /** The description of the market. */
   public description: string;
   /** The metadata string. */
   public metadataString: string;
-  /** The `Invalid` share hash id. */
-  public invalidShareId: string;
-  /** The `Yes` share hash id.  */
-  public yesShareId: string;
-  /** The `No` share hash id. */
-  public noShareId: string;
+  /** The share identifiers */
+  public shareIds: string[];
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
@@ -71,9 +68,7 @@ class Market {
       title,
       description,
       metadataString,
-      invalidShareId,
-      yesShareId,
-      noShareId,
+      shareIds,
     } = market;
 
     this.creator = creator;
@@ -91,9 +86,7 @@ class Market {
     this.title = title;
     this.description = description;
     this.metadataString = metadataString;
-    this.invalidShareId = invalidShareId;
-    this.yesShareId = yesShareId;
-    this.noShareId = noShareId;
+    this.shareIds = shareIds;
 
     this.api = api;
   }
@@ -105,13 +98,14 @@ class Market {
   }
 
   async getEndTimestamp(): Promise<number> {
-    if (`${this.end}`.length >= 13) {
-      return this.end;
+    if ("Timestamp" in this.end) {
+      return this.end.Timestamp;
     }
+
     const now = (await this.api.query.timestamp.now()).toNumber();
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
-    const diffInMs = 6000 * (this.end - blockNum);
+    const diffInMs = 6000 * (this.end.Block - blockNum);
     return now + diffInMs;
   }
 

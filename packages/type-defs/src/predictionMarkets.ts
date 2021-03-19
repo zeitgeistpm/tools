@@ -27,8 +27,8 @@ export default {
       _enum: ["Permissionless", "Advised"],
     },
     MarketEnd: {
-      enum: {
-        Block: "u164",
+      _enum: {
+        Block: "u64",
         Timestamp: "u64",
       },
     },
