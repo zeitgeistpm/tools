@@ -6,6 +6,7 @@ import { concat, toString } from "uint8arrays";
 import { unsubOrWarns } from "../util";
 
 import {
+  MarketEnd,
   MarketId,
   MarketResponse,
   ExtendedMarketResponse,
@@ -73,14 +74,19 @@ export default class Models {
     title: string,
     description: string,
     oracle: string,
-    end: number,
+    end: MarketEnd,
     creationType = "Permissionless",
+    categories = ["Yes", "No"],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = initIpfs();
 
     const { cid } = await ipfs.add({
-      content: `title:${title}::info:${description}`,
+      content: JSON.stringify({
+        title,
+        description,
+        categories,
+      }),
     });
 
     return new Promise(async (resolve) => {
@@ -111,13 +117,7 @@ export default class Models {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(
-            oracle,
-            { Block: 100000 },
-            cid.toString(),
-            creationType,
-            2
-          )
+          .createCategoricalMarket(oracle, end, cid.toString(), creationType, 2)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -125,13 +125,7 @@ export default class Models {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(
-            oracle,
-            { Block: 100000 },
-            cid.toString(),
-            creationType,
-            2
-          )
+          .createCategoricalMarket(oracle, end, cid.toString(), creationType, 2)
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)
@@ -163,24 +157,36 @@ export default class Models {
     let data = {
       description: "No metadata",
       title: "No metadata",
+      categories: ["No metadata"],
     };
 
     // Metadata exists, so parse it.
     if (hexToString(metadata)) {
       const raw = toString(concat(await all(ipfs.cat(metadataString))));
 
-      const extract = (data: string) => {
-        const titlePattern = "title:";
-        const infoPattern = "::info:";
-        return {
-          description: data.slice(
-            data.indexOf(infoPattern) + infoPattern.length
-          ),
-          title: data.slice(titlePattern.length, data.indexOf(infoPattern)),
+      try {
+        // new version
+        const parsed = JSON.parse(raw) as {
+          title: string;
+          description: string;
+          categories: string[];
         };
-      };
+        data = parsed;
+      } catch {
+        const extract = (data: string) => {
+          const titlePattern = "title:";
+          const infoPattern = "::info:";
+          return {
+            description: data.slice(
+              data.indexOf(infoPattern) + infoPattern.length
+            ),
+            title: data.slice(titlePattern.length, data.indexOf(infoPattern)),
+            categories: ["Invalid", "Yes", "No"],
+          };
+        };
 
-      data = extract(raw);
+        data = extract(raw);
+      }
     }
 
     const shareIds = await Promise.all(
