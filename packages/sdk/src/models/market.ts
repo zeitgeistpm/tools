@@ -7,6 +7,7 @@ import {
   KeyringPairOrExtSigner,
   MarketCreation,
   MarketEnd,
+  MarketDispute,
   PoolResponse,
 } from "../types";
 import { NativeShareId } from "../consts";
@@ -131,6 +132,12 @@ class Market {
 
     return new Swap(poolId, poolResponse, this.api);
   };
+
+  getDisputes = async (): Promise<MarketDispute[]> => {
+    return (
+      await this.api.query.predictionMarkets.disputes(this.marketId)
+    ).toJSON() as MarketDispute[];
+  }
 
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
