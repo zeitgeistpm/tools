@@ -31,7 +31,7 @@ const catchErrorsAndExit = async (fn: any, opts: any) => {
 };
 
 program
-  .command("createMarket <title> <description> <oracle> <end>")
+  .command("createMarket <title> <description> <oracle> <end> <categories>")
   .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
@@ -48,11 +48,12 @@ program
       description: string,
       oracle: string,
       end: string,
+      categories: string,
       opts: { endpoint: string; seed: string }
     ) =>
       catchErrorsAndExit(
         createMarket,
-        Object.assign(opts, { title, description, oracle, end })
+        Object.assign(opts, { title, description, oracle, end, categories })
       )
   );
 

@@ -6,11 +6,12 @@ type Options = {
   description: string;
   oracle: string;
   end: string;
+  categories: string;
   seed: string;
 };
 
 const createMarket = async (opts: Options): Promise<void> => {
-  const { endpoint, title, description, oracle, end, seed } = opts;
+  const { endpoint, title, description, oracle, end, categories, seed } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
@@ -22,7 +23,8 @@ const createMarket = async (opts: Options): Promise<void> => {
     title,
     description,
     oracle,
-    Number(end)
+    Number(end),
+    Number(categories)
   );
 
   console.log(`Market created! Market Id: ${marketId}`);
