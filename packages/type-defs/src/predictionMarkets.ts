@@ -58,6 +58,7 @@ export default {
       market_status: "MarketStatus",
       report: "Option<Report>",
       categories: "Option<u16>",
+      resolved_outcome: "Option<u16>",
     },
     Report: {
       at: "BlockNumber",

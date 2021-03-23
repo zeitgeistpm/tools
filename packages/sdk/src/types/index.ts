@@ -16,6 +16,7 @@ export type MarketResponse = {
   market_status: string;
   report: Report | null;
   categories: number | null;
+  resolved_outcome: number | null;
 };
 
 // The extended market data from which a market may be created.
@@ -30,6 +31,7 @@ export type ExtendedMarketResponse = {
   market_status: string;
   report: Report | null;
   categories: number | null;
+  resolved_outcome: number | null;
   // new ones
   marketId: number;
   title: string;
@@ -52,7 +54,7 @@ export type MarketDispute = {
   at: number;
   by: string;
   outcome: number;
-}
+};
 
 export type PoolResponse = {
   assets: string[];

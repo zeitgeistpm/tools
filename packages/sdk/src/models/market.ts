@@ -39,6 +39,8 @@ class Market {
   public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
   public categories: number | null;
+  /** The resolved outcome for the market. */
+  public resolvedOutcome: number | null;
   /** The title of the market. */
   public title: string;
   /** The description of the market. */
@@ -63,6 +65,7 @@ class Market {
       market_status,
       report,
       categories,
+      resolved_outcome,
       marketId,
       title,
       description,
@@ -80,6 +83,7 @@ class Market {
     this.marketStatus = market_status;
     this.report = report;
     this.categories = categories;
+    this.resolvedOutcome = resolved_outcome;
     this.marketId = marketId;
     this.title = title;
     this.description = description;
@@ -134,7 +138,7 @@ class Market {
     return (
       await this.api.query.predictionMarkets.disputes(this.marketId)
     ).toJSON() as MarketDispute[];
-  }
+  };
 
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
