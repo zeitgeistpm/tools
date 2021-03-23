@@ -48,6 +48,12 @@ export type MarketEnd = { Block: number } | { Timestamp: number };
 
 export type MarketCreation = "Permissioned" | "Advised";
 
+export type MarketDispute = {
+  at: number;
+  by: string;
+  outcome: number;
+}
+
 export type PoolResponse = {
   assets: string[];
   swap_fee: number;
