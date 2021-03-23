@@ -7,6 +7,7 @@ import {
   KeyringPairOrExtSigner,
   MarketCreation,
   MarketEnd,
+  Report,
   PoolResponse,
 } from "../types";
 import { NativeShareId } from "../consts";
@@ -34,9 +35,7 @@ class Market {
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
-  public reportedOutcome: number | null;
-  /** The reporter of the market. Null if the market was not reported yet. */
-  public reporter: string | null;
+  public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
   public categories: number | null;
   /** The title of the market. */
@@ -61,8 +60,7 @@ class Market {
       metadata,
       market_type,
       market_status,
-      reported_outcome,
-      reporter,
+      report,
       categories,
       marketId,
       title,
@@ -79,8 +77,7 @@ class Market {
     this.metadata = metadata;
     this.marketType = market_type;
     this.marketStatus = market_status;
-    this.reportedOutcome = reported_outcome;
-    this.reporter = reporter;
+    this.report = report;
     this.categories = categories;
     this.marketId = marketId;
     this.title = title;
@@ -286,7 +283,7 @@ class Market {
     });
   }
 
-  async report(
+  async reportOutcome(
     signer: KeyringPairOrExtSigner,
     outcome: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void

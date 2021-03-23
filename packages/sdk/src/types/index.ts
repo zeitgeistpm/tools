@@ -14,8 +14,7 @@ export type MarketResponse = {
   metadata: string;
   market_type: string;
   market_status: string;
-  reported_outcome: number | null;
-  reporter: string | null;
+  report: Report | null;
   categories: number | null;
 };
 
@@ -29,8 +28,7 @@ export type ExtendedMarketResponse = {
   metadata: string;
   market_type: string;
   market_status: string;
-  reported_outcome: number | null;
-  reporter: string | null;
+  report: Report | null;
   categories: number | null;
   // new ones
   marketId: number;
@@ -38,6 +36,12 @@ export type ExtendedMarketResponse = {
   description: string;
   metadataString: string;
   shareIds: string[];
+};
+
+export type Report = {
+  at: number;
+  by: string;
+  outcome: number;
 };
 
 export type MarketEnd = { Block: number } | { Timestamp: number };

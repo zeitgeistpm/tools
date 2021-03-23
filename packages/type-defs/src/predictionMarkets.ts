@@ -56,9 +56,13 @@ export default {
       metadata: "Vec<u8>",
       market_type: "MarketType",
       market_status: "MarketStatus",
-      reported_outcome: "Option<u16>",
-      reporter: "Option<AccountId>",
+      report: "Option<Report>",
       categories: "Option<u16>",
+    },
+    Report: {
+      at: "BlockNumber",
+      by: "AccountId",
+      outcome: "u16",
     },
     MarketDispute: {
       at: "BlockNumber",
