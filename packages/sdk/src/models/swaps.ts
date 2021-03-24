@@ -43,14 +43,14 @@ export default class Swap {
   public async getSpotPrice(
     inAsset: string,
     outAsset: string,
-    blockHash = null
+    blockHash?: any
   ): Promise<any> {
     //@ts-ignore
     const res = await this.api.rpc.swaps.getSpotPrice(
       this.poolId,
       inAsset,
       outAsset,
-      blockHash
+      blockHash ? blockHash : undefined
     );
 
     return res;

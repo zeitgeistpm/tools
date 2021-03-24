@@ -6,7 +6,6 @@ export * as consts from "./consts";
 export * as models from "./models";
 export * as types from "./types";
 export * as util from "./util";
-
 export default class SDK {
   public api: ApiPromise;
   public models: Models;
