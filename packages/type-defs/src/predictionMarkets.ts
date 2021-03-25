@@ -28,7 +28,7 @@ export default {
     },
     MarketEnd: {
       _enum: {
-        Block: "u64",
+        Block: "BlockNumber",
         Timestamp: "u64",
       },
     },
