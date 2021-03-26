@@ -70,7 +70,7 @@ export const MockApi = {
           return () => {};
         }
       }),
-      create: (param1, param2, param3, param4, param5) => ({
+      createCategoricalMarket: (param1, param2, param3, param4, param5) => ({
         signAndSend: (param1, callback : (param) => void) => {
           setTimeout(() => {
             callback(MockApi.cb("MarketCreated"));
