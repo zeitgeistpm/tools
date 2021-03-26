@@ -6,6 +6,8 @@ import {
   ExtendedMarketResponse,
   KeyringPairOrExtSigner,
   MarketCreation,
+  MarketEnd,
+  Report,
   MarketDispute,
   PoolResponse,
 } from "../types";
@@ -26,7 +28,7 @@ class Market {
   /** The oracle that is designated to report on the market. */
   public oracle: string;
   /** The end block or timestamp for this market. */
-  public end: number;
+  public end: MarketEnd;
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
@@ -34,23 +36,19 @@ class Market {
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
-  public reportedOutcome: number | null;
-  /** The reporter of the market. Null if the market was not reported yet. */
-  public reporter: string | null;
+  public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
-  public categories: string[] | null;
+  public categories: number | null;
+  /** The resolved outcome for the market. */
+  public resolvedOutcome: number | null;
   /** The title of the market. */
   public title: string;
   /** The description of the market. */
   public description: string;
   /** The metadata string. */
   public metadataString: string;
-  /** The `Invalid` share hash id. */
-  public invalidShareId: string;
-  /** The `Yes` share hash id.  */
-  public yesShareId: string;
-  /** The `No` share hash id. */
-  public noShareId: string;
+  /** The share identifiers */
+  public shareIds: string[];
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
@@ -65,16 +63,14 @@ class Market {
       metadata,
       market_type,
       market_status,
-      reported_outcome,
-      reporter,
+      report,
       categories,
+      resolved_outcome,
       marketId,
       title,
       description,
       metadataString,
-      invalidShareId,
-      yesShareId,
-      noShareId,
+      shareIds,
     } = market;
 
     this.creator = creator;
@@ -85,16 +81,14 @@ class Market {
     this.metadata = metadata;
     this.marketType = market_type;
     this.marketStatus = market_status;
-    this.reportedOutcome = reported_outcome;
-    this.reporter = reporter;
+    this.report = report;
     this.categories = categories;
+    this.resolvedOutcome = resolved_outcome;
     this.marketId = marketId;
     this.title = title;
     this.description = description;
     this.metadataString = metadataString;
-    this.invalidShareId = invalidShareId;
-    this.yesShareId = yesShareId;
-    this.noShareId = noShareId;
+    this.shareIds = shareIds;
 
     this.api = api;
   }
@@ -106,13 +100,14 @@ class Market {
   }
 
   async getEndTimestamp(): Promise<number> {
-    if (`${this.end}`.length >= 13) {
-      return this.end;
+    if ("Timestamp" in this.end) {
+      return this.end.Timestamp;
     }
+
     const now = (await this.api.query.timestamp.now()).toNumber();
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
-    const diffInMs = 6000 * (this.end - blockNum);
+    const diffInMs = 6000 * (this.end.Block - blockNum);
     return now + diffInMs;
   }
 
@@ -143,7 +138,7 @@ class Market {
     return (
       await this.api.query.predictionMarkets.disputes(this.marketId)
     ).toJSON() as MarketDispute[];
-  }
+  };
 
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
@@ -299,7 +294,7 @@ class Market {
     });
   }
 
-  async report(
+  async reportOutcome(
     signer: KeyringPairOrExtSigner,
     outcome: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
