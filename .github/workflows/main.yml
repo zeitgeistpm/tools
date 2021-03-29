@@ -27,8 +27,7 @@ jobs:
 
       - name: Install dependencies and checks TypeScript compiliation
         run: |
-          yarn
-          yarn compile
+          npx lerna bootstrap
 
       - name: Run tests in all packages
         run: |
