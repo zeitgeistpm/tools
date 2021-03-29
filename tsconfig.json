@@ -1,16 +1,13 @@
 {
-    "compilerOptions": {
-        "composite": true
-    },
     "references": [
+        {
+            "path": "./packages/type-defs"
+        },
         {
             "path": "./packages/sdk"
         },
         {
             "path": "./packages/cli"
-        },
-        {
-            "path": "./packages/type-defs"
         }
     ],
     "files": [],
