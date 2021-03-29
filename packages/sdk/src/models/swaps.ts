@@ -90,7 +90,7 @@ export default class Swap {
       unsubOrWarns(_unsub);
     };
 
-    const tx = this.api.tx.swaps.joinPool(
+    const tx = this.api.tx.swaps.poolJoin(
       this.poolId,
       poolAmountOut,
       maxAmountsIn
@@ -137,7 +137,7 @@ export default class Swap {
       unsubOrWarns(_unsub);
     };
 
-    const tx = this.api.tx.swaps.exitPool(
+    const tx = this.api.tx.swaps.poolExit(
       this.poolId,
       poolAmountIn,
       minAmountsOut
