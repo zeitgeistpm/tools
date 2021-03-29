@@ -29,6 +29,6 @@ jobs:
         run: |
           npx lerna bootstrap
 
-      - name: Run tests in all packages
-        run: |
-          npx lerna run test
+      # - name: Run tests in all packages
+      #   run: |
+      #     npx lerna run test
