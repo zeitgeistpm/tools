@@ -7,7 +7,16 @@
         "sourceMap": true,
         "esModuleInterop": true,
         "declaration": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "paths": {
+            "@zeitgeistpm/sdk": [
+                "../sdk"
+            ],
+            "@zeitgeistpm/type-defs": [
+                "../type-defs"
+            ]
+        },
+        "baseUrl": "./"
     },
     "exclude": [
         "dist"
