@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies and checks TypeScript compiliation
         run: |
-          npx lerna bootstrap
+          npx lerna bootstrap --force-local
 
       - name: Run tests in all packages
         run: |
