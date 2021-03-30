@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.16",
-    "better-docs": "^2.3.2",
     "jest": "^26.6.3",
     "ts-jest": "^26.4.4",
     "ts-node": "^9.0.0",
