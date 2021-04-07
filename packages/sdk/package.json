@@ -1,6 +1,6 @@
 {
   "name": "@zeitgeistpm/sdk",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "description": "Zeitgeist network javascript library.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
