@@ -160,34 +160,36 @@ export default class Models {
       categories: ["No metadata"],
     };
 
-    // Metadata exists, so parse it.
-    if (hexToString(metadata)) {
-      const raw = toString(concat(await all(ipfs.cat(metadataString))));
+    try {
+      // Metadata exists, so parse it.
+      if (hexToString(metadata)) {
+        const raw = toString(concat(await all(ipfs.cat(metadataString))));
 
-      try {
-        // new version
-        const parsed = JSON.parse(raw) as {
-          title: string;
-          description: string;
-          categories: string[];
-        };
-        data = parsed;
-      } catch {
-        const extract = (data: string) => {
-          const titlePattern = "title:";
-          const infoPattern = "::info:";
-          return {
-            description: data.slice(
-              data.indexOf(infoPattern) + infoPattern.length
-            ),
-            title: data.slice(titlePattern.length, data.indexOf(infoPattern)),
-            categories: ["Invalid", "Yes", "No"],
+        try {
+          // new version
+          const parsed = JSON.parse(raw) as {
+            title: string;
+            description: string;
+            categories: string[];
           };
-        };
+          data = parsed;
+        } catch {
+          const extract = (data: string) => {
+            const titlePattern = "title:";
+            const infoPattern = "::info:";
+            return {
+              description: data.slice(
+                data.indexOf(infoPattern) + infoPattern.length
+              ),
+              title: data.slice(titlePattern.length, data.indexOf(infoPattern)),
+              categories: ["Invalid", "Yes", "No"],
+            };
+          };
 
-        data = extract(raw);
+          data = extract(raw);
+        }
       }
-    }
+    } catch (err) { console.error(err); }
 
     const shareIds = await Promise.all(
       [...Array(market.categories).keys()].map((id: number) => {
