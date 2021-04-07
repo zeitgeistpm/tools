@@ -1,6 +1,6 @@
 {
   "name": "@zeitgeistpm/type-defs",
-  "version": "0.1.35",
+  "version": "0.1.36",
   "description": "Zeitgeist's type definitions for polkadot-js",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
