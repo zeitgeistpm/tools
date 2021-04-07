@@ -9,5 +9,15 @@ export const index = {
     Address: "AccountId",
     LookupSource: "AccountId",
     RefCount: "u32",
+    Asset: {
+      _enum: {
+        Share: "Hash",
+        PredictionMarketShare: "(MarketId, u16)",
+        PoolShare: "u128",
+        Ztg: null,
+      }
+    },
+    CurrencyIdOf: "Asset",
+    CurrencyId: "Asset"
   },
 };
