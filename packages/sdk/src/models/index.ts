@@ -75,7 +75,7 @@ export default class Models {
     description: string,
     oracle: string,
     end: MarketEnd,
-    creationType = "Permissionless",
+    creationType = "Advised",
     categories = ["Yes", "No"],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
@@ -117,7 +117,7 @@ export default class Models {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(oracle, end, cid.toString(), creationType, 2)
+          .createCategoricalMarket(oracle, end, cid.toString(), creationType, categories.length)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -125,7 +125,7 @@ export default class Models {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(oracle, end, cid.toString(), creationType, 2)
+          .createCategoricalMarket(oracle, end, cid.toString(), creationType, categories.length)
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)

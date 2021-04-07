@@ -6,9 +6,6 @@ export { default as swaps } from "./swaps";
 export const index = {
   rpc: {},
   types: {
-    Address: "AccountId",
-    LookupSource: "AccountId",
-    RefCount: "u32",
     Asset: {
       _enum: {
         Share: "Hash",
@@ -18,6 +15,12 @@ export const index = {
       }
     },
     CurrencyIdOf: "Asset",
-    CurrencyId: "Asset"
+    CurrencyId: "Asset",
+    AmountOf: "i128",
+    Amount: "i128",
+    Address: "MultiAddress",
+    Lookup: "MultiAddress",
+    Index: "u64",
+    BlockNumber: "u64"
   },
 };
