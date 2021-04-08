@@ -100,14 +100,14 @@ class Market {
   }
 
   async getEndTimestamp(): Promise<number> {
-    if ("Timestamp" in this.end) {
-      return this.end.Timestamp;
+    if ("timestamp" in this.end) {
+      return this.end.timestamp;
     }
 
     const now = (await this.api.query.timestamp.now()).toNumber();
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
-    const diffInMs = 6000 * (this.end.Block - blockNum);
+    const diffInMs = 6000 * (this.end.block - blockNum);
     return now + diffInMs;
   }
 

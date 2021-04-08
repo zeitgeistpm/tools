@@ -46,7 +46,7 @@ export type Report = {
   outcome: number;
 };
 
-export type MarketEnd = { Block: number } | { Timestamp: number };
+export type MarketEnd = { block: number } | { timestamp: number };
 
 export type MarketCreation = "Permissioned" | "Advised";
 
