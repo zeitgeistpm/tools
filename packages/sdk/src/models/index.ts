@@ -194,7 +194,7 @@ export default class Models {
     const shareIds = await Promise.all(
       [...Array(market.categories).keys()].map((id: number) => {
         //@ts-ignore
-        return this.api.createType("Asset", { PredictionMarketShare: [marketId, id] });
+        return this.api.createType("Asset", { predictionmarketshare: [marketId, id] });
       })
     );
 
