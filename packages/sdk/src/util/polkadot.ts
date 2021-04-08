@@ -40,7 +40,7 @@ export const initApi = (
               isOptional: true,
             },
           ],
-          type: "Hash",
+          type: "Asset",
         },
       },
       swaps: {
@@ -57,7 +57,7 @@ export const initApi = (
               isOptional: true,
             },
           ],
-          type: "Hash",
+          type: "Asset",
         },
         poolAccountId: {
           description: "Gets the pool's account.",
