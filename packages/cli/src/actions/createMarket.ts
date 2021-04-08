@@ -22,7 +22,7 @@ const createMarket = async (opts: Options): Promise<void> => {
     title,
     description,
     oracle,
-    { Block: Number(end) } // TODO support timestamp
+    { block: Number(end) } // TODO support timestamp
   );
 
   console.log(`Market created! Market Id: ${marketId}`);
