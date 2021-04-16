@@ -18,6 +18,7 @@ import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 import transfer from "./actions/transfer";
 import redeemShares from "./actions/redeemShares";
 import getAssetsPrices from "./actions/getAssetsPrices";
+import countMarkets from "./actions/countMarkets";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -394,6 +395,17 @@ program
         transfer,
         Object.assign(opts, { marketId, sharesIndex, to, amount })
       )
+  );
+
+program
+  .command("countMarkets")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((opts: { endpoint: string }) =>
+    catchErrorsAndExit(countMarkets, Object.assign(opts))
   );
 
 program.parse(process.argv);
