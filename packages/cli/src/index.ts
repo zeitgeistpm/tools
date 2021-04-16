@@ -73,14 +73,14 @@ program
 program
   .command("cancelMarket <marketId>")
   .option(
-    "--endpoint <string>",
-    "The endpoint to connect the API to.",
-    "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
     "--seed <string>",
     "The signer's seed. Default is `//Alice`.",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(cancelPendingMarket, Object.assign(opts, { marketId }))
@@ -418,14 +418,14 @@ program
 program
   .command("approveMarket <marketId>")
   .option(
-    "--seed <string>",
-    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
-  )
-  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--seed <string>",
+    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(approveMarket, Object.assign(opts, { marketId }))
@@ -434,14 +434,14 @@ program
 program
   .command("rejectMarket <marketId>")
   .option(
-    "--seed <string>",
-    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
-  )
-  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--seed <string>",
+    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId }))
