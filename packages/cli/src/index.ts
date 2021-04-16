@@ -2,6 +2,7 @@ import program from "commander";
 
 import buyCompleteSet from "./actions/buyCompleteSet";
 import createMarket from "./actions/createMarket";
+import cancelPendingMarket from "./actions/cancelPendingMarket";
 import disputeMarket from "./actions/disputeMarket";
 import reportMarket from "./actions/reportMarket";
 import deployPool from "./actions/deployPool";
@@ -67,6 +68,22 @@ program
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(viewMarket, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("cancelMarket <marketId>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--seed <string>",
+    "The signer's seed. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(cancelPendingMarket, Object.assign(opts, { marketId }))
   );
 
 program
