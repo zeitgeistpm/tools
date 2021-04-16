@@ -18,6 +18,8 @@ import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 import transfer from "./actions/transfer";
 import redeemShares from "./actions/redeemShares";
 import getAssetsPrices from "./actions/getAssetsPrices";
+import approveMarket from "./actions/approveMarket";
+import rejectMarket from "./actions/rejectMarket";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -374,6 +376,38 @@ program
         transfer,
         Object.assign(opts, { marketId, sharesIndex, to, amount })
       )
+  );
+
+program
+  .command("approveMarket <marketId>")
+  .option(
+    "--seed <string>",
+    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(approveMarket, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("rejectMarket <marketId>")
+  .option(
+    "--seed <string>",
+    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId }))
   );
 
 program.parse(process.argv);
