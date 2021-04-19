@@ -21,6 +21,7 @@ import getAssetsPrices from "./actions/getAssetsPrices";
 import countMarkets from "./actions/countMarkets";
 import getAllMarketIds from "./actions/getAllMarketIds";
 import getAllMarkets from "./actions/getAllMarkets";
+import viewDisputes from "./actions/viewDisputes";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -385,6 +386,7 @@ program
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
   )
+  // TODO: check if these params really should be string!
   .action(
     (
       marketId: string,
@@ -432,6 +434,29 @@ program
   )
   .action((opts: { endpoint: string }) =>
     catchErrorsAndExit(getAllMarkets, Object.assign(opts))
+  );
+
+// program
+//   .command("viewSwap <marketId>")
+//   .option(
+//     "--endpoint <string>",
+//     "The endpoint to connect the API to.",
+//     "wss://bp-rpc.zeitgeist.pm"
+//   )
+//   .action((marketId: number, opts: any) =>
+//     catchErrorsAndExit(viewSwap, Object.assign(opts, { marketId }))
+//   );
+
+program
+  .command("viewDisputes <marketId>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((marketId: number,
+      opts: { endpoint: string}) =>
+    catchErrorsAndExit(viewDisputes, Object.assign(opts, { marketId }))
   );
 
 program.parse(process.argv);

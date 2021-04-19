@@ -1,6 +1,4 @@
-// import SDK, { util } from "@zeitgeistpm/sdk";
-import SDK, { util } from "../../../sdk/src";
-
+import SDK, { util } from "@zeitgeistpm/sdk";
 
 type Options = {
   endpoint: string;
@@ -17,7 +15,9 @@ const getAllMarkets = async (opts: Options): Promise<void> => {
 
   const res = await sdk.models.getAllMarkets();
 
-  res.forEach(market=> console.log(market.toJSONString()));
+  res.forEach(market=> console.log(market.toFilteredJSONString(
+    ["resolvedOutcome", "oracle", "marketStatus", "dispute","end", "report"])));
+  // res.forEach(market=> console.log(market.toJSONString()));
 };
 
 export default getAllMarkets;
