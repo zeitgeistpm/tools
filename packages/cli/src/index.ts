@@ -428,24 +428,17 @@ program
 program
   .command("getAllMarkets")
   .option(
+    "-f, --filter [fields...]",
+    'only output specified fields'
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((opts: { endpoint: string }) =>
+  .action((opts: { endpoint: string, filter: string[] }) =>
     catchErrorsAndExit(getAllMarkets, Object.assign(opts))
   );
-
-// program
-//   .command("viewSwap <marketId>")
-//   .option(
-//     "--endpoint <string>",
-//     "The endpoint to connect the API to.",
-//     "wss://bp-rpc.zeitgeist.pm"
-//   )
-//   .action((marketId: number, opts: any) =>
-//     catchErrorsAndExit(viewSwap, Object.assign(opts, { marketId }))
-//   );
 
 program
   .command("viewDisputes <marketId>")
