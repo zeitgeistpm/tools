@@ -3,7 +3,9 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import Swap from "./swaps";
 import {
+  MarketResponse,
   ExtendedMarketResponse,
+  FilteredMarketResponse,
   KeyringPairOrExtSigner,
   MarketCreation,
   MarketEnd,
@@ -97,6 +99,32 @@ class Market {
     const market = Object.assign({}, this);
     delete market.api;
     return JSON.stringify(market, null, 2);
+  }
+
+  toFilteredJSONString(filter? : string[] | null): string {
+    const market = Object.assign({}, this);
+    delete market.api;
+    if (!filter)
+      return JSON.stringify(market, null, 2)
+    else
+      return JSON.stringify(Market.filterMarketData(market, filter), null, 2)
+  }
+
+  static filterMarketData(
+    market: ExtendedMarketResponse | MarketResponse | Market, 
+    filter? : string[] | null
+  ): FilteredMarketResponse {
+    if (!filter)
+      return market;
+
+    const alwaysInclude=["marketId"];
+    
+    const res = {};
+    filter
+      .concat(alwaysInclude)
+      .filter(key=> Object.keys(market).includes(key))
+      .forEach(key=> res[key]= market[key]) ;    
+    return res;
   }
 
   async getEndTimestamp(): Promise<number> {

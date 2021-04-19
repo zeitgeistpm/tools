@@ -42,7 +42,7 @@ export default class Models {
         ? await this.api.query.predictionMarkets.markets.keys()
         : await this.api.query.predictionMarkets.marketIds.keys();
 
-    return keys.map((key) => {
+    return keys.map((key) => {      
       const idStr = "0x" + changeEndianness(key.toString().slice(-32));
       const id = hexToNumber(idStr);
       return id;
@@ -206,6 +206,52 @@ export default class Models {
     });
 
     return new Market(market as ExtendedMarketResponse, this.api);
+  }
+
+  /**
+   * Fetches market_count variable from Zeitgeist chain
+   * This acts as a count of all markets which have been created, but includes those which have
+   * been cancelled, and all other statuses
+   */
+  async getMarketCount(): Promise<number | null> {
+    const count = (
+      await this.api.query.predictionMarkets.marketCount()
+    ).toJSON();
+    if (typeof count === 'number')
+      return count
+    else
+      // Spoiler: return null will never be run
+      return null    
+
+  }
+
+  /**
+   * Gets an array of disputes for a given marketId.
+   * Should throw errors where market status is such that no disputes can have been registered.
+   * but all registered disputes will still be returned even if, eg, resolved.
+   * To check if disputes are active, use viewMarket and check market_status for "Disputed"
+   */
+  async fetchDisputes(marketId: MarketId): Promise<any> {
+    
+    const res = (
+      await this.api.query.predictionMarkets.disputes(marketId)
+    ).toJSON() ;
+
+    if (!Array.isArray(res))
+      throw new Error(`fetchDisputes expected response an array but got ${typeof res}.`);
+
+    if (!res.length) {
+      const market = (
+        await this.api.query.predictionMarkets.markets(marketId)
+      ).toJSON() as MarketResponse;
+      if (!market) {
+        throw new Error(`Market with market id ${marketId} does not exist.`);
+      }
+      if (!market.report)
+        throw new Error(`Market with market id ${marketId} has not been reported and therefore has not been disputed.`);
+      }
+
+    return res;
   }
 
   async fetchPoolData(poolId: PoolId): Promise<Swap> {

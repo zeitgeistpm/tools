@@ -40,6 +40,27 @@ export type ExtendedMarketResponse = {
   shareIds: string[];
 };
 
+// The extended market data from which a market may be created.
+export type FilteredMarketResponse = {
+  creator?: string;
+  creation?: MarketCreation;
+  creator_fee?: number;
+  oracle?: string;
+  end?: MarketEnd;
+  metadata?: string;
+  market_type?: string;
+  market_status?: string;
+  report?: Report | null;
+  categories?: number | null;
+  resolved_outcome?: number | null;
+  // new ones
+  marketId?: number;
+  title?: string;
+  description?: string;
+  metadataString?: string;
+  shareIds?: string[];
+};
+
 export type Report = {
   at: number;
   by: string;
