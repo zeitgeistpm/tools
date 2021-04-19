@@ -19,6 +19,8 @@ import transfer from "./actions/transfer";
 import redeemShares from "./actions/redeemShares";
 import getAssetsPrices from "./actions/getAssetsPrices";
 import countMarkets from "./actions/countMarkets";
+import getAllMarketIds from "./actions/getAllMarketIds";
+import getAllMarkets from "./actions/getAllMarkets";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -406,6 +408,30 @@ program
   )
   .action((opts: { endpoint: string }) =>
     catchErrorsAndExit(countMarkets, Object.assign(opts))
+  );
+
+
+program
+  .command("getAllMarketIds")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((opts: { endpoint: string }) =>
+    catchErrorsAndExit(getAllMarketIds, Object.assign(opts))
+  );
+
+
+program
+  .command("getAllMarkets")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((opts: { endpoint: string }) =>
+    catchErrorsAndExit(getAllMarkets, Object.assign(opts))
   );
 
 program.parse(process.argv);
