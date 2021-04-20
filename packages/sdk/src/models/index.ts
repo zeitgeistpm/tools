@@ -10,6 +10,7 @@ import {
   MarketId,
   MarketResponse,
   ExtendedMarketResponse,
+  MarketCreationOptions,
   PoolResponse,
   KeyringPairOrExtSigner,
   PoolId,
@@ -63,6 +64,16 @@ export default class Models {
    * Creates a new market with the given parameters. Returns the `marketId` that can be used
    * to get the full data via `sdk.models.fetchMarket(marketId)`.
    * @param signer The actual signer provider to sign the transaction.
+   * @param opts A MarketCreationOptions object, with fields as below
+   */
+  async createNewMarket(signer: KeyringPairOrExtSigner, opts: MarketCreationOptions,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> ;
+
+  /**
+   * Creates a new market with the given parameters. Returns the `marketId` that can be used
+   * to get the full data via `sdk.models.fetchMarket(marketId)`.
+   * @param signer The actual signer provider to sign the transaction.
    * @param title The title of the new prediction market.
    * @param description The description / extra information for the market.
    * @param oracle The address that will be responsible for reporting the market.
@@ -75,8 +86,65 @@ export default class Models {
     description: string,
     oracle: string,
     end: MarketEnd,
-    creationType = "Advised",
+    creationType?: string,
+    categories?: string[],
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> 
+
+  /*
+   * overloaded createNewMarket - do not call directly
+   * this function rectifies argument types and passes through to _createNewMarket
+   */
+  async createNewMarket(
+    signer: KeyringPairOrExtSigner,
+    titleOrOpts: string | MarketCreationOptions,
+    descriptionOrCallback?: string | ((result: ISubmittableResult, _unsub: () => void) => void) ,
+    oracle?: string,
+    end?: MarketEnd,
+    creationType: string = "Advised",
     categories = ["Yes", "No"],
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> {
+    if (typeof titleOrOpts==="object") {
+      const { title, description } = titleOrOpts;
+      const creationType = titleOrOpts.creationType || "Advised";
+      const categories = titleOrOpts.categories || ["Yes", "No"];      
+      const { oracle, end, callback } = {
+        ...{ callback: descriptionOrCallback },
+        ...titleOrOpts
+      }
+
+      console.log('SDK (object param):');
+      console.log('opts', titleOrOpts);
+      console.log('creationType (unused)', creationType);
+
+      return (typeof callback==="function")
+        ? this._createNewMarket( 
+            signer, title, description, 
+            oracle, end, creationType, categories, callback
+          )
+        : this._createNewMarket( 
+            signer, title, description, 
+            oracle, end, creationType, categories
+          );
+    } else {
+      if (typeof descriptionOrCallback!=="string")
+        throw new Error("Mixed parameter types provided to createNewMarket.");
+      return this._createNewMarket( 
+        signer, titleOrOpts, descriptionOrCallback, 
+        oracle, end, creationType, categories, callback
+      ) ;
+    }
+  }
+
+  private async _createNewMarket(
+    signer: KeyringPairOrExtSigner,
+    title: string,
+    description: string,
+    oracle: string,
+    end: MarketEnd,
+    creationType?: string,
+    categories?: string[],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = initIpfs();

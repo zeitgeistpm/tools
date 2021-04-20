@@ -69,7 +69,16 @@ export type Report = {
 
 export type MarketEnd = { block: number } | { timestamp: number };
 
-export type MarketCreation = "Permissioned" | "Advised";
+export type MarketCreation = "Permissionless" | "Advised";
+
+export type MarketCreationOptions = {
+  title: string;
+  description: string;
+  oracle: string;
+  end: MarketEnd;
+  creationType?: MarketCreation;
+  categories?: string[];
+};
 
 export type MarketDispute = {
   at: number;

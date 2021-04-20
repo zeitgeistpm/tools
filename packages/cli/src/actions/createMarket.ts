@@ -35,15 +35,14 @@ const createMarket = async (opts: Options): Promise<void> => {
     throw new Error ("If specifying categories, at least two must be specified.");
   }
 
-  const marketId = await sdk.models.createNewMarket(
-    signer,
+  const marketId = await sdk.models.createNewMarket(signer, {
     title,
     description,
     oracle,
-    { block: Number(end) }, // TODO support timestamp
-    advised ? "Advised" : "Permissionless",
-    (categories && categories.length>1) ? categories : ["Yes", "No"],
-  );
+    end: { block: Number(end) }, // TODO support timestamp
+    creationType: (advised ? "Advised" : "Permissionless"),
+    categories: (categories && categories.length>1) ? categories : ["Yes", "No"],
+  });
 
   console.log(`Market created! Market Id: ${marketId}`);
 };
