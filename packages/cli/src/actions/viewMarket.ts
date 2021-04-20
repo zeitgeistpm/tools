@@ -1,4 +1,5 @@
-import SDK from "@zeitgeistpm/sdk";
+// import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK, { util } from "../../../sdk/src";
 
 type Options = {
   endpoint: string;
