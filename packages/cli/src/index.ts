@@ -41,6 +41,10 @@ program
     "Create Permissionless market instead of Advised market"
   )
   .option(
+    "-c --categories [categories...]",
+    'specify at least two categories'
+  )
+  .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
     "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
@@ -56,7 +60,7 @@ program
       description: string,
       oracle: string,
       end: string,
-      opts: { endpoint: string; seed: string, advised: boolean }
+      opts: { endpoint: string; seed: string, categories: string[], advised: boolean }
     ) =>
       catchErrorsAndExit(
         createMarket,
