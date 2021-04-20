@@ -6,11 +6,12 @@ type Options = {
   description: string;
   oracle: string;
   end: string;
+  advised: boolean,
   seed: string;
 };
 
 const createMarket = async (opts: Options): Promise<void> => {
-  const { endpoint, title, description, oracle, end, seed } = opts;
+  const { title, description, oracle, end, advised, endpoint, seed } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
@@ -22,7 +23,8 @@ const createMarket = async (opts: Options): Promise<void> => {
     title,
     description,
     oracle,
-    { block: Number(end) } // TODO support timestamp
+    { block: Number(end) }, // TODO support timestamp
+    advised ? "Advised" : "Permissionless",
   );
 
   console.log(`Market created! Market Id: ${marketId}`);

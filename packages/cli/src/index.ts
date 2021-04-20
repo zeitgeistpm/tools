@@ -37,9 +37,13 @@ const catchErrorsAndExit = async (fn: any, opts: any) => {
 program
   .command("createMarket <title> <description> <oracle> <end>")
   .option(
+    "--no-advised",
+    "Create Permissionless market instead of Advised market"
+  )
+  .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -52,7 +56,7 @@ program
       description: string,
       oracle: string,
       end: string,
-      opts: { endpoint: string; seed: string }
+      opts: { endpoint: string; seed: string, advised: boolean }
     ) =>
       catchErrorsAndExit(
         createMarket,

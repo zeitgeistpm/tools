@@ -221,8 +221,7 @@ export default class Models {
       return count
     else
       // Spoiler: return null will never be run
-      return null    
-
+      return null
   }
 
   /**
@@ -231,8 +230,7 @@ export default class Models {
    * but all registered disputes will still be returned even if, eg, resolved.
    * To check if disputes are active, use viewMarket and check market_status for "Disputed"
    */
-  async fetchDisputes(marketId: MarketId): Promise<any> {
-    
+  async fetchDisputes(marketId: MarketId): Promise<any> {    
     const res = (
       await this.api.query.predictionMarkets.disputes(marketId)
     ).toJSON() ;
