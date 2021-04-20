@@ -462,10 +462,10 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
-        const call = await this.api.tx.predictionMarkets
-          .approveMarket(this.marketId);
+      const call = await this.api.tx.predictionMarkets
+        .approveMarket(this.marketId);
 
-        const sudoTx = await this.api.tx.sudo.sudo(call);
+      const sudoTx = await this.api.tx.sudo.sudo(call);
         
       if (isExtSigner(signer)) {
         const unsub = await sudoTx
@@ -474,7 +474,7 @@ class Market {
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
           );
-      } else {        
+      } else {
         const unsub = await sudoTx
           .signAndSend(signer, (result) =>
             callback
@@ -514,11 +514,11 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
-        const call = await this.api.tx.predictionMarkets
-          .rejectMarket(this.marketId);
+      const call = await this.api.tx.predictionMarkets
+        .rejectMarket(this.marketId);
 
-        const sudoTx = await this.api.tx.sudo.sudo(call);
-        
+      const sudoTx = await this.api.tx.sudo.sudo(call);
+
       if (isExtSigner(signer)) {
         const unsub = await sudoTx
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
@@ -526,7 +526,7 @@ class Market {
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
           );
-      } else {        
+      } else {
         const unsub = await sudoTx
           .signAndSend(signer, (result) =>
             callback
