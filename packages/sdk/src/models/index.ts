@@ -105,6 +105,7 @@ export default class Models {
     categories = ["Yes", "No"],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
+
     if (typeof titleOrOpts==="object") {
       const { title, description } = titleOrOpts;
       const creationType = titleOrOpts.creationType || "Advised";
@@ -113,11 +114,7 @@ export default class Models {
         ...{ callback: descriptionOrCallback },
         ...titleOrOpts
       }
-
-      console.log('SDK (object param):');
-      console.log('opts', titleOrOpts);
-      console.log('creationType (unused)', creationType);
-
+      
       return (typeof callback==="function")
         ? this._createNewMarket( 
             signer, title, description, 
@@ -127,13 +124,16 @@ export default class Models {
             signer, title, description, 
             oracle, end, creationType, categories
           );
+
     } else {
+
       if (typeof descriptionOrCallback!=="string")
         throw new Error("Mixed parameter types provided to createNewMarket.");
+
       return this._createNewMarket( 
         signer, titleOrOpts, descriptionOrCallback, 
         oracle, end, creationType, categories, callback
-      ) ;
+      );
     }
   }
 
