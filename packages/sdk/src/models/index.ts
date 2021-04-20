@@ -42,7 +42,7 @@ export default class Models {
         ? await this.api.query.predictionMarkets.markets.keys()
         : await this.api.query.predictionMarkets.marketIds.keys();
 
-    return keys.map((key) => {      
+    return keys.map((key) => {
       const idStr = "0x" + changeEndianness(key.toString().slice(-32));
       const id = hexToNumber(idStr);
       return id;
