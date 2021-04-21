@@ -15,12 +15,14 @@
     "eslint-plugin-security": "^1.4.0",
     "lerna": "^4.0.0",
     "prettier": "^2.2.1",
+    "ts-node": "^9.1.1",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^4.2.3"
   },
   "scripts": {
     "clean": "rm packages/**/dist -rf",
     "compile": "tsc --build --force tsconfig.json",
     "prepublish": "yarn compile",
-    "cli": "node packages/cli/dist/index"
+    "cli": "ts-node -r tsconfig-paths/register packages/cli/src/index"
   }
 }

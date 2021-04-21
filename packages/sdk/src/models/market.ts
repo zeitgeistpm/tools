@@ -13,6 +13,7 @@ import {
 } from "../types";
 import { NativeShareId } from "../consts";
 import { isExtSigner, unsubOrWarns } from "../util";
+
 /**
  * The Market class initializes all the market data.
  */
