@@ -83,11 +83,11 @@ export const initApi = (
             },
             {
               name: "asset_in",
-              type: "Hash",
+              type: "Asset",
             },
             {
               name: "asset_out",
-              type: "Hash",
+              type: "Asset",
             },
             {
               name: "at",

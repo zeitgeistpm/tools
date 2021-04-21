@@ -2,6 +2,7 @@ import program from "commander";
 
 import buyCompleteSet from "./actions/buyCompleteSet";
 import createMarket from "./actions/createMarket";
+import cancelPendingMarket from "./actions/cancelPendingMarket";
 import disputeMarket from "./actions/disputeMarket";
 import reportMarket from "./actions/reportMarket";
 import deployPool from "./actions/deployPool";
@@ -22,6 +23,8 @@ import countMarkets from "./actions/countMarkets";
 import getAllMarketIds from "./actions/getAllMarketIds";
 import getAllMarkets from "./actions/getAllMarkets";
 import viewDisputes from "./actions/viewDisputes";
+import approveMarket from "./actions/approveMarket";
+import rejectMarket from "./actions/rejectMarket";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -77,6 +80,22 @@ program
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(viewMarket, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("cancelMarket <marketId>")
+  .option(
+    "--seed <string>",
+    "The signer's seed. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(cancelPendingMarket, Object.assign(opts, { marketId }))
   );
 
 program
@@ -446,6 +465,38 @@ program
   )
   .action((opts: { endpoint: string, filter: string[] }) =>
     catchErrorsAndExit(getAllMarkets, Object.assign(opts))
+  );
+
+
+program  .command("approveMarket <marketId>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--seed <string>",
+    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(approveMarket, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("rejectMarket <marketId>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )  
+  .option(
+    "--seed <string>",
+    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId }))
   );
 
 program

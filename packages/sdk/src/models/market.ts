@@ -460,6 +460,160 @@ class Market {
       }
     });
   }
+
+  async approve(
+    signer: KeyringPairOrExtSigner,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: string | PromiseLike<string>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "MarketApproved") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+
+          unsubOrWarns(_unsub);
+        });
+      }
+    };
+
+    return new Promise(async (resolve) => {
+      const call = await this.api.tx.predictionMarkets
+        .approveMarket(this.marketId);
+
+      const sudoTx = await this.api.tx.sudo.sudo(call);
+        
+      if (isExtSigner(signer)) {
+        const unsub = await sudoTx
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await sudoTx
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
+  }
+
+  async reject(
+    signer: KeyringPairOrExtSigner,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: string | PromiseLike<string>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "MarketRejected") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+
+          unsubOrWarns(_unsub);
+        });
+      }
+    };
+
+    return new Promise(async (resolve) => {
+      const call = await this.api.tx.predictionMarkets
+        .rejectMarket(this.marketId);
+
+      const sudoTx = await this.api.tx.sudo.sudo(call);
+
+      if (isExtSigner(signer)) {
+        const unsub = await sudoTx
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await sudoTx
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
+  }
+
+  async cancelAdvised(
+    signer: KeyringPairOrExtSigner,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: string | PromiseLike<string>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "MarketCancelled") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+
+          unsubOrWarns(_unsub);
+        });
+      }
+    };
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .cancelPendingMarket(this.marketId)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .cancelPendingMarket(this.marketId)
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
+  }
+  
 }
 
 export default Market;
