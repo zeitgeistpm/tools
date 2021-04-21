@@ -13,7 +13,8 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@zeitgeistpm/sdk": ["packages/sdk"]
+            "@zeitgeistpm/sdk": ["packages/sdk"],
+            "@zeitgeistpm/type-defs": ["packages/type-defs"]
         },
         "esModuleInterop": true
     },

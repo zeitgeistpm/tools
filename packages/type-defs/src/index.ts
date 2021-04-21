@@ -8,12 +8,15 @@ export const index = {
   types: {
     Asset: {
       _enum: {
-        Share: "Hash",
-        PredictionMarketShare: "(MarketId, u16)",
+        CategoricalOutcome: "(MarketId, CategoryIndex)",
+        ScalarOutcome: "(MarketId, ScalarPosition)",
+        CombinatorialOutcome: null,
         PoolShare: "u128",
         Ztg: null,
       }
     },
+    BlockNumber: "u64",
+    CategoryIndex: "u16",
     CurrencyIdOf: "Asset",
     CurrencyId: "Asset",
     AmountOf: "i128",
@@ -21,6 +24,11 @@ export const index = {
     Address: "MultiAddress",
     Lookup: "MultiAddress",
     Index: "u64",
-    BlockNumber: "u64"
+    ScalarPosition: {
+      _enum: [
+        "Long",
+        "Short"
+      ]
+    }
   },
 };

@@ -4,6 +4,22 @@ import { Signer } from "@polkadot/types/types";
 // Just a market identifier.
 export type MarketId = number;
 
+// Types of markets.
+export type MarketType = CategoricalMarket | ScalarMarket;
+
+export type CategoricalMarket = {
+  categories: number;
+}
+
+export type ScalarMarket = {
+  lowerBound: number,
+  higherBound: number,
+}
+
+export type Outcome = {
+  
+}
+
 // The market type as returned by the API call to `predictionMarkets.markets`.
 export type MarketResponse = {
   creator: string;
@@ -12,10 +28,9 @@ export type MarketResponse = {
   oracle: string;
   end: MarketEnd;
   metadata: string;
-  market_type: string;
+  market_type: any;
   market_status: string;
   report: Report | null;
-  categories: number | null;
   resolved_outcome: number | null;
 };
 

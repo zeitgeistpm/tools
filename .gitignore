@@ -2,6 +2,7 @@ node_modules
 build
 dist
 yarn-error.lock
+yarn-error.log
 create.sh
 view.sh
 out
