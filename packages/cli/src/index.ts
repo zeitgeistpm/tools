@@ -2,6 +2,7 @@ import program from "commander";
 
 import buyCompleteSet from "./actions/buyCompleteSet";
 import createMarket from "./actions/createMarket";
+import cancelPendingMarket from "./actions/cancelPendingMarket";
 import disputeMarket from "./actions/disputeMarket";
 import reportMarket from "./actions/reportMarket";
 import deployPool from "./actions/deployPool";
@@ -18,6 +19,8 @@ import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 import transfer from "./actions/transfer";
 import redeemShares from "./actions/redeemShares";
 import getAssetsPrices from "./actions/getAssetsPrices";
+import approveMarket from "./actions/approveMarket";
+import rejectMarket from "./actions/rejectMarket";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -33,14 +36,14 @@ const catchErrorsAndExit = async (fn: any, opts: any) => {
 program
   .command("createMarket <title> <description> <oracle> <end>")
   .option(
+    "--seed <string>",
+    "The signer's seed. Default is:",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action(
     (
@@ -68,6 +71,22 @@ program
   );
 
 program
+  .command("cancelMarket <marketId>")
+  .option(
+    "--seed <string>",
+    "The signer's seed. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(cancelPendingMarket, Object.assign(opts, { marketId }))
+  );
+
+program
   .command("viewSwap <marketId>")
   .option(
     "--endpoint <string>",
@@ -81,14 +100,14 @@ program
 program
   .command("buyCompleteSet <marketId> <amount>")
   .option(
+    "--seed <string>",
+    "The signer's seed. Default is:",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action(
     (
@@ -106,8 +125,13 @@ program
   .command("sellCompleteSet <marketId> <amount>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
+    "The signer's seed. Default is:",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, amount: number, opts: { seed: string }) =>
     catchErrorsAndExit(
@@ -120,8 +144,13 @@ program
   .command("report <marketId> <outcome>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
+    "The signer's seed. Default is:",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, outcome: number, opts: { seed: string }) =>
     catchErrorsAndExit(reportMarket, Object.assign(opts, { marketId, outcome }))
@@ -131,8 +160,13 @@ program
   .command("dispute <marketId> <outcome>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
+    "The signer's seed. Default is:",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, outcome: number, opts: { seed: string }) =>
     catchErrorsAndExit(
@@ -145,8 +179,13 @@ program
   .command("redeem <marketId>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
+    "The signer's seed. Default is:",
     "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, opts: { seed: string }) =>
     catchErrorsAndExit(redeemShares, Object.assign(opts, { marketId }))
@@ -155,14 +194,14 @@ program
 program
   .command("deployPool <marketId>")
   .option(
+    "--seed <string>",
+    "The signer's seed. Default is:",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action((marketId: number, opts: { endpoint: string; seed: string }) =>
     catchErrorsAndExit(deployPool, Object.assign(opts, { marketId }))
@@ -171,14 +210,14 @@ program
 program
   .command("joinPool <poolId> <amountOut> <amountIn>")
   .option(
+    "--seed <string>",
+    "The signer's seed. Default is:",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action(
     (
@@ -196,14 +235,14 @@ program
 program
   .command("exitPool <poolId> <amountIn> <amountOut>")
   .option(
+    "--seed <string>",
+    "The signer's seed. Default is:",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action(
     (
@@ -223,14 +262,14 @@ program
     "swapExactAmountIn <poolId> <assetIn> <assetAmountIn> <assetOut> <minAmountOut> <maxPrice>"
   )
   .option(
+    "--seed <string>",
+    "The signer's seed. Default is:",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action(
     (
@@ -260,14 +299,14 @@ program
     "swapExactAmountOut <poolId> <assetIn> <maxAmountIn> <assetOut> <assetAmountOut> <maxPrice>"
   )
   .option(
+    "--seed <string>",
+    "The signer's seed. Default is:",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action(
     (
@@ -326,14 +365,14 @@ program
 program
   .command("wrapNativeCurrency <amount>")
   .option(
+    "--seed <string>",
+    "The signer's seed. Default is:",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action((amount: string, opts: { endpoint: string; seed: string }) =>
     catchErrorsAndExit(wrapNativeCurrency, Object.assign(opts, { amount }))
@@ -353,14 +392,14 @@ program
 program
   .command("transfer <marketId> <sharesIndex> <to> <amount>")
   .option(
+    "--seed <string>",
+    "The signer's seed. Default is:",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
   )
   .action(
     (
@@ -374,6 +413,38 @@ program
         transfer,
         Object.assign(opts, { marketId, sharesIndex, to, amount })
       )
+  );
+
+program
+  .command("approveMarket <marketId>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--seed <string>",
+    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(approveMarket, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("rejectMarket <marketId>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--seed <string>",
+    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .action((marketId: number, opts: any) =>
+    catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId }))
   );
 
 program.parse(process.argv);
