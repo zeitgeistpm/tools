@@ -3,6 +3,7 @@ import Keyring from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 
 import * as zeitgeistDefinitions from "@zeitgeistpm/type-defs";
+import "@zeitgeistpm/types";
 
 const typesFromDefs = (
   definitions: Record<string, { types: Record<string, any> }>

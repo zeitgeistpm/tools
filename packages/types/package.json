@@ -2,6 +2,7 @@
   "name": "@zeitgeistpm/types",
   "version": "0.1.0",
   "description": "Generated types for the Zeitgeist network.",
+  "main": "dist/src/index",
   "scripts": {
     "build": "tsc"
   },

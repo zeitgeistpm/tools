@@ -142,16 +142,16 @@ export default class Models {
   async fetchMarketData(marketId: MarketId): Promise<Market> {
     const ipfs = initIpfs();
 
-    const market = (
-      await this.api.query.predictionMarkets.markets(marketId)
-    ).toJSON() as MarketResponse;
+    const market =
+      await this.api.query.predictionMarkets.markets(marketId);
 
     if (!market) {
       throw new Error(`Market with market id ${marketId} does not exist.`);
     }
 
+    console.log(market);
     const { metadata } = market;
-    const metadataString = hexToString(metadata);
+    const metadataString = hexToString(metadata.toString());
 
     // Default to no metadata, but actually parse it below if it exists.
     let data = {
@@ -162,7 +162,7 @@ export default class Models {
 
     try {
       // Metadata exists, so parse it.
-      if (hexToString(metadata)) {
+      if (metadataString) {
         const raw = toString(concat(await all(ipfs.cat(metadataString))));
 
         try {
@@ -191,21 +191,35 @@ export default class Models {
       }
     } catch (err) { console.error(err); }
 
-    // const shareIds = await Promise.all(
-    //   [...Array(market.categories).keys()].map((id: number) => {
-    //     //@ts-ignore
-    //     return this.api.createType("Asset", { predictionmarketshare: [marketId, id] });
-    //   })
-    // );
 
-    // Object.assign(market, {
-    //   ...data,
-    //   marketId,
-    //   metadataString,
-    //   shareIds: shareIds.map((id) => id.toString()),
-    // });
+    const outcomeAssets = market.market_type.isCategorical 
+      ? [...Array(market.market_type.asCategorical).keys()].map((catIdx) => {
+          //@ts-ignore
+          return this.api.createType("Asset", {
+            categoricalOutcome: [ marketId, catIdx ]
+          });
+        })
+      : ["Long", "Short"].map((pos) => {
+        //@ts-ignore
+        const position = this.api.createType("ScalarPosition", pos);
+        //@ts-ignore
+        return this.api.createType("Asset", {
+          scalarOutcome: [ marketId, position.toString() ]
+        });
+      });
 
-    return new Market(market as ExtendedMarketResponse, this.api);
+    const extendedMarket = market.toJSON();
+
+    Object.assign(extendedMarket, {
+      ...data,
+      marketId,
+      metadataString,
+      outcomeAssets,
+    });
+
+    console.log(extendedMarket);
+
+    return new Market(extendedMarket as any, this.api);
   }
 
   async fetchPoolData(poolId: PoolId): Promise<Swap> {

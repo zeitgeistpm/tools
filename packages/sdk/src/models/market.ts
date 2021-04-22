@@ -49,7 +49,7 @@ class Market {
   /** The metadata string. */
   public metadataString: string;
   /** The share identifiers */
-  public shareIds: string[];
+  public outcomeAssets: any;
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
@@ -71,7 +71,7 @@ class Market {
       title,
       description,
       metadataString,
-      shareIds,
+      outcomeAssets,
     } = market;
 
     this.creator = creator;
@@ -80,7 +80,7 @@ class Market {
     this.oracle = oracle;
     this.end = end;
     this.metadata = metadata;
-    this.marketType = market_type;
+    this.marketType = market_type.toString();
     this.marketStatus = market_status;
     this.report = report;
     this.categories = categories;
@@ -89,7 +89,7 @@ class Market {
     this.title = title;
     this.description = description;
     this.metadataString = metadataString;
-    this.shareIds = shareIds;
+    this.outcomeAssets = outcomeAssets;
 
     this.api = api;
   }

@@ -1,11 +1,9 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
+import { Market, MarketType, Outcome } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets/types";
 
 // Just a market identifier.
 export type MarketId = number;
-
-// Types of markets.
-export type MarketType = CategoricalMarket | ScalarMarket;
 
 export type CategoricalMarket = {
   categories: number;
@@ -16,23 +14,8 @@ export type ScalarMarket = {
   higherBound: number,
 }
 
-export type Outcome = {
-  
-}
-
 // The market type as returned by the API call to `predictionMarkets.markets`.
-export type MarketResponse = {
-  creator: string;
-  creation: MarketCreation;
-  creator_fee: number;
-  oracle: string;
-  end: MarketEnd;
-  metadata: string;
-  market_type: any;
-  market_status: string;
-  report: Report | null;
-  resolved_outcome: number | null;
-};
+export type MarketResponse = Market;
 
 // The extended market data from which a market may be created.
 export type ExtendedMarketResponse = {
@@ -42,7 +25,7 @@ export type ExtendedMarketResponse = {
   oracle: string;
   end: MarketEnd;
   metadata: string;
-  market_type: string;
+  market_type: MarketType;
   market_status: string;
   report: Report | null;
   categories: number | null;
@@ -52,7 +35,7 @@ export type ExtendedMarketResponse = {
   title: string;
   description: string;
   metadataString: string;
-  shareIds: string[];
+  outcomeAssets: any;
 };
 
 export type Report = {

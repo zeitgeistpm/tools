@@ -1,6 +1,11 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
+        "paths": {
+            "@zeitgeistpm/types/*": [
+              "./src/*"
+            ]
+        },
         "outDir": "dist",
         "skipLibCheck": true
     },
