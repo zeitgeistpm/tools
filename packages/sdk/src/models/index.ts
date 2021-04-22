@@ -217,11 +217,9 @@ export default class Models {
     const count = (
       await this.api.query.predictionMarkets.marketCount()
     ).toJSON();
-    if (typeof count === 'number')
-      return count
-    else
-      // Spoiler: return null will never be run
-      return null
+    if (typeof count !== 'number')
+      throw new Error('Expected a number to return from api.query.predictionMarkets.marketCount (even if variable remains unset)');
+    return count;
   }
 
   /**
