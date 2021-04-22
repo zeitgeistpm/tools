@@ -19,6 +19,10 @@ import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 import transfer from "./actions/transfer";
 import redeemShares from "./actions/redeemShares";
 import getAssetsPrices from "./actions/getAssetsPrices";
+import countMarkets from "./actions/countMarkets";
+import getAllMarketIds from "./actions/getAllMarketIds";
+import getAllMarkets from "./actions/getAllMarkets";
+import viewDisputes from "./actions/viewDisputes";
 import approveMarket from "./actions/approveMarket";
 import rejectMarket from "./actions/rejectMarket";
 
@@ -36,9 +40,17 @@ const catchErrorsAndExit = async (fn: any, opts: any) => {
 program
   .command("createMarket <title> <description> <oracle> <end>")
   .option(
+    "--no-advised",
+    "Create Permissionless market instead of Advised market"
+  )
+  .option(
+    "-c --categories [categories...]",
+    'specify at least two categories'
+  )
+  .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -51,7 +63,7 @@ program
       description: string,
       oracle: string,
       end: string,
-      opts: { endpoint: string; seed: string }
+      opts: { endpoint: string; seed: string, categories: string[], advised: boolean }
     ) =>
       catchErrorsAndExit(
         createMarket,
@@ -401,6 +413,7 @@ program
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
   )
+  // TODO: check if these params really should be string!
   .action(
     (
       marketId: string,
@@ -416,7 +429,46 @@ program
   );
 
 program
-  .command("approveMarket <marketId>")
+  .command("countMarkets")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((opts: { endpoint: string }) =>
+    catchErrorsAndExit(countMarkets, Object.assign(opts))
+  );
+
+
+program
+  .command("getAllMarketIds")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((opts: { endpoint: string }) =>
+    catchErrorsAndExit(getAllMarketIds, Object.assign(opts))
+  );
+
+
+program
+  .command("getAllMarkets")
+  .option(
+    "-f, --filter [fields...]",
+    'only output specified fields'
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((opts: { endpoint: string, filter: string[] }) =>
+    catchErrorsAndExit(getAllMarkets, Object.assign(opts))
+  );
+
+
+program  .command("approveMarket <marketId>")
   .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
@@ -437,7 +489,7 @@ program
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"
-  )
+  )  
   .option(
     "--seed <string>",
     "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
@@ -445,6 +497,18 @@ program
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("viewDisputes <marketId>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint to connect the API to.",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((marketId: number,
+      opts: { endpoint: string}) =>
+    catchErrorsAndExit(viewDisputes, Object.assign(opts, { marketId }))
   );
 
 program.parse(process.argv);
