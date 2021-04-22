@@ -5,7 +5,7 @@ export default {
       assets: "Vec<Asset>",
       swap_fee: "Balance",
       total_weight: "u128",
-      weights: "BTreeMap<Hash, u128>",
+      weights: "BTreeMap<Asset, u128>",
     },
     CommonPoolEventParams: {
       pool_id: "u128",
