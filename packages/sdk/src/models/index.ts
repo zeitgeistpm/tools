@@ -191,19 +191,19 @@ export default class Models {
       }
     } catch (err) { console.error(err); }
 
-    const shareIds = await Promise.all(
-      [...Array(market.categories).keys()].map((id: number) => {
-        //@ts-ignore
-        return this.api.createType("Asset", { predictionmarketshare: [marketId, id] });
-      })
-    );
+    // const shareIds = await Promise.all(
+    //   [...Array(market.categories).keys()].map((id: number) => {
+    //     //@ts-ignore
+    //     return this.api.createType("Asset", { predictionmarketshare: [marketId, id] });
+    //   })
+    // );
 
-    Object.assign(market, {
-      ...data,
-      marketId,
-      metadataString,
-      shareIds: shareIds.map((id) => id.toString()),
-    });
+    // Object.assign(market, {
+    //   ...data,
+    //   marketId,
+    //   metadataString,
+    //   shareIds: shareIds.map((id) => id.toString()),
+    // });
 
     return new Market(market as ExtendedMarketResponse, this.api);
   }

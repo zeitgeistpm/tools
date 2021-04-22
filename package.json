@@ -3,26 +3,29 @@
   "workspaces": [
     "packages/cli",
     "packages/sdk",
-    "packages/type-defs"
+    "packages/type-defs",
+    "packages/types"
   ],
   "name": "tools",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.21.0",
-    "@typescript-eslint/parser": "^4.21.0",
-    "eslint": "^7.14.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-prettier": "^3.1.4",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.24.0",
+    "eslint-config-prettier": "^8.2.0",
+    "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-security": "^1.4.0",
     "lerna": "^4.0.0",
     "prettier": "^2.2.1",
     "ts-node": "^9.1.1",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.4"
   },
   "scripts": {
-    "clean": "rm packages/**/dist -rf",
+    "clean": "rm -rf packages/**/dist",
     "compile": "tsc --build --force tsconfig.json",
     "prepublish": "yarn compile",
-    "cli": "ts-node -r tsconfig-paths/register packages/cli/src/index"
+    "cli": "ts-node -r tsconfig-paths/register packages/cli/src/index",
+    "types:getMetadata": "ts-node packages/types/scripts/getMetadata.ts",
+    "types:generate": "ts-node -r tsconfig-paths/register packages/types/scripts/generate.ts"
   }
 }

@@ -2,8 +2,6 @@
   "name": "@zeitgeistpm/types",
   "version": "0.1.0",
   "description": "Generated types for the Zeitgeist network.",
-  "main": "",
-  "types": "",
   "scripts": {
     "build": "tsc"
   },
@@ -13,6 +11,9 @@
     "@polkadot/typegen": "^4.6.2"
   },
   "dependencies": {
-    "@zeitgeistpm/type-defs": "^0.1.36"
+    "@polkadot/metadata": "^4.6.2",
+    "@polkadot/types": "^4.6.2",
+    "@zeitgeistpm/type-defs": "^0.1.44",
+    "axios": "^0.21.1"
   }
 }

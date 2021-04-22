@@ -4,6 +4,9 @@
             "path": "./packages/type-defs"
         },
         {
+            "path": "./packages/types"
+        },
+        {
             "path": "./packages/sdk"
         },
         {
@@ -14,7 +17,11 @@
         "baseUrl": ".",
         "paths": {
             "@zeitgeistpm/sdk": ["packages/sdk"],
-            "@zeitgeistpm/type-defs": ["packages/type-defs"]
+            "@zeitgeistpm/type-defs": ["packages/type-defs"],
+            "@zeitgeistpm/types": ["packages/types"],
+            "@zeitgeistpm/types/*": [
+                "packages/types/src/*"
+              ],
         },
         "esModuleInterop": true
     },
