@@ -4,15 +4,27 @@
 
 Zeitgeist JavaScript libraries and tools.
 
-## @zeitgeistpm/cli
+## [@zeitgeistpm/cli](packages/cli)
 
 The commandline interface that is built on top of `@zeitgeistpm/sdk`.
 
-## @zeigeistpm/sdk
+## [@zeigeistpm/sdk](packages/sdk)
 
 The main JavaScript library for interacting with the Zeitgeist network.
 
-## Development
+## [@zeitgeistpm/type-defs](packages/type-defs)
+
+Type definitions for the Zeitgeist network.
+
+## [@zeitgeistpm/types](packages/types)
+
+Types for the Zeigeist network.
+
+- [README](packages/types/README.md)
+
+---
+
+## Development Guide
 
 We develop the JavaScript libraries inside of this monorepo and use [Lerna](https://github.com/lerna/lerna) as a tool to help us manage it. This repository uses TypeScript and we do not commit the built JavaScript files. Instead, the files will be generated when we publish the NPM packages, or if called manually by the developer.
 
