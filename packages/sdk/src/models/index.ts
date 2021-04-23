@@ -228,6 +228,48 @@ export default class Models {
     return new Market(extendedMarket as any, this.api);
   }
 
+  /**
+   * Fetches market_count variable from Zeitgeist chain
+   * This acts as a count of all markets which have been created, but includes those which have
+   * been cancelled, and all other statuses
+   */
+  async getMarketCount(): Promise<number | null> {
+    const count = (
+      await this.api.query.predictionMarkets.marketCount()
+    ).toJSON();
+    if (typeof count !== 'number')
+      throw new Error('Expected a number to return from api.query.predictionMarkets.marketCount (even if variable remains unset)');
+    return count;
+  }
+
+  /**
+   * Gets an array of disputes for a given marketId.
+   * Should throw errors where market status is such that no disputes can have been registered.
+   * but all registered disputes will still be returned even if, eg, resolved.
+   * To check if disputes are active, use viewMarket and check market_status for "Disputed"
+   */
+  async fetchDisputes(marketId: MarketId): Promise<any> {    
+    const res = (
+      await this.api.query.predictionMarkets.disputes(marketId)
+    ).toJSON() ;
+
+    if (!Array.isArray(res))
+      throw new Error(`fetchDisputes expected response an array but got ${typeof res}.`);
+
+    if (!res.length) {
+      const market = (
+        await this.api.query.predictionMarkets.markets(marketId)
+      ).toJSON() as MarketResponse;
+      if (!market) {
+        throw new Error(`Market with market id ${marketId} does not exist.`);
+      }
+      if (!market.report)
+        throw new Error(`Market with market id ${marketId} has not been reported and therefore has not been disputed.`);
+      }
+
+    return res;
+  }
+
   async fetchPoolData(poolId: PoolId): Promise<Swap> {
     const poolResponse = (
       await this.api.query.swaps.pools(poolId)
