@@ -6,6 +6,9 @@ export { default as swaps } from "./swaps";
 export const index = {
   rpc: {},
   types: {
+    Address: "MultiAddress",
+    Amount: "i128",
+    AmountOf: "i128",
     Asset: {
       _enum: {
         CategoricalOutcome: "(MarketId, CategoryIndex)",
@@ -15,15 +18,15 @@ export const index = {
         Ztg: null,
       }
     },
+    BalanceInfo: {
+      amount: "Balance"
+    },
     BlockNumber: "u64",
     CategoryIndex: "u16",
     CurrencyIdOf: "Asset",
     CurrencyId: "Asset",
-    AmountOf: "i128",
-    Amount: "i128",
-    Address: "MultiAddress",
-    Lookup: "MultiAddress",
     Index: "u64",
+    Lookup: "MultiAddress",
     ScalarPosition: {
       _enum: [
         "Long",

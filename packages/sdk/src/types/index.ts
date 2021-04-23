@@ -62,7 +62,7 @@ export type FilteredMarketResponse = {
 export type Report = {
   at: number;
   by: string;
-  outcome: number;
+  outcome: Outcome;
 };
 
 export type MarketEnd = { block: number } | { timestamp: number };
@@ -72,7 +72,7 @@ export type MarketCreation = "Permissioned" | "Advised";
 export type MarketDispute = {
   at: number;
   by: string;
-  outcome: number;
+  outcome: Outcome;
 };
 
 export type PoolResponse = {

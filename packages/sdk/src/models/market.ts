@@ -116,7 +116,7 @@ class Market {
     filter? : string[] | null
   ): FilteredMarketResponse {
     if (!filter)
-      return market;
+      return market as any;
 
     const alwaysInclude=["marketId"];
     
@@ -166,7 +166,7 @@ class Market {
   getDisputes = async (): Promise<MarketDispute[]> => {
     return (
       await this.api.query.predictionMarkets.disputes(this.marketId)
-    ).toJSON() as MarketDispute[];
+    ).toJSON() as any[];
   };
 
   deploySwapPool = async (

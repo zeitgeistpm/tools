@@ -259,10 +259,11 @@ export default class Models {
     if (!res.length) {
       const market = (
         await this.api.query.predictionMarkets.markets(marketId)
-      ).toJSON() as MarketResponse;
+      ).toJSON();
       if (!market) {
         throw new Error(`Market with market id ${marketId} does not exist.`);
       }
+      //@ts-ignore
       if (!market.report)
         throw new Error(`Market with market id ${marketId} has not been reported and therefore has not been disputed.`);
       }

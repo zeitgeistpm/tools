@@ -98,6 +98,28 @@ export const initApi = (
           ],
           type: "BalanceInfo<Balance>",
         },
+        getSpotPrices: {
+          description: "Gets spot prices for a range of blocks",
+          params: [
+            {
+              name: "pool_id",
+              type: "u128",
+            },
+            {
+              name: "asset_in",
+              type: "Asset"
+            },
+            {
+              name: "asset_out",
+              type: "Asset"
+            },
+            {
+              name: "blocks",
+              type: "Vec<Hash>"
+            }
+          ],
+          type: "Vec<BalanceInfo<Balance>>"
+        }
       },
     },
     types: {

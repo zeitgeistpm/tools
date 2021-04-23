@@ -2,7 +2,7 @@
 /* eslint-disable */
 
 import type { BTreeMap, Struct, Vec, u128 } from '@polkadot/types';
-import type { AccountId, Balance, Hash } from '@polkadot/types/interfaces/runtime';
+import type { AccountId, Balance } from '@polkadot/types/interfaces/runtime';
 import type { Asset } from '@zeitgeistpm/types/interfaces/index';
 
 /** @name CommonPoolEventParams */
@@ -16,7 +16,7 @@ export interface Pool extends Struct {
   readonly assets: Vec<Asset>;
   readonly swap_fee: Balance;
   readonly total_weight: u128;
-  readonly weights: BTreeMap<Hash, u128>;
+  readonly weights: BTreeMap<Asset, u128>;
 }
 
 /** @name PoolAssetEvent */

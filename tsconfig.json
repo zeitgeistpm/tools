@@ -20,7 +20,7 @@
             "@zeitgeistpm/type-defs": ["packages/type-defs"],
             "@zeitgeistpm/types": ["packages/types"],
             "@zeitgeistpm/types/*": [
-                "packages/types/src/*"
+                "packages/types/*"
               ],
         },
         "esModuleInterop": true
