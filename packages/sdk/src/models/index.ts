@@ -142,15 +142,18 @@ export default class Models {
   async fetchMarketData(marketId: MarketId): Promise<Market> {
     const ipfs = initIpfs();
 
-    const market =
+
+    const marketRaw =
       await this.api.query.predictionMarkets.markets(marketId);
 
-    if (!market) {
+    const marketJson = marketRaw.toJSON();
+
+    if (!marketJson) {
       throw new Error(`Market with market id ${marketId} does not exist.`);
     }
 
-    console.log(market);
-    const { metadata } = market;
+    //@ts-ignore
+    const { metadata } = marketJson;
     const metadataString = hexToString(metadata.toString());
 
     // Default to no metadata, but actually parse it below if it exists.
@@ -192,8 +195,13 @@ export default class Models {
     } catch (err) { console.error(err); }
 
 
+    //@ts-ignore
+    const market = marketRaw.unwrap();
+
+    //@ts-ignore
     const outcomeAssets = market.market_type.isCategorical 
-      ? [...Array(market.market_type.asCategorical).keys()].map((catIdx) => {
+      //@ts-ignore
+      ? [...Array(market.market_type.asCategorical.toNumber()).keys()].map((catIdx) => {
           //@ts-ignore
           return this.api.createType("Asset", {
             categoricalOutcome: [ marketId, catIdx ]
@@ -208,7 +216,7 @@ export default class Models {
         });
       });
 
-    const extendedMarket = market.toJSON();
+    const extendedMarket = marketJson;
 
     Object.assign(extendedMarket, {
       ...data,
@@ -216,8 +224,6 @@ export default class Models {
       metadataString,
       outcomeAssets,
     });
-
-    console.log(extendedMarket);
 
     return new Market(extendedMarket as any, this.api);
   }
