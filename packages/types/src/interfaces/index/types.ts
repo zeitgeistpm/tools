@@ -1,9 +1,9 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { Enum, i128, u128, u16, u64 } from '@polkadot/types';
+import type { Enum, Struct, i128, u128, u16, u64 } from '@polkadot/types';
 import type { ITuple } from '@polkadot/types/types';
-import type { MultiAddress } from '@polkadot/types/interfaces/runtime';
+import type { Balance, MultiAddress } from '@polkadot/types/interfaces/runtime';
 import type { MarketId } from '@zeitgeistpm/types/interfaces/predictionMarkets';
 
 /** @name Address */
@@ -25,6 +25,11 @@ export interface Asset extends Enum {
   readonly isPoolShare: boolean;
   readonly asPoolShare: u128;
   readonly isZtg: boolean;
+}
+
+/** @name BalanceInfo */
+export interface BalanceInfo extends Struct {
+  readonly amount: Balance;
 }
 
 /** @name BlockNumber */

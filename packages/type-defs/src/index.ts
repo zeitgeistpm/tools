@@ -18,9 +18,7 @@ export const index = {
         Ztg: null,
       }
     },
-    BalanceInfo: {
-      amount: "Balance"
-    },
+    BalanceInfo: "Balance",
     BlockNumber: "u64",
     CategoryIndex: "u16",
     CurrencyIdOf: "Asset",

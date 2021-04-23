@@ -55,7 +55,7 @@ import type { Multiplier } from '@polkadot/types/interfaces/txpayment';
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces/utility';
 import type { VestingInfo } from '@polkadot/types/interfaces/vesting';
 import type { AccountId32Junction, AccountIndex64Junction, AccountKey20Junction, AssetInstance, DoubleEncodedCall, Junction, MultiAsset, MultiAssetAbstractFungible, MultiAssetAbstractNonFungible, MultiAssetConcreteFungible, MultiAssetConcreteNonFungible, MultiLocation, NetworkId, VersionedMultiAsset, VersionedMultiLocation, VersionedXcm, Xcm, XcmAssetEffects, XcmError, XcmHrmpChannelAccepted, XcmHrmpChannelClosing, XcmHrmpNewChannelOpenRequest, XcmOrder, XcmOrderBuyExecution, XcmOrderDepositAsset, XcmOrderDepositReserveAsset, XcmOrderExchangeAsset, XcmOrderInitiateReserveWithdraw, XcmOrderInitiateTeleport, XcmOrderQueryHolding, XcmOriginKind, XcmOutcome, XcmQueryResponse, XcmRelayedFrom, XcmReserveAssetDeposit, XcmResponse, XcmTeleportAsset, XcmTransact, XcmTransferAsset, XcmTransferReserveAsset, XcmWithdrawAsset } from '@polkadot/types/interfaces/xcm';
-import type { Amount, AmountOf, Asset, CategoryIndex, CurrencyId, CurrencyIdOf, Lookup, ScalarPosition } from '@zeitgeistpm/types/interfaces/index';
+import type { Amount, AmountOf, Asset, BalanceInfo, CategoryIndex, CurrencyId, CurrencyIdOf, Lookup, ScalarPosition } from '@zeitgeistpm/types/interfaces/index';
 import type { Order, OrderSide } from '@zeitgeistpm/types/interfaces/orderbook';
 import type { Market, MarketCreation, MarketDispute, MarketEnd, MarketId, MarketStatus, MarketType, Outcome, Report } from '@zeitgeistpm/types/interfaces/predictionMarkets';
 import type { CommonPoolEventParams, Pool, PoolAssetEvent, PoolAssetsEvent, SwapEvent } from '@zeitgeistpm/types/interfaces/swaps';
@@ -216,6 +216,7 @@ declare module '@polkadot/types/types/registry' {
     'Option<BabeWeight>': Option<BabeWeight>;
     'Option<BackedCandidate>': Option<BackedCandidate>;
     'Option<Balance>': Option<Balance>;
+    'Option<BalanceInfo>': Option<BalanceInfo>;
     'Option<BalanceLock>': Option<BalanceLock>;
     'Option<BalanceLockTo212>': Option<BalanceLockTo212>;
     'Option<BalanceOf>': Option<BalanceOf>;
@@ -1025,6 +1026,7 @@ declare module '@polkadot/types/types/registry' {
     'Vec<BabeWeight>': Vec<BabeWeight>;
     'Vec<BackedCandidate>': Vec<BackedCandidate>;
     'Vec<Balance>': Vec<Balance>;
+    'Vec<BalanceInfo>': Vec<BalanceInfo>;
     'Vec<BalanceLock>': Vec<BalanceLock>;
     'Vec<BalanceLockTo212>': Vec<BalanceLockTo212>;
     'Vec<BalanceOf>': Vec<BalanceOf>;
@@ -1834,6 +1836,7 @@ declare module '@polkadot/types/types/registry' {
     BabeWeight: BabeWeight;
     BackedCandidate: BackedCandidate;
     Balance: Balance;
+    BalanceInfo: BalanceInfo;
     BalanceLock: BalanceLock;
     BalanceLockTo212: BalanceLockTo212;
     BalanceOf: BalanceOf;
