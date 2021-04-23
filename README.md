@@ -20,8 +20,6 @@ Type definitions for the Zeitgeist network.
 
 Types for the Zeigeist network.
 
-- [README](packages/types/README.md)
-
 ---
 
 ## Development Guide
