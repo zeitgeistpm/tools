@@ -7,7 +7,7 @@ type Options = {
 
 const getAllMarkets = async (opts: Options): Promise<void> => {
   const { endpoint, filter } = opts;
-  if (filter[0]==='ilter')
+  if (Array.isArray(filter) && filter[0]==='ilter')
     return console.log('-filter is not an option. Did you mean --filter ?');
 
   const sdk = await SDK.initialize(endpoint);
