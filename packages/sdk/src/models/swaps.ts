@@ -70,6 +70,30 @@ export default class Swap {
     return res;
   }
 
+    // /// Unimplemented:
+    // /// Comment in (exposed) substrate pub fn create_pool: 
+    // ///   Temporary probably - The Swap is created per prediction market.
+    // /// Instead of this function, use Market.deploySwapPool
+    // createPool = async (
+    //   signer: KeyringPairOrExtSigner,
+    //   assets: string[], 
+    //   weights?: string[],
+    //   callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    // ): Promise<string> => {
+    //     if (assets.length !== weights.length) {
+    //       throw new Error("Relative weights were supplied, but they do not cover all assets.");
+    //     }
+    //     if (!weights) {
+    //       weights = new Array(assets.length).fill(1);
+    //     }
+    //     ...
+    //     return new Promise(async (resolve) => {
+    //         const unsub = await this.api.tx.swaps
+    //           .createPool(this.marketId, assets, weights)
+    //           . etc etc
+    //     });
+    // };
+
   joinPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,

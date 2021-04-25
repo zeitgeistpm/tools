@@ -221,6 +221,7 @@ class Market {
           );
       }
     });
+
   };
 
   async getAssetsPrices(blockNumber: any): Promise<any> {
