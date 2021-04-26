@@ -10,6 +10,8 @@ const viewMarket = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
+  console.log("here");
+
   const market = await sdk.models.fetchMarketData(Number(marketId));
 
   console.log(market.toJSONString());

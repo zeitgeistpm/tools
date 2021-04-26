@@ -4,12 +4,24 @@
             "path": "./packages/type-defs"
         },
         {
+            "path": "./packages/types"
+        },
+        {
             "path": "./packages/sdk"
         },
         {
             "path": "./packages/cli"
         }
     ],
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@zeitgeistpm/sdk": ["packages/sdk"],
+            "@zeitgeistpm/type-defs": ["packages/type-defs"],
+            "@zeitgeistpm/types": ["packages/types"],
+        },
+        "esModuleInterop": true
+    },
     "files": [],
     "include": [
         ".eslintrc.js"

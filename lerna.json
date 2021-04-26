@@ -2,7 +2,8 @@
   "packages": [
     "packages/cli",
     "packages/sdk",
-    "packages/type-defs"
+    "packages/type-defs",
+    "packages/types"
   ],
   "version": "0.1.45",
   "npmClient": "yarn",
