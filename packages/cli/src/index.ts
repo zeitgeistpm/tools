@@ -113,8 +113,8 @@ program
   .command("buyCompleteSet <marketId> <amount>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -137,8 +137,8 @@ program
   .command("sellCompleteSet <marketId> <amount>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -156,8 +156,8 @@ program
   .command("report <marketId> <outcome>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -172,8 +172,8 @@ program
   .command("dispute <marketId> <outcome>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -191,8 +191,8 @@ program
   .command("redeem <marketId>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -207,8 +207,8 @@ program
   .command("deployPool <marketId>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -223,8 +223,8 @@ program
   .command("joinPool <poolId> <amountOut> <amountIn>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -234,7 +234,7 @@ program
   .action(
     (
       poolId: number,
-      amountOut: string,
+      amountOut: number,
       amountIn: string,
       opts: { seed: string; endpoint: string }
     ) =>
@@ -248,8 +248,8 @@ program
   .command("exitPool <poolId> <amountIn> <amountOut>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -275,8 +275,8 @@ program
   )
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -312,8 +312,8 @@ program
   )
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -378,8 +378,8 @@ program
   .command("wrapNativeCurrency <amount>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -405,8 +405,8 @@ program
   .command("transfer <marketId> <sharesIndex> <to> <amount>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is:",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
