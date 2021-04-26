@@ -96,7 +96,7 @@ export const initApi = (
               isOptional: true,
             },
           ],
-          type: "BalanceInfo<Balance>",
+          type: "SerdeWrapper",
         },
         getSpotPrices: {
           description: "Gets spot prices for a range of blocks",
@@ -118,7 +118,7 @@ export const initApi = (
               type: "Vec<Hash>"
             }
           ],
-          type: "Vec<BalanceInfo<Balance>>"
+          type: "Vec<SerdeWrapper>"
         }
       },
     },

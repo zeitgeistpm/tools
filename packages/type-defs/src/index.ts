@@ -1,6 +1,5 @@
 export { default as orderbook } from "./orderbook";
 export { default as predictionMarkets } from "./predictionMarkets";
-export { default as shares } from "./shares";
 export { default as swaps } from "./swaps";
 
 export const index = {
@@ -18,7 +17,7 @@ export const index = {
         Ztg: null,
       }
     },
-    BalanceInfo: "Balance",
+    SerdeWrapper: "Balance",
     BlockNumber: "u64",
     CategoryIndex: "u16",
     CurrencyIdOf: "Asset",
