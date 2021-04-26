@@ -19,9 +19,6 @@
             "@zeitgeistpm/sdk": ["packages/sdk"],
             "@zeitgeistpm/type-defs": ["packages/type-defs"],
             "@zeitgeistpm/types": ["packages/types"],
-            "@zeitgeistpm/types/*": [
-                "packages/types/*"
-              ],
         },
         "esModuleInterop": true
     },

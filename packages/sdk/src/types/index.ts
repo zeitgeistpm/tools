@@ -1,6 +1,6 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
-import { Market, MarketType, Outcome } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets/types";
+import { Market, MarketType, Outcome } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
 
 // Just a market identifier.
 export type MarketId = number;
