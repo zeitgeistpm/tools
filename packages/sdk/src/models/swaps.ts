@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
-import { KeyringPairOrExtSigner, PoolResponse } from "../types";
+import { KeyringPairOrExtSigner, PoolResponse, poolJoinOpts, poolExitOpts } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 
 /**
@@ -119,6 +119,95 @@ export default class Swap {
       poolAmountOut,
       maxAmountsIn
     );
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
+  };
+
+
+  /** Three substrate join_pool_xxx functions in one
+  */
+  joinPoolMultifunc = async (
+    signer: KeyringPairOrExtSigner,
+    opts: poolJoinOpts,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _resolve(true);
+      }
+
+      unsubOrWarns(_unsub);
+    };
+    /// Quick helpers for readability
+    const isNum = (param) => typeof opts.bounds[param]==='number';
+    const areAllUndefined = (...params) => params.every(param=> typeof param==="undefined");
+    let tx;
+
+    if (isNum("assetAmount") && isNum("poolMin")) {
+      // PoolJoinForMinPool
+      if (!areAllUndefined("poolAmount", "poolMax", "assetMin", "assetMax")) {
+        throw new Error("Too many asset and pool bounds were specified.");
+      }
+      if (areAllUndefined("assetId")) {
+        throw new Error("Missing assetId.");
+      }
+
+      tx = this.api.tx.swaps.poolJoinWithExactAssetAmount(
+        this.poolId,
+        opts.asset,
+        opts.bounds.assetAmount,
+        opts.bounds.poolMin
+      );
+
+    } else if (isNum("poolAmount") && isNum("assetMax")) {
+      // PoolJoinForMaxAsset, with assetId optional
+      if (!areAllUndefined("assetAmount", "poolMin", "poolMax", "assetMin")) {
+        throw new Error("Too many asset and pool bounds were specified.");
+      }      
+
+      tx = areAllUndefined("assetId")
+      ? this.api.tx.swaps.poolJoin(
+          this.poolId,
+          opts.bounds.poolAmount,
+          opts.bounds.assetMax
+        )
+      : this.api.tx.swaps.poolJoinWithExactPoolAmount(
+          this.poolId,
+          opts.asset,
+          opts.bounds.poolAmount,
+          opts.bounds.assetMax
+        );
+
+    } else {
+      throw new Error(`Incorrect asset and pool bound parameters to joinPool. Valid combinations are:\n
+        poolId, assetId, bounds = { poolAmount, assetMax } \n
+        poolId, bounds = { poolAmount, assetMax } \n
+        poolId, bounds = { assetAmount, poolMin } \n`)
+    }
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {

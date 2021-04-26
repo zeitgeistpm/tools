@@ -203,6 +203,11 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
+      // TODO: // sanity check: weights.length should equal outcomes.length+1 (for ZTG)
+      // TODO: // weights should each be >= runtime's MinWeight (currently 1e10)
+      console.log(weights);
+      
+      
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
@@ -257,12 +262,13 @@ class Market {
 
       if (status.isInBlock) {
         _resolve(true);
+        unsubOrWarns(_unsub);
       }
-
-      unsubOrWarns(_unsub);
     };
 
     return new Promise(async (resolve) => {
+      console.log('async buyCompleteSet', this.marketId, amount);
+
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
           .buyCompleteSet(this.marketId, amount)
@@ -297,9 +303,8 @@ class Market {
 
       if (status.isInBlock) {
         _resolve(true);
+        unsubOrWarns(_unsub);
       }
-
-      unsubOrWarns(_unsub);
     };
 
     return new Promise(async (resolve) => {
@@ -436,9 +441,9 @@ class Market {
 
       if (status.isInBlock) {
         _resolve(true);
+        unsubOrWarns(_unsub);
       }
 
-      unsubOrWarns(_unsub);
     };
 
     return new Promise(async (resolve) => {
