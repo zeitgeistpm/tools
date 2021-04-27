@@ -38,6 +38,7 @@ export type ExtendedMarketResponse = {
   description: string;
   metadataString: string;
   shareIds: string[];
+  owns?: [{ shareId: string, amount: number }];
 };
 
 // The extended market data from which a market may be created.
@@ -86,14 +87,14 @@ export type PoolResponse = {
 
 
 interface PoolJoinOrExitIncomplete {
-  amount: number;
+  // amount: number;
 }
 
 interface PoolJoinForMaxAsset extends PoolJoinOrExitIncomplete {
   poolAmount: number;
   assetAmount?: never;
   poolMin?: never;
-  assetMax: number;
+  assetMax: number | number[];
   assetMin?: never;
   poolMax?: never;
 }

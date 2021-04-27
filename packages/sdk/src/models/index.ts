@@ -1,6 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber, hexToString } from "@polkadot/util";
+import { encodeAddress } from "@polkadot/util-crypto";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
 import { unsubOrWarns } from "../util";
@@ -139,7 +140,10 @@ export default class Models {
    * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
    * @param marketId The unique identifier for the market you want to fetch.
    */
-  async fetchMarketData(marketId: MarketId): Promise<Market> {
+  async fetchMarketData(
+    marketId: MarketId,
+    opts?:{ address: string },
+  ): Promise<Market> {
     const ipfs = initIpfs();
 
     const market = (
@@ -192,20 +196,62 @@ export default class Models {
     } catch (err) { console.error(err); }
 
     const shareIds = await Promise.all(
-      [...Array(market.categories).keys()].map((id: number) => {
-        //@ts-ignore
-        return this.api.createType("Asset", { predictionmarketshare: [marketId, id] });
-      })
+      [...Array(market.categories).keys()]
+        .map((id: number) => {
+          //@ts-ignore
+          const shareId= this.api.createType("Asset", { predictionmarketshare: [marketId, id] });
+          return shareId;
+        })
+        .map((id) => id.toString())
     );
+
+     console.log('\n\n\n>>>');
+     console.log(this.api.query.tokens.accounts);
+     
+      
+
+
+     const keys = await this.api.query.tokens.accounts.keys("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
+     const keys2 = await this.api.query.tokens.accounts.keys("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
+     console.log('keys.length:', keys.length);
+     console.log('keys2.length:', keys2.length);
+     
+     const shares = keys.map(key=> ({
+      shareId: key.toString().slice(-160, -96),
+      accountId: encodeAddress('0x'+ key.toString().slice(-64), 42),
+     }));
+
+     
+     console.log(shares.map(({shareId, accountId})=> `shareId: ${shareId}, accountId: ${accountId}`).join('\n'));
+     
+     
+     console.log('<<<\n\n\n');
+     console.log('keys.length:', keys.length);
+     console.log('<<<\n\n\n');
+
+    const owns = (opts && opts.address)
+      ? shareIds.map (shareId=>({
+         shareId,
+         amount: 777
+        }))
+      : null ;
 
     Object.assign(market, {
       ...data,
       marketId,
       metadataString,
-      shareIds: shareIds.map((id) => id.toString()),
+      shareIds,
     });
 
-    return new Market(market as ExtendedMarketResponse, this.api);
+    const extendedMarketResponse = new Market(market as ExtendedMarketResponse, this.api);
+    if (owns) {
+      console.log(owns);
+      
+      extendedMarketResponse[opts.address] = { owns };
+      
+    }  
+    // NB: no longer ExtendedMarketResponse type, since extra field's name is an address
+    return extendedMarketResponse;
   }
 
   /**

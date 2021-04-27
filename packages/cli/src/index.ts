@@ -74,6 +74,15 @@ program
 program
   .command("viewMarket <marketId>")
   .option(
+    "--address <string>",
+    "An address on which to report ownership of shares.",
+  )
+  .option(
+    "--seed <string>",
+    "A seed from which to calculate an address on which to report ownership of shares. Default is `//Alice`.",
+    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+  )
+  .option(
     "--endpoint <string>",
     "The endpoint to connect the API to.",
     "wss://bp-rpc.zeitgeist.pm"

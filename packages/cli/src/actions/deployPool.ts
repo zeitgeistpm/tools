@@ -1,4 +1,5 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+// import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK, { util } from "../../../sdk/src";
 
 type Options = {
   endpoint: string;
@@ -16,9 +17,14 @@ const deployPool = async (opts: Options): Promise<void> => {
 
   const market = await sdk.models.fetchMarketData(marketId);
   const res = await market.deploySwapPool(signer, [
-    "25".concat("0".repeat(10)),
-    "125".concat("0".repeat(9)),
-    "125".concat("0".repeat(9)),
+    "1".concat("0".repeat(10)),
+    "1".concat("0".repeat(10)),
+    "1".concat("0".repeat(10)),
+    "1".concat("0".repeat(10)),
+    "1".concat("0".repeat(10)),
+    "1".concat("0".repeat(10)),
+    "1".concat("0".repeat(10)),
+    "1".concat("0".repeat(10)),
   ]);
 
   console.log(res);

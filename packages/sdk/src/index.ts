@@ -11,9 +11,14 @@ export default class SDK {
   public models: Models;
 
   static async initialize(
-    endpoint = "wss://bp-rpc.zeitgeist.pm"
+    endpoint = "wss://bp-rpc.zeitgeist.pm",
+    logEndpointInitTime = true
   ): Promise<SDK> {
+    const start=Date.now();
     const api = await initApi(endpoint);
+    if (logEndpointInitTime) {
+      console.log(`${endpoint} initialised in ${Date.now()-start} ms.`);      
+    }
 
     return new SDK(api);
   }

@@ -109,9 +109,8 @@ export default class Swap {
 
       if (status.isInBlock) {
         _resolve(true);
+        unsubOrWarns(_unsub);
       }
-
-      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.poolJoin(
@@ -158,16 +157,25 @@ export default class Swap {
 
       if (status.isInBlock) {
         _resolve(true);
+        unsubOrWarns(_unsub);
       }
-
-      unsubOrWarns(_unsub);
     };
     /// Quick helpers for readability
-    const isNum = (param) => typeof opts.bounds[param]==='number';
-    const areAllUndefined = (...params) => params.every(param=> typeof param==="undefined");
+    const isLikeNum = (param) => {
+      const p=opts.bounds[param];
+      return (typeof p==="number" || (Array.isArray(p) && typeof p[0]==="number"));
+    }
+    const areAllUndefined = (...params) => params.every(param=> typeof opts.bounds[param]==="undefined");
     let tx;
 
-    if (isNum("assetAmount") && isNum("poolMin")) {
+    console.log(opts.bounds);
+    // ["poolAmount","assetAmount", "poolMin", "poolMax", "assetMin","assetMax"]
+    //   .forEach(key=>{
+    //     console.log(`\n${key}- isLikeNum:${isLikeNum(key)} areAllUndefined:${areAllUndefined([key])}\n`);
+    //     console.log(typeof opts.bounds[key], Array.isArray(opts.bounds[key]), Array.isArray(opts.bounds[key]) &&typeof opts.bounds[key][0]);
+    //   });
+
+    if (isLikeNum("assetAmount") && isLikeNum("poolMin")) {
       // PoolJoinForMinPool
       if (!areAllUndefined("poolAmount", "poolMax", "assetMin", "assetMax")) {
         throw new Error("Too many asset and pool bounds were specified.");
@@ -183,11 +191,16 @@ export default class Swap {
         opts.bounds.poolMin
       );
 
-    } else if (isNum("poolAmount") && isNum("assetMax")) {
+    } else if (isLikeNum("poolAmount") && isLikeNum("assetMax")) {
       // PoolJoinForMaxAsset, with assetId optional
       if (!areAllUndefined("assetAmount", "poolMin", "poolMax", "assetMin")) {
         throw new Error("Too many asset and pool bounds were specified.");
-      }      
+      }    
+      if (!areAllUndefined("assetId") && Array.isArray(opts.bounds.assetMax)) {
+        throw new Error("Too many asset maxima were specified.");
+      }  else if (areAllUndefined("assetId") && !Array.isArray(opts.bounds.assetMax)) {
+        opts.bounds.assetMax = [opts.bounds.assetMax];
+      }     
 
       tx = areAllUndefined("assetId")
       ? this.api.tx.swaps.poolJoin(
@@ -203,7 +216,8 @@ export default class Swap {
         );
 
     } else {
-      throw new Error(`Incorrect asset and pool bound parameters to joinPool. Valid combinations are:\n
+      console.log(opts.bounds);      
+      throw new Error(`Incorrect asset and pool bounds in params to joinPool. Valid combinations are:\n
         poolId, assetId, bounds = { poolAmount, assetMax } \n
         poolId, bounds = { poolAmount, assetMax } \n
         poolId, bounds = { assetAmount, poolMin } \n`)
@@ -245,9 +259,8 @@ export default class Swap {
 
       if (status.isInBlock) {
         _resolve(true);
+        unsubOrWarns(_unsub);
       }
-
-      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.poolExit(
@@ -295,9 +308,8 @@ export default class Swap {
 
       if (status.isInBlock) {
         _resolve(true);
+        unsubOrWarns(_unsub);
       }
-
-      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.swapExactAmountIn(
@@ -348,9 +360,8 @@ export default class Swap {
 
       if (status.isInBlock) {
         _resolve(true);
+        unsubOrWarns(_unsub);
       }
-
-      unsubOrWarns(_unsub);
     };
 
     const tx = this.api.tx.swaps.swapExactAmountOut(
