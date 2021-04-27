@@ -2,9 +2,10 @@
   "packages": [
     "packages/cli",
     "packages/sdk",
-    "packages/type-defs"
+    "packages/type-defs",
+    "packages/types"
   ],
-  "version": "0.1.45",
+  "version": "0.1.48",
   "npmClient": "yarn",
   "useWorkspaces": true,
   "scripts": {

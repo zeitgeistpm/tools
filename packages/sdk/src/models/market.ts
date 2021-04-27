@@ -15,6 +15,7 @@ import {
 } from "../types";
 import { NativeShareId } from "../consts";
 import { isExtSigner, unsubOrWarns } from "../util";
+
 /**
  * The Market class initializes all the market data.
  */
@@ -50,7 +51,7 @@ class Market {
   /** The metadata string. */
   public metadataString: string;
   /** The share identifiers */
-  public shareIds: string[];
+  public outcomeAssets: any;
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
@@ -72,7 +73,7 @@ class Market {
       title,
       description,
       metadataString,
-      shareIds,
+      outcomeAssets,
     } = market;
 
     this.creator = creator;
@@ -81,7 +82,7 @@ class Market {
     this.oracle = oracle;
     this.end = end;
     this.metadata = metadata;
-    this.marketType = market_type;
+    this.marketType = market_type.toString();
     this.marketStatus = market_status;
     this.report = report;
     this.categories = categories;
@@ -90,7 +91,7 @@ class Market {
     this.title = title;
     this.description = description;
     this.metadataString = metadataString;
-    this.shareIds = shareIds;
+    this.outcomeAssets = outcomeAssets;
 
     this.api = api;
   }
@@ -115,7 +116,7 @@ class Market {
     filter? : string[] | null
   ): FilteredMarketResponse {
     if (!filter)
-      return market;
+      return market as any;
 
     const alwaysInclude=["marketId"];
     
@@ -165,7 +166,7 @@ class Market {
   getDisputes = async (): Promise<MarketDispute[]> => {
     return (
       await this.api.query.predictionMarkets.disputes(this.marketId)
-    ).toJSON() as MarketDispute[];
+    ).toJSON() as any[];
   };
 
   deploySwapPool = async (
