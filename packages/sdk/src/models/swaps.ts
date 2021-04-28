@@ -45,15 +45,23 @@ export default class Swap {
     outAsset: string,
     blockHash?: any
   ): Promise<any> {
+
+    if (blockHash) {
+      //@ts-ignore
+      return this.api.rpc.swaps.getSpotPrice(
+        this.poolId,
+        inAsset,
+        outAsset,
+        blockHash,
+      );
+    }
+
     //@ts-ignore
-    const res = await this.api.rpc.swaps.getSpotPrice(
+    return this.api.rpc.swaps.getSpotPrice(
       this.poolId,
       inAsset,
-      outAsset,
-      blockHash ? blockHash : undefined
-    );
-
-    return res;
+      outAsset
+    )
   }
 
   public async sharesId(): Promise<any> {
