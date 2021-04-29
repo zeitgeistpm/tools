@@ -222,7 +222,6 @@ class Market {
       }
       console.log();
       
-      // console.log(this.marketId);      
       
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
