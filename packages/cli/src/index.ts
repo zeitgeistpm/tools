@@ -50,7 +50,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -80,7 +80,7 @@ program
   .option(
     "--seed <string>",
     "A seed from which to calculate an address on which to report ownership of shares. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -96,7 +96,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -123,7 +123,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -147,7 +147,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -166,7 +166,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -182,7 +182,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -201,7 +201,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -217,7 +217,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -233,7 +233,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -258,7 +258,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -285,7 +285,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -322,7 +322,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -388,7 +388,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -415,7 +415,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -486,7 +486,7 @@ program  .command("approveMarket <marketId>")
   .option(
     "--seed <string>",
     "The signer's seed. Must be an ApprovalOrigin. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(approveMarket, Object.assign(opts, { marketId }))
@@ -502,7 +502,7 @@ program
   .option(
     "--seed <string>",
     "The signer's seed. Must be an ApprovalOrigin. Default Alice:",
-    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
+    "//Alice"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId }))
