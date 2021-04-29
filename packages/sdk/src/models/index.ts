@@ -146,16 +146,22 @@ export default class Models {
   ): Promise<Market> {
     const ipfs = initIpfs();
 
-    const market = (
-      await this.api.query.predictionMarkets.markets(marketId)
-    ).toJSON() as MarketResponse;
 
-    if (!market) {
+    const marketRaw =
+      await this.api.query.predictionMarkets.markets(marketId);
+
+    // TODO: type
+    const marketJson = marketRaw.toJSON();
+
+    if (!marketJson) {
       throw new Error(`Market with market id ${marketId} does not exist.`);
     }
 
-    const { metadata } = market;
-    const metadataString = hexToString(metadata);
+    const extendedMarket = marketJson;
+
+    //@ts-ignore
+    const { metadata } = marketJson;
+    const metadataString = hexToString(metadata.toString());
 
     // Default to no metadata, but actually parse it below if it exists.
     let data = {
@@ -166,7 +172,7 @@ export default class Models {
 
     try {
       // Metadata exists, so parse it.
-      if (hexToString(metadata)) {
+      if (metadataString) {
         const raw = toString(concat(await all(ipfs.cat(metadataString))));
 
         try {
@@ -195,62 +201,62 @@ export default class Models {
       }
     } catch (err) { console.error(err); }
 
-    const shareIds = await Promise.all(
-      [...Array(market.categories).keys()]
-        .map((id: number) => {
+    //@ts-ignore
+    const market = marketRaw.unwrap();
+
+    // TODO: Decorate empty const outcomeAssets=[], conditionally on market_type getters
+    //@ts-ignore
+    const outcomeAssets = market.market_type.isCategorical 
+      //@ts-ignore
+      ? [...Array(market.market_type.asCategorical.toNumber()).keys()].map((catIdx) => {
           //@ts-ignore
-          const shareId= this.api.createType("Asset", { predictionmarketshare: [marketId, id] });
-          return shareId;
+          return this.api.createType("Asset", {
+            categoricalOutcome: [ marketId, catIdx ]
+          });
         })
-        .map((id) => id.toString())
-    );
+      : ["Long", "Short"].map((pos) => {
+        //@ts-ignore
+        const position = this.api.createType("ScalarPosition", pos);
+        //@ts-ignore
+        return this.api.createType("Asset", {
+          scalarOutcome: [ marketId, position.toString() ]
+        });
+      });
 
-     console.log('\n\n\n>>>');
-     console.log(this.api.query.tokens.accounts);
-     
-      
 
+    // EXPERIMENT      
+    // TODO:  Poll tokens pallet for AccountIds with accounts_by_currency_id
+    // But see: https://github.com/zeitgeistpm/zeitgeist/issues/101
+    // (maybe wait until new index is built!)
+    // const owns = (opts && opts.address)
+    //   ? outcomeAssets.map (asset=>({
+    //      asset: asset.toJSON(),
+    //      amount: 777
+    //     }))
+    //   : null ;
+    // console.log('owns:', owns);
+    
 
-     const keys = await this.api.query.tokens.accounts.keys("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
-     const keys2 = await this.api.query.tokens.accounts.keys("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
-     console.log('keys.length:', keys.length);
-     console.log('keys2.length:', keys2.length);
-     
-     const shares = keys.map(key=> ({
-      shareId: key.toString().slice(-160, -96),
-      accountId: encodeAddress('0x'+ key.toString().slice(-64), 42),
-     }));
-
-     
-     console.log(shares.map(({shareId, accountId})=> `shareId: ${shareId}, accountId: ${accountId}`).join('\n'));
-     
-     
-     console.log('<<<\n\n\n');
-     console.log('keys.length:', keys.length);
-     console.log('<<<\n\n\n');
-
-    const owns = (opts && opts.address)
-      ? shareIds.map (shareId=>({
-         shareId,
-         amount: 777
-        }))
-      : null ;
-
-    Object.assign(market, {
+    // new
+    Object.assign(extendedMarket, {
       ...data,
       marketId,
       metadataString,
-      shareIds,
+      outcomeAssets,
     });
 
+    // old 
     const extendedMarketResponse = new Market(market as ExtendedMarketResponse, this.api);
-    if (owns) {
-      console.log(owns);
-      
-      extendedMarketResponse[opts.address] = { owns };
-      
-    }  
-    // NB: no longer ExtendedMarketResponse type, since extra field's name is an address
+
+    // new
+    // const extendedMarketResponse = new Market(extendedMarket as any, this.api);
+
+    // if (owns) {
+    //   console.log(owns);
+    //   // NB: no longer ExtendedMarketResponse type, since extra field's name is an address
+    //   extendedMarketResponse[opts.address] = { owns };      
+    // }  
+
     return extendedMarketResponse;
   }
 
@@ -285,10 +291,11 @@ export default class Models {
     if (!res.length) {
       const market = (
         await this.api.query.predictionMarkets.markets(marketId)
-      ).toJSON() as MarketResponse;
+      ).toJSON();
       if (!market) {
         throw new Error(`Market with market id ${marketId} does not exist.`);
       }
+      //@ts-ignore
       if (!market.report)
         throw new Error(`Market with market id ${marketId} has not been reported and therefore has not been disputed.`);
       }

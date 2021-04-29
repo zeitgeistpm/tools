@@ -1,12 +1,6 @@
 {
+    "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "declaration": true,
         "outDir": "dist",
         "skipLibCheck": true
     },

@@ -10,7 +10,8 @@ const getAllMarkets = async (opts: Options): Promise<void> => {
   if (Array.isArray(filter) && filter[0]==='ilter')
     return console.log('-filter is not an option. Did you mean --filter ?');
 
-  const sdk = await SDK.initialize(endpoint);
+  // supress output of endpoint initialisation timer, which confuses |jq '.'
+  const sdk = await SDK.initialize(endpoint, { logEndpointInitTime: false });
 
   const res = await sdk.models.getAllMarkets();
 

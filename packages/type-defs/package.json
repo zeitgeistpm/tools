@@ -1,6 +1,6 @@
 {
   "name": "@zeitgeistpm/type-defs",
-  "version": "0.1.45",
+  "version": "0.1.47",
   "description": "Zeitgeist's type definitions for polkadot-js",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,5 +11,6 @@
     "test": "echo \"Error: no test specified\" && exit 0"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "gitHead": "f65183993419e36276711f4634c57536ffad93a1"
 }

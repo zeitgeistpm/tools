@@ -1,23 +1,22 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
+//@ts-ignore
+import { Market, MarketType, Outcome } from "@zeitgeistpm/types/interfaces/predictionMarkets";
 
 // Just a market identifier.
 export type MarketId = number;
 
+export type CategoricalMarket = {
+  categories: number;
+}
+
+export type ScalarMarket = {
+  lowerBound: number,
+  higherBound: number,
+}
+
 // The market type as returned by the API call to `predictionMarkets.markets`.
-export type MarketResponse = {
-  creator: string;
-  creation: MarketCreation;
-  creator_fee: number;
-  oracle: string;
-  end: MarketEnd;
-  metadata: string;
-  market_type: string;
-  market_status: string;
-  report: Report | null;
-  categories: number | null;
-  resolved_outcome: number | null;
-};
+export type MarketResponse = Market;
 
 // The extended market data from which a market may be created.
 export type ExtendedMarketResponse = {
@@ -27,7 +26,7 @@ export type ExtendedMarketResponse = {
   oracle: string;
   end: MarketEnd;
   metadata: string;
-  market_type: string;
+  market_type: MarketType;
   market_status: string;
   report: Report | null;
   categories: number | null;
@@ -39,6 +38,7 @@ export type ExtendedMarketResponse = {
   metadataString: string;
   shareIds: string[];
   owns?: [{ shareId: string, amount: number }];
+  outcomeAssets: any;
 };
 
 // The extended market data from which a market may be created.
@@ -65,7 +65,7 @@ export type FilteredMarketResponse = {
 export type Report = {
   at: number;
   by: string;
-  outcome: number;
+  outcome: Outcome;
 };
 
 export type MarketEnd = { block: number } | { timestamp: number };
@@ -75,7 +75,7 @@ export type MarketCreation = "Permissioned" | "Advised";
 export type MarketDispute = {
   at: number;
   by: string;
-  outcome: number;
+  outcome: Outcome;
 };
 
 export type PoolResponse = {
