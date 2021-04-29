@@ -79,8 +79,8 @@ program
   )
   .option(
     "--seed <string>",
-    "A seed from which to calculate an address on which to report ownership of shares. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "A seed from which to calculate an address on which to report ownership of shares. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -95,8 +95,8 @@ program
   .command("cancelMarket <marketId>")
   .option(
     "--seed <string>",
-    "The signer's seed. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .option(
     "--endpoint <string>",
@@ -485,8 +485,8 @@ program  .command("approveMarket <marketId>")
   )
   .option(
     "--seed <string>",
-    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Must be an ApprovalOrigin. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(approveMarket, Object.assign(opts, { marketId }))
@@ -501,8 +501,8 @@ program
   )  
   .option(
     "--seed <string>",
-    "The signer's seed. Must be an ApprovalOrigin. Default is `//Alice`.",
-    "clean useful exotic shoe day rural hotel pitch manual happy inherit concert"
+    "The signer's seed. Must be an ApprovalOrigin. Default Alice:",
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId }))
