@@ -246,10 +246,10 @@ export default class Models {
     });
 
     // old 
-    const extendedMarketResponse = new Market(market as ExtendedMarketResponse, this.api);
+    // const extendedMarketResponse = new Market(market as ExtendedMarketResponse, this.api);
 
     // new
-    // const extendedMarketResponse = new Market(extendedMarket as any, this.api);
+    const extendedMarketResponse = new Market(extendedMarket as any, this.api);
 
     // if (owns) {
     //   console.log(owns);

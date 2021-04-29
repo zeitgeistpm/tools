@@ -11,6 +11,8 @@ import {
   MarketEnd,
   Report,
   MarketDispute,
+  marketTypeForHuman,
+  OutcomeAsset,
   PoolResponse,
 } from "../types";
 import { NativeShareId } from "../consts";
@@ -35,7 +37,7 @@ class Market {
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
-  public marketType: string; // <- TODO add a real type for this
+  public marketType: marketTypeForHuman;
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
@@ -51,7 +53,7 @@ class Market {
   /** The metadata string. */
   public metadataString: string;
   /** The share identifiers */
-  public outcomeAssets: any;
+  public outcomeAssets: OutcomeAsset[];
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
@@ -82,7 +84,7 @@ class Market {
     this.oracle = oracle;
     this.end = end;
     this.metadata = metadata;
-    this.marketType = market_type.toString();
+    this.marketType = market_type;
     this.marketStatus = market_status;
     this.report = report;
     this.categories = categories;
@@ -206,8 +208,21 @@ class Market {
     return new Promise(async (resolve) => {
       // TODO: // sanity check: weights.length should equal outcomes.length+1 (for ZTG)
       // TODO: // weights should each be >= runtime's MinWeight (currently 1e10)
-      console.log(weights);
+      console.log("Relative weights: ", weights);
+      console.log(`If market ${this.marketId} has a different number of outcomes than ${weights.length-1}, you might get error {6,13}.\n`);
+      if (this.outcomeAssets) {
+        if (weights.length+1 !== this.outcomeAssets.length) {
+          console.log("Weights length mismatch. Expect an error {6,13}: ProvidedValuesLenMustEqualAssetsLen.");
+          if (weights.length === this.outcomeAssets.length)
+            console.log("Hint: don't forget to include the weight of ZTG as the last weight!");
+        }
+      } else {
+        console.log("Market object appears to be a bare MarketResponse, not an ExtendedMarket");
+        console.log("This should not happen unless you are running old code for bug testing.");        
+      }
+      console.log();
       
+      // console.log(this.marketId);      
       
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets

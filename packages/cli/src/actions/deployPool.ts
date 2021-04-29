@@ -16,19 +16,13 @@ const deployPool = async (opts: Options): Promise<void> => {
   console.log("Sending transaction from", signer.address);
 
   const market = await sdk.models.fetchMarketData(marketId);
-  const res = await market.deploySwapPool(signer, [
-    "1".concat("0".repeat(10)),
-    "1".concat("0".repeat(10)),
-    "1".concat("0".repeat(10)),
-    "1".concat("0".repeat(10)),
-    "1".concat("0".repeat(10)),
-    "1".concat("0".repeat(10)),
-    "1".concat("0".repeat(10)),
-    "1".concat("0".repeat(10)),
-  ]);
+
+  const weights = Array(market.outcomeAssets.length+1)
+    .fill("1".concat("0".repeat(10)));
+
+  const res = await market.deploySwapPool(signer, weights);
 
   console.log(res);
-  console.log("!!!");
 };
 
 export default deployPool;

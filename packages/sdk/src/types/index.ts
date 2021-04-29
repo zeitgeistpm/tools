@@ -8,12 +8,39 @@ export type MarketId = number;
 
 export type CategoricalMarket = {
   categories: number;
-}
+};
 
 export type ScalarMarket = {
   lowerBound: number,
   higherBound: number,
+};
+
+export type OutcomeIndex = [
+  number, number | string
+];
+
+type categoricalOutcomeIndex = [number, number];
+
+type scalarOutcomeIndex = [number, "Long" | "Short" ];
+
+export type marketTypeForHuman = 
+    CategoricalOutcome
+  | ScalarOutcome
+  | {
+    ztg: null;
+  } | {
+    poolshare: number;
+  };
+
+export type CategoricalOutcome = {
+ categoricalOutcome : categoricalOutcomeIndex;
 }
+
+export type ScalarOutcome = {
+  scalarOutcome: scalarOutcomeIndex;  
+};
+
+export type OutcomeAsset = CategoricalOutcome | ScalarOutcome;
 
 // The market type as returned by the API call to `predictionMarkets.markets`.
 export type MarketResponse = Market;
@@ -36,9 +63,8 @@ export type ExtendedMarketResponse = {
   title: string;
   description: string;
   metadataString: string;
-  shareIds: string[];
+  outcomeAssets: OutcomeAsset[];
   owns?: [{ shareId: string, amount: number }];
-  outcomeAssets: any;
 };
 
 // The extended market data from which a market may be created.
@@ -59,7 +85,7 @@ export type FilteredMarketResponse = {
   title?: string;
   description?: string;
   metadataString?: string;
-  shareIds?: string[];
+  outcomeAssets?: OutcomeAsset[];
 };
 
 export type Report = {
