@@ -151,7 +151,7 @@ export default class Models {
       await this.api.query.predictionMarkets.markets(marketId);
 
     // TODO: type
-    const marketJson = marketRaw.toJSON();
+    const marketJson = marketRaw.toJSON() as MarketResponse;
 
     if (!marketJson) {
       throw new Error(`Market with market id ${marketId} does not exist.`);

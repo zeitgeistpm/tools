@@ -18,7 +18,7 @@ beforeAll(async () => {
   marketId = await sdk.models.createNewMarket(signer, 'test', 'new market for test', '5FzstFvrLWWjEbmPuibFHnvJ1UC9zYaRSQXLjdHPhTNxoiQn', { Timestamp: Number(new Date().getTime() + 10000) });
   market = await sdk.models.fetchMarketData(parseInt(marketId));
   await market.buyCompleteSet(signer, Number(1000000000000));
-  await sdk.models.shares.wrapNativeCurrency(signer, "1000000000000");
+  // await sdk.models.shares.wrapNativeCurrency(signer, "1000000000000");
 });
 
 afterAll(async () => {
@@ -58,11 +58,11 @@ test('Gets a pool from a pool id', async () => {
   expect(pool).toBeInstanceOf(Swap);
 });
 
-test('Can fetch data using the swaps-namespaced RPC', async () => {
-  const sharesId = await pool.sharesId();
-  console.log(sharesId.toString());
-  const account = await pool.accountId();
-  console.log(account.toString());
-  // const spotPrice = await pool.getSpotPrice(pool.assets[0], pool.assets[1]);
-  // console.log(spotPrice);
-});
+// test('Can fetch data using the swaps-namespaced RPC', async () => {
+//   const sharesId = await pool.sharesId();
+//   console.log(sharesId.toString());
+//   const account = await pool.accountId();
+//   console.log(account.toString());
+//   // const spotPrice = await pool.getSpotPrice(pool.assets[0], pool.assets[1]);
+//   // console.log(spotPrice);
+// });
