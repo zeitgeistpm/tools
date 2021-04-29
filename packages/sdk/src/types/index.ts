@@ -29,7 +29,7 @@ export type marketTypeForHuman =
   | {
     ztg: null;
   } | {
-    poolshare: number;
+    poolShare: number;
   };
 
 export type CategoricalOutcome = {
