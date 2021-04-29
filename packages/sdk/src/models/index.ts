@@ -1,7 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber, hexToString } from "@polkadot/util";
-import { encodeAddress } from "@polkadot/util-crypto";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
 import { unsubOrWarns } from "../util";
@@ -18,19 +17,20 @@ import {
 import { initIpfs, changeEndianness, isExtSigner } from "../util";
 
 import Market from "./market";
-import Shares from "./shares";
+// import Shares from "./shares";
 import Swap from "./swaps";
 
-export { Market, Shares, Swap };
+export { Market, Swap };
+// export Shares ;
 
 export default class Models {
-  public shares: Shares;
+  // public shares: Shares;
 
   private api: ApiPromise;
 
   constructor(api: ApiPromise) {
     this.api = api;
-    this.shares = new Shares(this.api);
+    // this.shares = new Shares(this.api);
   }
 
   /**

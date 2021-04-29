@@ -281,4 +281,4 @@ class Shares {
   }
 }
 
-export default Shares;
+// export default Shares;
