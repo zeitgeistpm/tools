@@ -14,7 +14,7 @@ export default class SDK {
     endpoint = "wss://bp-rpc.zeitgeist.pm",
     opts = { logEndpointInitTime: true }
   ): Promise<SDK> {
-    const start=Date.now();
+    const start = Date.now();
     const api = await initApi(endpoint);
     if (opts.logEndpointInitTime) {
       console.log(`${endpoint} initialised in ${Date.now()-start} ms.`);      
