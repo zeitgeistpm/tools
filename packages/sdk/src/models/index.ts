@@ -142,7 +142,6 @@ export default class Models {
    */
   async fetchMarketData(
     marketId: MarketId,
-    opts?:{ address: string },
   ): Promise<Market> {
     const ipfs = initIpfs();
 
@@ -222,20 +221,7 @@ export default class Models {
           scalarOutcome: [ marketId, position.toString() ]
         });
       });
-
-
-    // EXPERIMENT      
-    // TODO:  Poll tokens pallet for AccountIds with accounts_by_currency_id
-    // But see: https://github.com/zeitgeistpm/zeitgeist/issues/101
-    // (maybe wait until new index is built!)
-    // const owns = (opts && opts.address)
-    //   ? outcomeAssets.map (asset=>({
-    //      asset: asset.toJSON(),
-    //      amount: 777
-    //     }))
-    //   : null ;
-    // console.log('owns:', owns);
-    
+  
 
     // new
     Object.assign(extendedMarket, {
@@ -250,12 +236,6 @@ export default class Models {
 
     // new
     const extendedMarketResponse = new Market(extendedMarket as any, this.api);
-
-    // if (owns) {
-    //   console.log(owns);
-    //   // NB: no longer ExtendedMarketResponse type, since extra field's name is an address
-    //   extendedMarketResponse[opts.address] = { owns };      
-    // }  
 
     return extendedMarketResponse;
   }
