@@ -1,5 +1,4 @@
-// import SDK, { util } from "@zeitgeistpm/sdk";
-import SDK, { util } from "../../../sdk/src";
+import SDK, { util } from "@zeitgeistpm/sdk";
 
 type Options = {
   endpoint: string;
@@ -17,6 +16,7 @@ const deployPool = async (opts: Options): Promise<void> => {
 
   const market = await sdk.models.fetchMarketData(marketId);
 
+  console.log(market);
   const weights = Array(market.outcomeAssets.length+1)
     .fill("1".concat("0".repeat(10)));
 
