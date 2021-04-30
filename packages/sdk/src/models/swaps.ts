@@ -168,12 +168,6 @@ export default class Swap {
     const areAllUndefined = (...params) => params.every(param=> typeof opts.bounds[param]==="undefined");
     let tx;
 
-    console.log(opts.bounds);
-    // ["poolAmount","assetAmount", "poolMin", "poolMax", "assetMin","assetMax"]
-    //   .forEach(key=>{
-    //     console.log(`\n${key}- isLikeNum:${isLikeNum(key)} areAllUndefined:${areAllUndefined([key])}\n`);
-    //     console.log(typeof opts.bounds[key], Array.isArray(opts.bounds[key]), Array.isArray(opts.bounds[key]) &&typeof opts.bounds[key][0]);
-    //   });
 
     if (isLikeNum("assetAmount") && isLikeNum("poolMin")) {
       // PoolJoinForMinPool
