@@ -24,7 +24,6 @@ export { Market, Swap };
 // export Shares ;
 
 export default class Models {
-  // public shares: Shares;
 
   private api: ApiPromise;
 
