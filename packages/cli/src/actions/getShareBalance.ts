@@ -11,13 +11,6 @@ const getShareBalance = async (opts: Options): Promise<void> => {
 
   console.log("getShareBalance not implemented for tokens pallet!")
 
-  // const balance = await models.Shares.externBalanceOf(
-  //   marketId,
-  //   shareIndex,
-  //   account
-  // );
-
-  // console.log(`Balance: ${balance}`);
 };
 
 export default getShareBalance;
