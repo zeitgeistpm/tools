@@ -27,7 +27,6 @@ export default class Models {
 
   constructor(api: ApiPromise) {
     this.api = api;
-    // this.shares = new Shares(this.api);
   }
 
   /**
