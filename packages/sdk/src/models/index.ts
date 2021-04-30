@@ -203,7 +203,6 @@ export default class Models {
     //@ts-ignore
     const market = marketRaw.unwrap();
 
-    // TODO: Decorate empty const outcomeAssets=[], conditionally on market_type getters
     //@ts-ignore
     const outcomeAssets = market.market_type.isCategorical 
       //@ts-ignore

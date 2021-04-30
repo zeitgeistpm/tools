@@ -281,9 +281,6 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
-      // TODO (maybe) : test for undefined behaviour in @polkadot/api (marketId==undefined)
-      // console.log('Market.buyCompleteSet', this.marketId, amount);
-
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
           .buyCompleteSet(this.marketId, amount)
