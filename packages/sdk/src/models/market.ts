@@ -220,7 +220,6 @@ class Market {
         console.log("Market object appears to be a bare MarketResponse, not an ExtendedMarket");
         console.log("This should not happen unless you are running old code for bug testing.");        
       }
-      console.log();
       
       
       if (isExtSigner(signer)) {
