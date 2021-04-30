@@ -149,7 +149,7 @@ export default class Models {
     const marketRaw =
       await this.api.query.predictionMarkets.markets(marketId);
 
-    // TODO: type
+    // TODO: type (#???)
     const marketJson = marketRaw.toJSON() as MarketResponse;
 
     if (!marketJson) {
