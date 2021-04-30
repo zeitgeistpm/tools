@@ -64,7 +64,6 @@ export type ExtendedMarketResponse = {
   description: string;
   metadataString: string;
   outcomeAssets: OutcomeAsset[];
-  owns?: [{ shareId: string, amount: number }];
 };
 
 // The extended market data from which a market may be created.
