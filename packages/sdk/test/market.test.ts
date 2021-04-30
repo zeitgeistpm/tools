@@ -18,7 +18,6 @@ beforeAll(async () => {
   marketId = await sdk.models.createNewMarket(signer, 'test', 'new market for test', '5FzstFvrLWWjEbmPuibFHnvJ1UC9zYaRSQXLjdHPhTNxoiQn', { Timestamp: Number(new Date().getTime() + 10000) });
   market = await sdk.models.fetchMarketData(parseInt(marketId));
   await market.buyCompleteSet(signer, Number(1000000000000));
-  // await sdk.models.shares.wrapNativeCurrency(signer, "1000000000000");
 });
 
 afterAll(async () => {
