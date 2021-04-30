@@ -20,7 +20,6 @@ import Market from "./market";
 import Swap from "./swaps";
 
 export { Market, Swap };
-// export Shares ;
 
 export default class Models {
 
