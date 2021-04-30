@@ -230,10 +230,6 @@ export default class Models {
       outcomeAssets,
     });
 
-    // old 
-    // const extendedMarketResponse = new Market(market as ExtendedMarketResponse, this.api);
-
-    // new
     const extendedMarketResponse = new Market(extendedMarket as any, this.api);
 
     return extendedMarketResponse;
