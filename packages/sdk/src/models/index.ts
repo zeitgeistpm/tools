@@ -17,7 +17,6 @@ import {
 import { initIpfs, changeEndianness, isExtSigner } from "../util";
 
 import Market from "./market";
-// import Shares from "./shares";
 import Swap from "./swaps";
 
 export { Market, Swap };
