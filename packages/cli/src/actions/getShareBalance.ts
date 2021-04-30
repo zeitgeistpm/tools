@@ -9,13 +9,8 @@ type Options = {
 const getShareBalance = async (opts: Options): Promise<void> => {
   const { account, marketId, shareIndex } = opts;
 
-  const balance = await models.Shares.externBalanceOf(
-    marketId,
-    shareIndex,
-    account
-  );
+  console.log("getShareBalance not implemented for tokens pallet!")
 
-  console.log(`Balance: ${balance}`);
 };
 
 export default getShareBalance;

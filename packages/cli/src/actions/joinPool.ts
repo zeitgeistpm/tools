@@ -1,4 +1,5 @@
 import SDK, { util } from "@zeitgeistpm/sdk";
+import { poolJoinBounds } from "../../../sdk/src/types";
 
 type Options = {
   endpoint: string;
@@ -8,8 +9,15 @@ type Options = {
   seed: string;
 };
 
-const joinPool = async (opts: Options): Promise<void> => {
-  const { endpoint, amountIn, amountOut, poolId, seed } = opts;
+// "joinPool" | "joinPoolMultifunc | ""
+const sdkJoinPoolFunctionToUse = "joinPoolMultifunc";
+
+const joinPool =  async (opts: Options): Promise<void> => {
+  const { endpoint, seed, poolId, amountIn, amountOut, ...bounds } = opts;
+  const trimmedBounds = {
+    poolAmount: Number(amountOut),
+    assetMax: amountIn.split(",").map(Number)
+  };
 
   const sdk = await SDK.initialize(endpoint);
 
@@ -17,7 +25,16 @@ const joinPool = async (opts: Options): Promise<void> => {
   console.log("Sending transaction from", signer.address);
 
   const pool = await sdk.models.fetchPoolData(poolId);
-  const res = await pool.joinPool(signer, amountOut, amountIn.split(","));
+
+  //@ts-ignore
+  const res = sdkJoinPoolFunctionToUse === "joinPool"
+   ? await pool.joinPool(signer, amountOut, amountIn.split(","))
+   : await pool.joinPoolMultifunc(
+      signer, 
+      { 
+        bounds: trimmedBounds
+      } 
+    );
   console.log(res);
 };
 

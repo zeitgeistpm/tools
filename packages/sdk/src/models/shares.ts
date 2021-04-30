@@ -280,5 +280,3 @@ class Shares {
     return NativeShareId;
   }
 }
-
-export default Shares;

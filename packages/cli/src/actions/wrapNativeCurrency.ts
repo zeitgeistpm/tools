@@ -9,15 +9,17 @@ type Options = {
 const wrapNativeCurrency = async (opts: Options): Promise<void> => {
   const { amount, endpoint, seed } = opts;
 
-  const sdk = await SDK.initialize(endpoint);
+  console.log("wrapNativeCurrency not implemented for tokens pallet!");
 
-  const signer = util.signerFromSeed(seed);
-  console.log("Sending transaction from", signer.address);
+  // const sdk = await SDK.initialize(endpoint);
 
-  const res = await sdk.models.shares.wrapNativeCurrency(signer, amount);
+  // const signer = util.signerFromSeed(seed);
+  // console.log("Sending transaction from", signer.address);
 
-  console.log(res);
-  console.log("!!!");
+  // const res = await sdk.models.shares.wrapNativeCurrency(signer, amount);
+
+  // console.log(res);
+  // console.log("!!!");
 };
 
 export default wrapNativeCurrency;

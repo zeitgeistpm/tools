@@ -12,19 +12,21 @@ type Options = {
 const transfer = async (opts: Options): Promise<void> => {
   const { endpoint, marketId, sharesIndex, to, amount, seed } = opts;
 
-  const sdk = await SDK.initialize(endpoint);
+  console.log("transfer not implemented for tokens pallet!");
 
-  const signer = util.signerFromSeed(seed);
+//   const sdk = await SDK.initialize(endpoint);
 
-  const res = await sdk.models.shares.shareTransfer(
-    signer,
-    Number(marketId),
-    Number(sharesIndex),
-    to,
-    amount
-  );
+//   const signer = util.signerFromSeed(seed);
 
-  console.log(res);
+//   const res = await sdk.models.shares.shareTransfer(
+//     signer,
+//     Number(marketId),
+//     Number(sharesIndex),
+//     to,
+//     amount
+//   );
+
+//   console.log(res);
 };
 
 export default transfer;

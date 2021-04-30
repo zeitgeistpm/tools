@@ -17,19 +17,16 @@ import {
 import { initIpfs, changeEndianness, isExtSigner } from "../util";
 
 import Market from "./market";
-import Shares from "./shares";
 import Swap from "./swaps";
 
-export { Market, Shares, Swap };
+export { Market, Swap };
 
 export default class Models {
-  public shares: Shares;
 
   private api: ApiPromise;
 
   constructor(api: ApiPromise) {
     this.api = api;
-    this.shares = new Shares(this.api);
   }
 
   /**
@@ -139,18 +136,23 @@ export default class Models {
    * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
    * @param marketId The unique identifier for the market you want to fetch.
    */
-  async fetchMarketData(marketId: MarketId): Promise<Market> {
+  async fetchMarketData(
+    marketId: MarketId,
+  ): Promise<Market> {
     const ipfs = initIpfs();
 
 
     const marketRaw =
       await this.api.query.predictionMarkets.markets(marketId);
 
-    const marketJson = marketRaw.toJSON();
+    // TODO: type (#???)
+    const marketJson = marketRaw.toJSON() as MarketResponse;
 
     if (!marketJson) {
       throw new Error(`Market with market id ${marketId} does not exist.`);
     }
+
+    const extendedMarket = marketJson;
 
     //@ts-ignore
     const { metadata } = marketJson;
@@ -194,7 +196,6 @@ export default class Models {
       }
     } catch (err) { console.error(err); }
 
-
     //@ts-ignore
     const market = marketRaw.unwrap();
 
@@ -215,8 +216,7 @@ export default class Models {
           scalarOutcome: [ marketId, position.toString() ]
         });
       });
-
-    const extendedMarket = marketJson;
+  
 
     Object.assign(extendedMarket, {
       ...data,
@@ -225,7 +225,9 @@ export default class Models {
       outcomeAssets,
     });
 
-    return new Market(extendedMarket as any, this.api);
+    const extendedMarketResponse = new Market(extendedMarket as any, this.api);
+
+    return extendedMarketResponse;
   }
 
   /**
