@@ -223,7 +223,6 @@ export default class Models {
       });
   
 
-    // new
     Object.assign(extendedMarket, {
       ...data,
       marketId,
