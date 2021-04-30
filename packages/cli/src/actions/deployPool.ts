@@ -16,7 +16,6 @@ const deployPool = async (opts: Options): Promise<void> => {
 
   const market = await sdk.models.fetchMarketData(marketId);
 
-  console.log(market);
   const weights = Array(market.outcomeAssets.length+1)
     .fill("1".concat("0".repeat(10)));
 
