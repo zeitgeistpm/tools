@@ -22,6 +22,8 @@ const deployPool = async (opts: Options): Promise<void> => {
   const res = await market.deploySwapPool(signer, weights);
 
   console.log(res);
+
+  process.exit(0);
 };
 
 export default deployPool;
