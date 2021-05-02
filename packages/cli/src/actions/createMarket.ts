@@ -18,7 +18,6 @@ const createMarket = async (opts: Options): Promise<void> => {
 
   const signer = util.signerFromSeed(seed);
   console.log("Sending transaction from", signer.address);
-  console.log("categories", categories);
 
   if (categories && !(categories.length>1)) {
     if (categories.length===1) {
