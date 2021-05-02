@@ -224,6 +224,11 @@ program
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
+  .option(
+    "--weights <weights>",
+    "A comma-separated list of lengths for each asset",
+    ""
+  )
   .action((marketId: number, opts: { endpoint: string; seed: string }) =>
     catchErrorsAndExit(deployPool, Object.assign(opts, { marketId }))
   );
