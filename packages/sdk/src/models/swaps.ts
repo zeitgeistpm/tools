@@ -1,7 +1,12 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
-import { KeyringPairOrExtSigner, PoolResponse, poolJoinOpts, poolExitOpts } from "../types";
+import {
+  KeyringPairOrExtSigner,
+  PoolResponse,
+  poolJoinOpts,
+  poolExitOpts,
+} from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 
 /**
@@ -45,23 +50,18 @@ export default class Swap {
     outAsset: string,
     blockHash?: any
   ): Promise<any> {
-
     if (blockHash) {
       //@ts-ignore
       return this.api.rpc.swaps.getSpotPrice(
         this.poolId,
         inAsset,
         outAsset,
-        blockHash,
+        blockHash
       );
     }
 
     //@ts-ignore
-    return this.api.rpc.swaps.getSpotPrice(
-      this.poolId,
-      inAsset,
-      outAsset
-    )
+    return this.api.rpc.swaps.getSpotPrice(this.poolId, inAsset, outAsset);
   }
 
   public async sharesId(): Promise<any> {
@@ -78,29 +78,29 @@ export default class Swap {
     return res;
   }
 
-    // /// Unimplemented:
-    // /// Comment in (exposed) substrate pub fn create_pool: 
-    // ///   Temporary probably - The Swap is created per prediction market.
-    // /// Instead of this function, use Market.deploySwapPool
-    // createPool = async (
-    //   signer: KeyringPairOrExtSigner,
-    //   assets: string[], 
-    //   weights?: string[],
-    //   callback?: (result: ISubmittableResult, _unsub: () => void) => void
-    // ): Promise<string> => {
-    //     if (assets.length !== weights.length) {
-    //       throw new Error("Relative weights were supplied, but they do not cover all assets.");
-    //     }
-    //     if (!weights) {
-    //       weights = new Array(assets.length).fill(1);
-    //     }
-    //     ...
-    //     return new Promise(async (resolve) => {
-    //         const unsub = await this.api.tx.swaps
-    //           .createPool(this.marketId, assets, weights)
-    //           . etc etc
-    //     });
-    // };
+  // /// Unimplemented:
+  // /// Comment in (exposed) substrate pub fn create_pool:
+  // ///   Temporary probably - The Swap is created per prediction market.
+  // /// Instead of this function, use Market.deploySwapPool
+  // createPool = async (
+  //   signer: KeyringPairOrExtSigner,
+  //   assets: string[],
+  //   weights?: string[],
+  //   callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  // ): Promise<string> => {
+  //     if (assets.length !== weights.length) {
+  //       throw new Error("Relative weights were supplied, but they do not cover all assets.");
+  //     }
+  //     if (!weights) {
+  //       weights = new Array(assets.length).fill(1);
+  //     }
+  //     ...
+  //     return new Promise(async (resolve) => {
+  //         const unsub = await this.api.tx.swaps
+  //           .createPool(this.marketId, assets, weights)
+  //           . etc etc
+  //     });
+  // };
 
   joinPool = async (
     signer: KeyringPairOrExtSigner,
@@ -148,9 +148,8 @@ export default class Swap {
     });
   };
 
-
   /** Three substrate join_pool_xxx functions in one
-  */
+   */
   joinPoolMultifunc = async (
     signer: KeyringPairOrExtSigner,
     opts: poolJoinOpts,
@@ -170,12 +169,14 @@ export default class Swap {
     };
     /// Quick helpers for readability
     const isLikeNum = (param) => {
-      const p=opts.bounds[param];
-      return (typeof p==="number" || (Array.isArray(p) && typeof p[0]==="number"));
-    }
-    const areAllUndefined = (...params) => params.every(param=> typeof opts.bounds[param]==="undefined");
+      const p = opts.bounds[param];
+      return (
+        typeof p === "number" || (Array.isArray(p) && typeof p[0] === "number")
+      );
+    };
+    const areAllUndefined = (...params) =>
+      params.every((param) => typeof opts.bounds[param] === "undefined");
     let tx;
-
 
     if (isLikeNum("assetAmount") && isLikeNum("poolMin")) {
       // PoolJoinForMinPool
@@ -192,37 +193,38 @@ export default class Swap {
         opts.bounds.assetAmount,
         opts.bounds.poolMin
       );
-
     } else if (isLikeNum("poolAmount") && isLikeNum("assetMax")) {
       // PoolJoinForMaxAsset, with assetId optional
       if (!areAllUndefined("assetAmount", "poolMin", "poolMax", "assetMin")) {
         throw new Error("Too many asset and pool bounds were specified.");
-      }    
+      }
       if (!areAllUndefined("assetId") && Array.isArray(opts.bounds.assetMax)) {
         throw new Error("Too many asset maxima were specified.");
-      }  else if (areAllUndefined("assetId") && !Array.isArray(opts.bounds.assetMax)) {
+      } else if (
+        areAllUndefined("assetId") &&
+        !Array.isArray(opts.bounds.assetMax)
+      ) {
         opts.bounds.assetMax = [opts.bounds.assetMax];
-      }     
+      }
 
       tx = areAllUndefined("assetId")
-      ? this.api.tx.swaps.poolJoin(
-          this.poolId,
-          opts.bounds.poolAmount,
-          opts.bounds.assetMax
-        )
-      : this.api.tx.swaps.poolJoinWithExactPoolAmount(
-          this.poolId,
-          opts.asset,
-          opts.bounds.poolAmount,
-          opts.bounds.assetMax
-        );
-
+        ? this.api.tx.swaps.poolJoin(
+            this.poolId,
+            opts.bounds.poolAmount,
+            opts.bounds.assetMax
+          )
+        : this.api.tx.swaps.poolJoinWithExactPoolAmount(
+            this.poolId,
+            opts.asset,
+            opts.bounds.poolAmount,
+            opts.bounds.assetMax
+          );
     } else {
-      console.log(opts.bounds);      
+      console.log(opts.bounds);
       throw new Error(`Incorrect asset and pool bounds in params to joinPool. Valid combinations are:\n
         poolId, assetId, bounds = { poolAmount, assetMax } \n
         poolId, bounds = { poolAmount, assetMax } \n
-        poolId, bounds = { assetAmount, poolMin } \n`)
+        poolId, bounds = { assetAmount, poolMin } \n`);
     }
 
     return new Promise(async (resolve) => {
