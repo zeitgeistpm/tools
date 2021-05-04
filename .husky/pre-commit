@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-echo "Linting SDK:" && yarn sdk:lint-quiet & echo "Linting CLI:" && yarn cli:lint-quiet && echo "Linted OK"
+echo "" && echo "Linting SDK:" && yarn sdk:lint-quiet && echo "" && echo "Linting CLI:" && yarn cli:lint-quiet && printf "\nLinted OK\n"
