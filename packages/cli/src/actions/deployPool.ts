@@ -20,14 +20,17 @@ const deployPool = async (opts: Options): Promise<void> => {
 
   let wts = [];
   if (weights) {
-    wts = weights.split(',');
+    wts = weights.split(",");
     if (wts.length !== outcomeAssets.length + 1) {
-      throw new Error(`Provided weights length must match assets length!\nWeights: ${wts.length}\nAssets: ${outcomeAssets.length + 1}`);
+      throw new Error(
+        `Provided weights length must match assets length!\nWeights: ${
+          wts.length
+        }\nAssets: ${outcomeAssets.length + 1}`
+      );
     }
   } else {
     //default
-    wts = Array(outcomeAssets.length + 1)
-      .fill("1".concat("0".repeat(10)));
+    wts = Array(outcomeAssets.length + 1).fill("1".concat("0".repeat(10)));
   }
 
   const res = await market.deploySwapPool(signer, wts);

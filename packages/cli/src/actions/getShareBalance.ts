@@ -9,8 +9,7 @@ type Options = {
 const getShareBalance = async (opts: Options): Promise<void> => {
   const { account, marketId, shareIndex } = opts;
 
-  console.log("getShareBalance not implemented for tokens pallet!")
-
+  console.log("getShareBalance not implemented for tokens pallet!");
 };
 
 export default getShareBalance;

@@ -9,7 +9,7 @@ type Options = {
 const wrapNativeCurrency = async (opts: Options): Promise<void> => {
   const { amount, endpoint, seed } = opts;
 
-  console.log("wrapNativeCurrency not implemented for tokens pallet!")
+  console.log("wrapNativeCurrency not implemented for tokens pallet!");
 
   // const sdk = await SDK.initialize(endpoint);
 
