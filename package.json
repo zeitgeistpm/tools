@@ -14,6 +14,7 @@
     "eslint-config-prettier": "^8.2.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-security": "^1.4.0",
+    "husky": "^6.0.0",
     "lerna": "^4.0.0",
     "prettier": "^2.2.1",
     "ts-node": "^9.1.1",
@@ -21,6 +22,7 @@
     "typescript": "^4.2.4"
   },
   "scripts": {
+    "hooks-init": "husky install",
     "clean": "rm -rf packages/**/dist",
     "compile": "tsc --build --force tsconfig.json",
     "prepublish": "yarn compile",
