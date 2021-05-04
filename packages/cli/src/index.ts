@@ -43,15 +43,8 @@ program
     "--no-advised",
     "Create Permissionless market instead of Advised market"
   )
-  .option(
-    "-c --categories [categories...]",
-    'specify at least two categories'
-  )
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("-c --categories [categories...]", "specify at least two categories")
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -63,7 +56,12 @@ program
       description: string,
       oracle: string,
       end: string,
-      opts: { endpoint: string; seed: string, categories: string[], advised: boolean }
+      opts: {
+        endpoint: string;
+        seed: string;
+        categories: string[];
+        advised: boolean;
+      }
     ) =>
       catchErrorsAndExit(
         createMarket,
@@ -75,7 +73,7 @@ program
   .command("viewMarket <marketId>")
   .option(
     "--address <string>",
-    "An address on which to report ownership of shares.",
+    "An address on which to report ownership of shares."
   )
   .option(
     "--seed <string>",
@@ -93,11 +91,7 @@ program
 
 program
   .command("cancelMarket <marketId>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -120,11 +114,7 @@ program
 
 program
   .command("buyCompleteSet <marketId> <amount>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -144,11 +134,7 @@ program
 
 program
   .command("sellCompleteSet <marketId> <amount>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -163,11 +149,7 @@ program
 
 program
   .command("report <marketId> <outcome>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -179,11 +161,7 @@ program
 
 program
   .command("dispute <marketId> <outcome>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -198,11 +176,7 @@ program
 
 program
   .command("redeem <marketId>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -214,11 +188,7 @@ program
 
 program
   .command("deployPool <marketId>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -235,11 +205,7 @@ program
 
 program
   .command("joinPool <poolId> <amountOut> <amountIn>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -260,11 +226,7 @@ program
 
 program
   .command("exitPool <poolId> <amountIn> <amountOut>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -287,11 +249,7 @@ program
   .command(
     "swapExactAmountIn <poolId> <assetIn> <assetAmountIn> <assetOut> <minAmountOut> <maxPrice>"
   )
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -324,11 +282,7 @@ program
   .command(
     "swapExactAmountOut <poolId> <assetIn> <maxAmountIn> <assetOut> <assetAmountOut> <maxPrice>"
   )
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -390,11 +344,7 @@ program
 
 program
   .command("wrapNativeCurrency <amount>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -417,11 +367,7 @@ program
 
 program
   .command("transfer <marketId> <sharesIndex> <to> <amount>")
-  .option(
-    "--seed <string>",
-    "The signer's seed",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -453,7 +399,6 @@ program
     catchErrorsAndExit(countMarkets, Object.assign(opts))
   );
 
-
 program
   .command("getAllMarketIds")
   .option(
@@ -465,24 +410,20 @@ program
     catchErrorsAndExit(getAllMarketIds, Object.assign(opts))
   );
 
-
 program
   .command("getAllMarkets")
-  .option(
-    "-f, --filter [fields...]",
-    'only output specified fields'
-  )
+  .option("-f, --filter [fields...]", "only output specified fields")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((opts: { endpoint: string, filter: string[] }) =>
+  .action((opts: { endpoint: string; filter: string[] }) =>
     catchErrorsAndExit(getAllMarkets, Object.assign(opts))
   );
 
-
-program  .command("approveMarket <marketId>")
+program
+  .command("approveMarket <marketId>")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -503,7 +444,7 @@ program
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
-  )  
+  )
   .option(
     "--seed <string>",
     "The signer's seed. Must be an ApprovalOrigin",
@@ -520,8 +461,7 @@ program
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((marketId: number,
-      opts: { endpoint: string}) =>
+  .action((marketId: number, opts: { endpoint: string }) =>
     catchErrorsAndExit(viewDisputes, Object.assign(opts, { marketId }))
   );
 

@@ -12,9 +12,9 @@ const viewMarket = async (opts: Options): Promise<void> => {
   let { address } = opts;
 
   const sdk = await SDK.initialize(endpoint);
-  
+
   if (seed) {
-    address = address || util.signerFromSeed(seed).address
+    address = address || util.signerFromSeed(seed).address;
   }
 
   const market = await sdk.models.fetchMarketData(Number(marketId));
