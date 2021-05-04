@@ -25,7 +25,7 @@
     "hooks-init": "husky install",
     "clean": "rm -rf packages/**/dist",
     "compile": "tsc --build --force tsconfig.json",
-    "prepublish": "yarn compile",
+    "prepublish": "yarn sdk:lint-quiet & yarn cli:lint-quiet & yarn compile",
     "cli": "ts-node -r tsconfig-paths/register packages/cli/src/index",
     "sdk:lint": "tsc --noEmit && eslint 'packages/sdk/src/**/*.ts'",
     "sdk:lint-quiet": "tsc --noEmit && eslint 'packages/sdk/src/**/*.ts' --quiet",
