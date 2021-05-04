@@ -107,19 +107,19 @@ export const initApi = (
             },
             {
               name: "asset_in",
-              type: "Asset"
+              type: "Asset",
             },
             {
               name: "asset_out",
-              type: "Asset"
+              type: "Asset",
             },
             {
               name: "blocks",
-              type: "Vec<Hash>"
-            }
+              type: "Vec<Hash>",
+            },
           ],
-          type: "Vec<SerdeWrapper>"
-        }
+          type: "Vec<SerdeWrapper>",
+        },
       },
     },
     types: {

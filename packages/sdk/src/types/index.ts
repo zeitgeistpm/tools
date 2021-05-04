@@ -1,7 +1,11 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
 //@ts-ignore
-import { Market, MarketType, Outcome } from "@zeitgeistpm/types/interfaces/predictionMarkets";
+import {
+  Market,
+  MarketType,
+  Outcome,
+} from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
 
 // Just a market identifier.
 export type MarketId = number;
@@ -11,33 +15,32 @@ export type CategoricalMarket = {
 };
 
 export type ScalarMarket = {
-  lowerBound: number,
-  higherBound: number,
+  lowerBound: number;
+  higherBound: number;
 };
 
-export type OutcomeIndex = [
-  number, number | string
-];
+export type OutcomeIndex = [number, number | string];
 
 type categoricalOutcomeIndex = [number, number];
 
-type scalarOutcomeIndex = [number, "Long" | "Short" ];
+type scalarOutcomeIndex = [number, "Long" | "Short"];
 
-export type marketTypeForHuman = 
-    CategoricalOutcome
+export type marketTypeForHuman =
+  | CategoricalOutcome
   | ScalarOutcome
   | {
-    ztg: null;
-  } | {
-    poolShare: number;
-  };
+      ztg: null;
+    }
+  | {
+      poolShare: number;
+    };
 
 export type CategoricalOutcome = {
- categoricalOutcome : categoricalOutcomeIndex;
-}
+  categoricalOutcome: categoricalOutcomeIndex;
+};
 
 export type ScalarOutcome = {
-  scalarOutcome: scalarOutcomeIndex;  
+  scalarOutcome: scalarOutcomeIndex;
 };
 
 export type OutcomeAsset = CategoricalOutcome | ScalarOutcome;
@@ -110,9 +113,8 @@ export type PoolResponse = {
   weights: any; // { string => number } TODO how to do repr this in TS?
 };
 
-
 interface PoolJoinOrExitIncomplete {
-  // amount: number;
+  amount: number;
 }
 
 interface PoolJoinForMaxAsset extends PoolJoinOrExitIncomplete {
@@ -160,14 +162,14 @@ export type PoolId = number;
 export type AssetId = string;
 
 export type poolJoinOpts = {
-  asset? : AssetId;
+  asset?: AssetId;
   bounds: poolJoinBounds;
-}
+};
 
 export type poolExitOpts = {
-  asset? : AssetId;
+  asset?: AssetId;
   bounds: poolExitBounds;
-}
+};
 
 export type ExtSigner = { address: string; signer: Signer };
 

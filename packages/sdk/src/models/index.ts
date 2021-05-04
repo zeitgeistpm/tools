@@ -22,7 +22,6 @@ import Swap from "./swaps";
 export { Market, Swap };
 
 export default class Models {
-
   private api: ApiPromise;
 
   constructor(api: ApiPromise) {
@@ -114,7 +113,13 @@ export default class Models {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(oracle, end, cid.toString(), creationType, categories.length)
+          .createCategoricalMarket(
+            oracle,
+            end,
+            cid.toString(),
+            creationType,
+            categories.length
+          )
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -122,7 +127,13 @@ export default class Models {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(oracle, end, cid.toString(), creationType, categories.length)
+          .createCategoricalMarket(
+            oracle,
+            end,
+            cid.toString(),
+            creationType,
+            categories.length
+          )
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)
@@ -136,17 +147,13 @@ export default class Models {
    * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
    * @param marketId The unique identifier for the market you want to fetch.
    */
-  async fetchMarketData(
-    marketId: MarketId,
-  ): Promise<Market> {
+  async fetchMarketData(marketId: MarketId): Promise<Market> {
     const ipfs = initIpfs();
 
-
-    const marketRaw =
-      await this.api.query.predictionMarkets.markets(marketId);
+    const marketRaw = await this.api.query.predictionMarkets.markets(marketId);
 
     // TODO: type (#???)
-    const marketJson = marketRaw.toJSON() as MarketResponse;
+    const marketJson = (marketRaw.toJSON() as any) as MarketResponse;
 
     if (!marketJson) {
       throw new Error(`Market with market id ${marketId} does not exist.`);
@@ -194,29 +201,32 @@ export default class Models {
           data = extract(raw);
         }
       }
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
 
     //@ts-ignore
     const market = marketRaw.unwrap();
 
     //@ts-ignore
-    const outcomeAssets = market.market_type.isCategorical 
-      //@ts-ignore
-      ? [...Array(market.market_type.asCategorical.toNumber()).keys()].map((catIdx) => {
+    const outcomeAssets = market.market_type.isCategorical
+      ? //@ts-ignore
+        [...Array(market.market_type.asCategorical.toNumber()).keys()].map(
+          (catIdx) => {
+            //@ts-ignore
+            return this.api.createType("Asset", {
+              categoricalOutcome: [marketId, catIdx],
+            });
+          }
+        )
+      : ["Long", "Short"].map((pos) => {
+          //@ts-ignore
+          const position = this.api.createType("ScalarPosition", pos);
           //@ts-ignore
           return this.api.createType("Asset", {
-            categoricalOutcome: [ marketId, catIdx ]
+            scalarOutcome: [marketId, position.toString()],
           });
-        })
-      : ["Long", "Short"].map((pos) => {
-        //@ts-ignore
-        const position = this.api.createType("ScalarPosition", pos);
-        //@ts-ignore
-        return this.api.createType("Asset", {
-          scalarOutcome: [ marketId, position.toString() ]
         });
-      });
-  
 
     Object.assign(extendedMarket, {
       ...data,
@@ -239,8 +249,11 @@ export default class Models {
     const count = (
       await this.api.query.predictionMarkets.marketCount()
     ).toJSON();
-    if (typeof count !== 'number')
-      throw new Error('Expected a number to return from api.query.predictionMarkets.marketCount (even if variable remains unset)');
+    if (typeof count !== "number") {
+      throw new Error(
+        "Expected a number to return from api.query.predictionMarkets.marketCount (even if variable remains unset)"
+      );
+    }
     return count;
   }
 
@@ -250,13 +263,16 @@ export default class Models {
    * but all registered disputes will still be returned even if, eg, resolved.
    * To check if disputes are active, use viewMarket and check market_status for "Disputed"
    */
-  async fetchDisputes(marketId: MarketId): Promise<any> {    
+  async fetchDisputes(marketId: MarketId): Promise<any> {
     const res = (
       await this.api.query.predictionMarkets.disputes(marketId)
-    ).toJSON() ;
+    ).toJSON();
 
-    if (!Array.isArray(res))
-      throw new Error(`fetchDisputes expected response an array but got ${typeof res}.`);
+    if (!Array.isArray(res)) {
+      throw new Error(
+        `fetchDisputes expected response an array but got ${typeof res}.`
+      );
+    }
 
     if (!res.length) {
       const market = (
@@ -266,9 +282,12 @@ export default class Models {
         throw new Error(`Market with market id ${marketId} does not exist.`);
       }
       //@ts-ignore
-      if (!market.report)
-        throw new Error(`Market with market id ${marketId} has not been reported and therefore has not been disputed.`);
+      if (!market.report) {
+        throw new Error(
+          `Market with market id ${marketId} has not been reported and therefore has not been disputed.`
+        );
       }
+    }
 
     return res;
   }

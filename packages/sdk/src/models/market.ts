@@ -84,7 +84,7 @@ class Market {
     this.oracle = oracle;
     this.end = end;
     this.metadata = metadata;
-    this.marketType = market_type;
+    this.marketType = market_type as any;
     this.marketStatus = market_status;
     this.report = report;
     this.categories = categories;
@@ -104,29 +104,31 @@ class Market {
     return JSON.stringify(market, null, 2);
   }
 
-  toFilteredJSONString(filter? : string[] | null): string {
+  toFilteredJSONString(filter?: string[] | null): string {
     const market = Object.assign({}, this);
     delete market.api;
-    if (!filter)
-      return JSON.stringify(market, null, 2)
-    else
-      return JSON.stringify(Market.filterMarketData(market, filter), null, 2)
+    if (!filter) {
+      return JSON.stringify(market, null, 2);
+    } else {
+      return JSON.stringify(Market.filterMarketData(market, filter), null, 2);
+    }
   }
 
   static filterMarketData(
-    market: ExtendedMarketResponse | MarketResponse | Market, 
-    filter? : string[] | null
+    market: ExtendedMarketResponse | MarketResponse | Market,
+    filter?: string[] | null
   ): FilteredMarketResponse {
-    if (!filter)
+    if (!filter) {
       return market as any;
+    }
 
-    const alwaysInclude=["marketId"];
-    
+    const alwaysInclude = ["marketId"];
+
     const res = {};
     filter
       .concat(alwaysInclude)
-      .filter(key=> Object.keys(market).includes(key))
-      .forEach(key=> res[key]= market[key]) ;    
+      .filter((key) => Object.keys(market).includes(key))
+      .forEach((key) => (res[key] = market[key]));
     return res;
   }
 
@@ -209,19 +211,31 @@ class Market {
       // TODO: // sanity check: weights.length should equal outcomes.length+1 (for ZTG)
       // TODO: // weights should each be >= runtime's MinWeight (currently 1e10)
       console.log("Relative weights: ", weights);
-      console.log(`If market ${this.marketId} has a different number of outcomes than ${weights.length-1}, you might get error {6,13}.\n`);
+      console.log(
+        `If market ${this.marketId} has a different number of outcomes than ${
+          weights.length - 1
+        }, you might get error {6,13}.\n`
+      );
       if (this.outcomeAssets) {
-        if (weights.length+1 !== this.outcomeAssets.length) {
-          console.log("Weights length mismatch. Expect an error {6,13}: ProvidedValuesLenMustEqualAssetsLen.");
-          if (weights.length === this.outcomeAssets.length)
-            console.log("Hint: don't forget to include the weight of ZTG as the last weight!");
+        if (weights.length + 1 !== this.outcomeAssets.length) {
+          console.log(
+            "Weights length mismatch. Expect an error {6,13}: ProvidedValuesLenMustEqualAssetsLen."
+          );
+          if (weights.length === this.outcomeAssets.length) {
+            console.log(
+              "Hint: don't forget to include the weight of ZTG as the last weight!"
+            );
+          }
         }
       } else {
-        console.log("Market object appears to be a bare MarketResponse, not an ExtendedMarket");
-        console.log("This should not happen unless you are running old code for bug testing.");        
+        console.log(
+          "Market object appears to be a bare MarketResponse, not an ExtendedMarket"
+        );
+        console.log(
+          "This should not happen unless you are running old code for bug testing."
+        );
       }
-      
-      
+
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
@@ -240,7 +254,6 @@ class Market {
           );
       }
     });
-
   };
 
   async getAssetsPrices(blockNumber: any): Promise<any> {
@@ -455,7 +468,6 @@ class Market {
         _resolve(true);
         unsubOrWarns(_unsub);
       }
-
     };
 
     return new Promise(async (resolve) => {
@@ -508,25 +520,25 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
-      const call = await this.api.tx.predictionMarkets
-        .approveMarket(this.marketId);
+      const call = await this.api.tx.predictionMarkets.approveMarket(
+        this.marketId
+      );
 
       const sudoTx = await this.api.tx.sudo.sudo(call);
-        
+
       if (isExtSigner(signer)) {
-        const unsub = await sudoTx
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await sudoTx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await sudoTx
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await sudoTx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -560,25 +572,25 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
-      const call = await this.api.tx.predictionMarkets
-        .rejectMarket(this.marketId);
+      const call = await this.api.tx.predictionMarkets.rejectMarket(
+        this.marketId
+      );
 
       const sudoTx = await this.api.tx.sudo.sudo(call);
 
       if (isExtSigner(signer)) {
-        const unsub = await sudoTx
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await sudoTx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await sudoTx
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await sudoTx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -631,7 +643,6 @@ class Market {
       }
     });
   }
-  
 }
 
 export default Market;

@@ -17,7 +17,7 @@ export default class SDK {
     const start = Date.now();
     const api = await initApi(endpoint);
     if (opts.logEndpointInitTime) {
-      console.log(`${endpoint} initialised in ${Date.now()-start} ms.`);      
+      console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
     }
 
     return new SDK(api);

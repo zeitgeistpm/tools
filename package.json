@@ -25,6 +25,8 @@
     "compile": "tsc --build --force tsconfig.json",
     "prepublish": "yarn compile",
     "cli": "ts-node -r tsconfig-paths/register packages/cli/src/index",
+    "sdk:lint": "tsc --noEmit && eslint 'packages/sdk/src/**/*.ts' --quiet",
+    "sdk:lint-fix": "tsc --noEmit && eslint 'packages/sdk/src/**/*.ts' --fix --quiet",
     "types:getMetadata": "ts-node packages/types/scripts/getMetadata.ts",
     "types:generate": "ts-node -r tsconfig-paths/register packages/types/scripts/generate.ts"
   }
