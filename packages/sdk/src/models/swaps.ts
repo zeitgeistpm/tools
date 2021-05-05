@@ -1,12 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
-import {
-  KeyringPairOrExtSigner,
-  PoolResponse,
-  poolJoinOpts,
-  poolExitOpts,
-} from "../types";
+import { KeyringPairOrExtSigner, PoolResponse, poolJoinOpts } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 
 /**
@@ -125,6 +120,56 @@ export default class Swap {
       this.poolId,
       poolAmountOut,
       maxAmountsIn
+    );
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
+  };
+
+  poolJoinWithExactAssetAmount = async (
+    signer: KeyringPairOrExtSigner,
+    assetIn: any,
+    assetAmount: any,
+    minPoolAmount: any,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    // Define the default callback if none is provided by the invoker of this function.
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { status } = result;
+
+      if (status.isInBlock) {
+        _resolve(true);
+        unsubOrWarns(_unsub);
+      }
+    };
+
+    // Create the transaction type and supply it with the arguments.
+    const tx = this.api.tx.swaps.poolJoinWithExactAssetAmount(
+      this.poolId,
+      assetIn,
+      assetAmount,
+      minPoolAmount
     );
 
     return new Promise(async (resolve) => {

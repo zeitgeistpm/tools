@@ -25,6 +25,7 @@ import getAllMarkets from "./actions/getAllMarkets";
 import viewDisputes from "./actions/viewDisputes";
 import approveMarket from "./actions/approveMarket";
 import rejectMarket from "./actions/rejectMarket";
+import poolJoinWithExactAssetAmount from "./actions/poolJoinWithExactAssetAmount";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -40,15 +41,24 @@ const catchErrorsAndExit = async (fn: any, opts: any) => {
 program
   .command("createMarket <title> <description> <oracle> <end>")
   .option(
-    "--no-advised",
-    "Create Permissionless market instead of Advised market"
+    "--advised",
+    "Create Advised market instead of Permissionless market",
+    false
   )
-  .option("-c --categories [categories...]", "specify at least two categories")
+  .option(
+    "-c --categories [categories...]",
+    "A space-separated list of categories for the market"
+  )
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--timestamp",
+    "Interpret the end value as a unix timestamp instead of a block number",
+    false
   )
   .action(
     (
@@ -61,6 +71,7 @@ program
         seed: string;
         categories: string[];
         advised: boolean;
+        timestamp: boolean;
       }
     ) =>
       catchErrorsAndExit(
@@ -221,6 +232,30 @@ program
       catchErrorsAndExit(
         joinPool,
         Object.assign(opts, { amountOut, amountIn, poolId })
+      )
+  );
+
+program
+  .command(
+    "poolJoinWithExactAssetAmount <poolId> <assetIn> <assetAmount> <minPoolAmount>"
+  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action(
+    (
+      poolId: number,
+      assetIn: string,
+      assetAmount: string,
+      minPoolAmount: string,
+      opts: { seed: string; endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        poolJoinWithExactAssetAmount,
+        Object.assign(opts, { poolId, assetIn, assetAmount, minPoolAmount })
       )
   );
 
