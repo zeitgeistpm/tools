@@ -124,18 +124,18 @@ export const initApi = (
     },
     typesAlias: {
       tokens: {
-        //@ts-ignore
-        AccountData: {
-          free: "Balance",
-          reserved: "Balance",
-          frozen: "Balance",
-        },
+        AccountData: "TokensAccountData",
       },
     },
     types: {
       ...typesFromDefs(zeitgeistDefinitions),
       BalanceInfo: {
         amount: "Balance",
+      },
+      TokensAccountData: {
+        free: "Balance",
+        reserved: "Balance",
+        frozen: "Balance",
       },
     },
   });
