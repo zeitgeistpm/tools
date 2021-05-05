@@ -122,6 +122,16 @@ export const initApi = (
         },
       },
     },
+    typesAlias: {
+      tokens: {
+        //@ts-ignore
+        AccountData: {
+          free: "Balance",
+          reserved: "Balance",
+          frozen: "Balance",
+        },
+      },
+    },
     types: {
       ...typesFromDefs(zeitgeistDefinitions),
       BalanceInfo: {
