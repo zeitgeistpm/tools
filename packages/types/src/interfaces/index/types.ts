@@ -1,7 +1,7 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { Enum, Struct, i128, u128, u16, u64 } from '@polkadot/types';
+import type { Enum, i128, u128, u16, u64 } from '@polkadot/types';
 import type { ITuple } from '@polkadot/types/types';
 import type { Balance, MultiAddress } from '@polkadot/types/interfaces/runtime';
 import type { MarketId } from '@zeitgeistpm/types/interfaces/predictionMarkets';
@@ -27,11 +27,6 @@ export interface Asset extends Enum {
   readonly isZtg: boolean;
 }
 
-/** @name BalanceInfo */
-export interface BalanceInfo extends Struct {
-  readonly amount: Balance;
-}
-
 /** @name BlockNumber */
 export interface BlockNumber extends u64 {}
 
@@ -55,5 +50,8 @@ export interface ScalarPosition extends Enum {
   readonly isLong: boolean;
   readonly isShort: boolean;
 }
+
+/** @name SerdeWrapper */
+export interface SerdeWrapper extends Balance {}
 
 export type PHANTOM_INDEX = 'index';

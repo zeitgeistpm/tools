@@ -4,6 +4,15 @@ export { default as swaps } from "./swaps";
 
 export const index = {
   rpc: {},
+  typesAlias: {
+    tokens: {
+      AccountData: {
+        free: "Balance",
+        reserved: "Balance",
+        frozen: "Balance",
+      },
+    },
+  },
   types: {
     Address: "MultiAddress",
     Amount: "i128",
@@ -15,7 +24,7 @@ export const index = {
         CombinatorialOutcome: null,
         PoolShare: "u128",
         Ztg: null,
-      }
+      },
     },
     SerdeWrapper: "Balance",
     BlockNumber: "u64",
@@ -25,10 +34,7 @@ export const index = {
     Index: "u64",
     Lookup: "MultiAddress",
     ScalarPosition: {
-      _enum: [
-        "Long",
-        "Short"
-      ]
-    }
+      _enum: ["Long", "Short"],
+    },
   },
 };
