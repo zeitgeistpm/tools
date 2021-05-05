@@ -1,4 +1,5 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+// import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK, { util } from "../../../sdk/src";
 
 type Options = {
   endpoint: string;
@@ -30,7 +31,9 @@ const deployPool = async (opts: Options): Promise<void> => {
     }
   } else {
     //default
-    wts = Array(outcomeAssets.length + 1).fill("1".concat("0".repeat(10)));
+    // do not exceed: pub const MaxWeight: Balance = 50 * BASE;
+    // (See: /zeitgeist/runtime/src/lib.rs )
+    wts = Array(outcomeAssets.length + 1).fill("1".concat("0".repeat(11)));
   }
 
   const res = await market.deploySwapPool(signer, wts);

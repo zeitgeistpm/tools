@@ -15,6 +15,7 @@ import viewSwap from "./actions/viewSwap";
 import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
 import getSpotPrice from "./actions/getSpotPrice";
+import viewSpotPrices from "./actions/viewPoolSpotPrices";
 import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 import transfer from "./actions/transfer";
 import redeemShares from "./actions/redeemShares";
@@ -338,6 +339,26 @@ program
     ) =>
       catchErrorsAndExit(
         getSpotPrice,
+        Object.assign(opts, { poolId, assetIn, assetOut })
+      )
+  );
+
+program
+  .command("viewSpotPrices <poolId> <assetIn> <assetOut>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action(
+    (
+      poolId: string,
+      assetIn: string,
+      assetOut: string,
+      opts: { endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        viewSpotPrices,
         Object.assign(opts, { poolId, assetIn, assetOut })
       )
   );

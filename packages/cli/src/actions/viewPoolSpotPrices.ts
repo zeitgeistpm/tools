@@ -7,17 +7,19 @@ type Options = {
   poolId: string;
 };
 
-const getSpotPrice = async (opts: Options): Promise<void> => {
+const viewSpotPrices = async (opts: Options): Promise<void> => {
   const { endpoint, poolId, assetIn, assetOut } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
   //@ts-ignore
-  const price = await sdk.api.rpc.swaps.getSpotPrice(poolId, assetIn, assetOut);
-
-  console.log(price);
+  const price = await sdk.api.rpc.swaps.fetchPoolSpotPrices(
+    poolId,
+    assetIn,
+    assetOut
+  );
 
   console.log(price.amount.toString());
 };
 
-export default getSpotPrice;
+export default viewSpotPrices;

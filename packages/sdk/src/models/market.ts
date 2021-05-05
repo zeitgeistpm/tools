@@ -197,12 +197,12 @@ class Market {
 
           if (method == "PoolCreated") {
             _resolve(data[0].toString());
+            unsubOrWarns(_unsub);
           }
           if (method == "ExtrinsicFailed") {
             _resolve("");
+            unsubOrWarns(_unsub);
           }
-
-          unsubOrWarns(_unsub);
         });
       }
     };
@@ -210,14 +210,21 @@ class Market {
     return new Promise(async (resolve) => {
       // TODO: // sanity check: weights.length should equal outcomes.length+1 (for ZTG)
       // TODO: // weights should each be >= runtime's MinWeight (currently 1e10)
-      console.log("Relative weights: ", weights);
+      console.log(
+        "Relative weights: ",
+        weights
+          .map(Number)
+          .map((x) => x / 1e10)
+          .map((x) => `${x}X1e10`)
+      );
       console.log(
         `If market ${this.marketId} has a different number of outcomes than ${
           weights.length - 1
         }, you might get error {6,13}.\n`
       );
+
       if (this.outcomeAssets) {
-        if (weights.length + 1 !== this.outcomeAssets.length) {
+        if (weights.length !== this.outcomeAssets.length + 1) {
           console.log(
             "Weights length mismatch. Expect an error {6,13}: ProvidedValuesLenMustEqualAssetsLen."
           );

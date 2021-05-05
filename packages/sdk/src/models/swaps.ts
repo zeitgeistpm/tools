@@ -60,8 +60,35 @@ export default class Swap {
       );
     }
 
+    const IA = { categoricalOutcome: [8, 0] };
+    const OA = { ztg: null };
+
     //@ts-ignore
-    return this.api.rpc.swaps.getSpotPrice(this.poolId, inAsset, outAsset);
+    return this.api.rpc.swaps.getSpotPrice(this.poolId, IA, OA);
+
+    //@ts-ignore
+    // return this.api.rpc.swaps.getSpotPrice(this.poolId, inAsset, outAsset);
+  }
+
+  public async fetchPoolSpotPrices(
+    inAsset: string,
+    outAsset: string,
+    blockHashes: any[] = [
+      "0x96b3f13b5eff69d1fead2e07d48c708a249996428cdc6e0fef7a76a30905a678",
+    ]
+  ): Promise<any> {
+    if (blockHashes) {
+      //@ts-ignore
+      return this.api.rpc.swaps.getSpotPrices(
+        this.poolId,
+        inAsset,
+        outAsset,
+        blockHashes
+      );
+    }
+
+    //@ts-ignore
+    return this.api.rpc.swaps.getSpotPrices(this.poolId, inAsset, outAsset);
   }
 
   public async sharesId(): Promise<any> {
