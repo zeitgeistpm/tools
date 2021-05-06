@@ -25,6 +25,8 @@ const createMarket = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
+  console.log(`seed: (${typeof seed})"${seed}"`);  
+
   const signer = util.signerFromSeed(seed);
   console.log("Sending transaction from", signer.address);
 

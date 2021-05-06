@@ -312,14 +312,17 @@ program
   );
 
 program
-  .command("shareBalance <marketId> <shareIndex> <account>")
+  .command("getBalance <addressOrSeed>, <asset>")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((marketId: number, shareIndex: number, account: string) =>
-    catchErrorsAndExit(getShareBalance, { marketId, shareIndex, account })
+  .action((addressOrSeed = "//Alice", asset, opts: { endpoint: string }) =>
+    catchErrorsAndExit(
+      getShareBalance,
+      Object.assign(opts, { addressOrSeed, asset })
+    )
   );
 
 program
