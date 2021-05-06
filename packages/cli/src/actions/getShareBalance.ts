@@ -1,4 +1,5 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+// import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK, { util } from "../../../sdk/src";
 
 type Options = {
   addressOrSeed: string;
@@ -8,72 +9,13 @@ type Options = {
   endpoint: string;
 };
 
-const tolerantJsonParse = (anything) => {
-  try {
-    return JSON.parse(anything);
-  } catch (e) {
-    throw new Error("asset was not ztg, poolX or valid JSON");
-  }
-};
-
-const string48OrFalse = (address) =>
-  typeof address === "string" && address.length === 48 && address;
-
-const parseAssetName = (stringAsset) => {
-  console.log("asset (input):", stringAsset);
-
-  // asset= ztg
-  if (stringAsset === "ztg") {
-    return { ztg: null };
-  }
-
-  // asset= pool:x | poolx | poolShare:x | poolShareX
-  if (typeof stringAsset === "string") {
-    const poolId = stringAsset.replace(/pool(share)?\:?/i, "");
-    if (!isNaN(Number(poolId))) {
-      return { poolShare: poolId };
-    }
-  }
-
-  // asset= [x,y] | [x,'Long'|'Short']
-  const asset =
-    typeof stringAsset === "string"
-      ? tolerantJsonParse(stringAsset)
-      : stringAsset;
-
-  // asset= [x,y] | [x,'Long'|'Short']
-  if (Array.isArray(asset) && asset.length === 2) {
-    if (isNaN(Number(asset[0]))) {
-      throw new Error("In [market,outcome] market must be a number");
-    }
-    switch (asset[1]) {
-      case "Long":
-        return { scalarOutcome: asset };
-      case "Short":
-        return { scalarOutcome: asset };
-      default: {
-        if (isNaN(Number(asset[0]))) {
-          throw new Error(
-            `In [market,outcome] only numerical values, or "Long", "Short" are supported for outcome`
-          );
-        }
-        return { categoricalOutcome: asset };
-      }
-    }
-  }
-
-  throw new Error(
-    `Could not parse asset "${stringAsset}". Try ztg, [X,Y], '[X,"Long"]', '[X,"Short"]', poolX.`
-  );
-};
-
 const getShareBalance = async (opts: Options): Promise<void> => {
   const { addressOrSeed, seed, asset, endpoint } = opts;
   let address, signer;
 
   const sdk = await SDK.initialize(endpoint);
 
-  if (string48OrFalse(addressOrSeed || opts.address)) {
+  if (util.isValidAddress(addressOrSeed || opts.address)) {
     address = addressOrSeed || opts.address;
   } else {
     if (seed || addressOrSeed) {
@@ -99,15 +41,13 @@ const getShareBalance = async (opts: Options): Promise<void> => {
     }
   }
 
-  // temporary
-  if (asset !== "ztg") {
-    console.log("asset (output):", parseAssetName(asset));
-  }
-
   const data =
     asset === "ztg"
       ? await sdk.api.query.system.account(address).then((res) => res.data)
-      : await sdk.api.query.tokens.accounts(address, parseAssetName(asset));
+      : await sdk.api.query.tokens.accounts(
+          address,
+          util.CurrencyIdFromString(asset)
+        );
 
   console.log("", data.toJSON());
 };

@@ -1,8 +1,13 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
-import { KeyringPairOrExtSigner, PoolResponse, poolJoinOpts } from "../types";
-import { isExtSigner, unsubOrWarns } from "../util";
+import {
+  KeyringPairOrExtSigner,
+  CurrencyId,
+  PoolResponse,
+  poolJoinOpts,
+} from "../types";
+import { CurrencyIdFromString, isExtSigner, unsubOrWarns } from "../util";
 import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
 /**
@@ -67,8 +72,8 @@ export default class Swap {
   }
 
   public async fetchPoolSpotPrices(
-    inAsset: string,
-    outAsset: string,
+    inAsset: string | CurrencyId,
+    outAsset: string | CurrencyId,
     blockHashes: any[] = [
       "0x96b3f13b5eff69d1fead2e07d48c708a249996428cdc6e0fef7a76a30905a678",
     ]
@@ -77,8 +82,10 @@ export default class Swap {
       //@ts-ignore
       return this.api.rpc.swaps.getSpotPrices(
         this.poolId,
-        inAsset,
-        outAsset,
+        typeof inAsset === "string" ? CurrencyIdFromString(inAsset) : inAsset,
+        typeof outAsset === "string"
+          ? CurrencyIdFromString(outAsset)
+          : outAsset,
         blockHashes
       );
     }

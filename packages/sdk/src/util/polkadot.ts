@@ -1,6 +1,7 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import Keyring from "@polkadot/keyring";
+import { Keyring, encodeAddress, decodeAddress } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
+import { hexToU8a, isHex } from "@polkadot/util";
 
 import * as zeitgeistDefinitions from "@zeitgeistpm/type-defs";
 import "@zeitgeistpm/types";
@@ -156,4 +157,16 @@ export const signerFromSeed = (seed: string): KeyringPair => {
     type: "sr25519",
   });
   return keyring.addFromUri(seed);
+};
+
+export const isValidAddress = (address: any): boolean => {
+  if (typeof address !== "string") {
+    return false;
+  }
+  try {
+    encodeAddress(isHex(address) ? hexToU8a(address) : decodeAddress(address));
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
