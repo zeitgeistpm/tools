@@ -26,6 +26,7 @@ import viewDisputes from "./actions/viewDisputes";
 import approveMarket from "./actions/approveMarket";
 import rejectMarket from "./actions/rejectMarket";
 import poolJoinWithExactAssetAmount from "./actions/poolJoinWithExactAssetAmount";
+import deployKusamaDerby from "./actions/deployKusamaDerby";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -37,6 +38,16 @@ const catchErrorsAndExit = async (fn: any, opts: any) => {
     process.exit(1); // exit ERR
   }
 };
+
+program
+  .command("deployKusamaDerby")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .action((opts: any) => catchErrorsAndExit(deployKusamaDerby, opts));
 
 program
   .command("createMarket <title> <description> <oracle> <end>")

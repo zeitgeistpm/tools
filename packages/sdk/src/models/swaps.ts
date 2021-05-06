@@ -3,6 +3,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { KeyringPairOrExtSigner, PoolResponse, poolJoinOpts } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
+import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
@@ -108,11 +109,21 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
 
@@ -156,11 +167,21 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
 

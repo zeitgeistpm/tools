@@ -195,14 +195,14 @@ class Market {
         events.forEach(({ phase, event: { data, method, section } }) => {
           console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
 
-          if (method == "PoolCreated") {
+          if (method == "PoolCreate") {
+            unsubOrWarns(_unsub);
             _resolve(data[0].toString());
           }
           if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
             _resolve("");
           }
-
-          unsubOrWarns(_unsub);
         });
       }
     };
