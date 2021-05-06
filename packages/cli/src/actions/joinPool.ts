@@ -11,7 +11,7 @@ type Options = {
 
 // "joinPool" | "joinPoolMultifunc | ""
 /* @ts-ignore */
-const sdkJoinPoolFunctionToUse: string = "joinPoolMultifunc";
+const sdkJoinPoolFunctionToUse: any = "joinPoolMultifunc";
 
 const joinPool = async (opts: Options): Promise<void> => {
   const { endpoint, seed, poolId, amountIn, amountOut, ...bounds } = opts;
