@@ -11,7 +11,7 @@ import {
   MarketEnd,
   Report,
   MarketDispute,
-  marketTypeForHuman,
+  CurrencyId,
   OutcomeAsset,
   PoolResponse,
 } from "../types";
@@ -37,7 +37,7 @@ class Market {
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
-  public marketType: marketTypeForHuman;
+  public marketType: CurrencyId;
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */

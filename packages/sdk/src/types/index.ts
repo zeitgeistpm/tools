@@ -25,7 +25,7 @@ type categoricalOutcomeIndex = [number, number];
 
 type scalarOutcomeIndex = [number, "Long" | "Short"];
 
-export type marketTypeForHuman =
+export type CurrencyId =
   | CategoricalOutcome
   | ScalarOutcome
   | {
