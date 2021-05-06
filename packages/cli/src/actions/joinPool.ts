@@ -9,9 +9,9 @@ type Options = {
   seed: string;
 };
 
-// "joinPool" | "joinPoolMultifunc | ""
+type SdkJoinPoolFunctionToUse = "joinPool" | "joinPoolMultifunc";
 //@ts-ignore
-const sdkJoinPoolFunctionToUse = "joinPoolMultifunc";
+const sdkJoinPoolFunctionToUse: any = "joinPoolMultifunc";
 
 const joinPool = async (opts: Options): Promise<void> => {
   const { endpoint, seed, poolId, amountIn, amountOut, ...bounds } = opts;
@@ -27,7 +27,7 @@ const joinPool = async (opts: Options): Promise<void> => {
 
   const pool = await sdk.models.fetchPoolData(poolId);
 
-  //@ts-ignore
+  /* @ts-ignore */
   const res =
     sdkJoinPoolFunctionToUse === "joinPool"
       ? await pool.joinPool(signer, amountOut, amountIn.split(","))
