@@ -393,7 +393,7 @@ program
   );
 
 program
-  .command("viewSpotPrices <poolId> <assetIn> <assetOut>")
+  .command("viewSpotPrices <poolId> <assetIn> <assetOut> [blocks...]")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -404,11 +404,12 @@ program
       poolId: string,
       assetIn: string,
       assetOut: string,
+      blocks: string,
       opts: { endpoint: string }
     ) =>
       catchErrorsAndExit(
         viewSpotPrices,
-        Object.assign(opts, { poolId, assetIn, assetOut })
+        Object.assign(opts, { poolId, assetIn, assetOut, blocks })
       )
   );
 

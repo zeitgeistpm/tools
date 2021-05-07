@@ -267,14 +267,21 @@ class Market {
 
   async getAssetsPrices(blockNumber: any): Promise<any> {
     const assetPrices = {};
-    const blockHash = await this.api.rpc.chain.getBlockHash(blockNumber);
-    const pool = await this.getPool();
+    const [blockHash, pool] = await Promise.all([
+      this.api.rpc.chain.getBlockHash(blockNumber),
+      this.getPool(),
+    ]);
+
     if (pool != null) {
       const outAsset = NativeShareId;
       for (const inAsset of pool.assets) {
         if (JSON.stringify(inAsset) != JSON.stringify(outAsset)) {
           try {
-            const price = await pool.getSpotPrice(inAsset, outAsset, blockHash);
+            const price = await pool.getSpotPrice(
+              inAsset,
+              outAsset,
+              blockHash.toString()
+            );
             assetPrices[JSON.stringify(inAsset)] = price.toString();
           } catch (error) {
             console.log(

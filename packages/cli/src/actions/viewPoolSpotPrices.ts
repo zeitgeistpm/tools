@@ -1,39 +1,34 @@
-// import SDK, { util } from "@zeitgeistpm/sdk";
-import SDK, { util } from "../../../sdk/src";
+import SDK, { util } from "@zeitgeistpm/sdk";
 
 type Options = {
+  poolId: string;
   assetIn: string;
   assetOut: string;
+  blocks: string;
   endpoint: string;
-  poolId: string;
-  marketId?: string;
+  displayWeights?: boolean;
 };
 
 const viewSpotPrices = async (opts: Options): Promise<void> => {
-  const { endpoint, poolId, marketId, assetIn, assetOut } = opts;
-  let poolIdNum;
+  const { poolId, assetIn, assetOut, blocks, endpoint, displayWeights } = opts;
+
+  const blocksAsNumArray = JSON.parse(blocks).map(Number);
 
   const sdk = await SDK.initialize(endpoint);
 
-  if (marketId !== undefined) {
-    const market = await sdk.models.fetchMarketData(Number(marketId));
-    poolIdNum = await market.getPoolId();
-  } else {
-    poolIdNum = Number(poolId);
+  const pool = await sdk.models.fetchPoolData(Number(poolId));
+
+  if (displayWeights) {
+    console.log(pool.weights);
   }
 
-  const pool = await sdk.models.fetchPoolData(poolIdNum);
-
-  console.log(pool.weights);
-  console.log("\n\n\n");
-
-  //@ts-ignore
-  const prices = await pool.fetchPoolSpotPrices(
+  const prices = await pool.fetchPoolSpotPricesFromBlockNumbers(
     util.AssetIdFromString(assetIn),
-    util.AssetIdFromString(assetOut)
+    util.AssetIdFromString(assetOut),
+    blocksAsNumArray
   );
 
-  console.log(prices);
+  console.log(prices.map((price) => price.toString()).map(Number));
 };
 
 export default viewSpotPrices;

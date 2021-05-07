@@ -52,45 +52,57 @@ export default class Swap {
     outAsset: string | AssetId,
     blockHash?: any
   ): Promise<any> {
-    if (blockHash) {
-      //@ts-ignore
-      return this.api.rpc.swaps.getSpotPrice(
-        this.poolId,
-        AssetIdFromString(inAsset),
-        AssetIdFromString(outAsset),
-        blockHash
-      );
+    let lastHash;
+    if (blockHash === undefined) {
+      lastHash = await this.api.rpc.chain.getBlockHash();
+      lastHash = lastHash.toString();
     }
 
-    const IA = { categoricalOutcome: [8, 0] };
-    const OA = { ztg: null };
+    //@ts-ignore
+    return this.api.rpc.swaps.getSpotPrice(
+      this.poolId,
+      AssetIdFromString(inAsset),
+      AssetIdFromString(outAsset),
+      blockHash || lastHash
+    );
 
     //@ts-ignore
-    return this.api.rpc.swaps.getSpotPrice(this.poolId, IA, OA);
+    return this.api.rpc.swaps.getSpotPrice(this.poolId, inAsset, outAsset);
+  }
 
-    //@ts-ignore
-    // return this.api.rpc.swaps.getSpotPrice(this.poolId, inAsset, outAsset);
+  public async fetchPoolSpotPricesFromBlockNumbers(
+    inAsset: string | AssetId,
+    outAsset: string | AssetId,
+    blockNumbers: number[]
+  ): Promise<any> {
+    const timer = Date.now();
+    const blockHashes = await Promise.all(
+      blockNumbers.map((block) =>
+        this.api.rpc.chain.getBlockHash(block).then((hash) => hash.toString())
+      )
+    );
+
+    return this.fetchPoolSpotPrices(
+      AssetIdFromString(inAsset),
+      AssetIdFromString(outAsset),
+      blockHashes
+    );
   }
 
   public async fetchPoolSpotPrices(
     inAsset: string | AssetId,
     outAsset: string | AssetId,
-    blockHashes: any[] = [
-      "0x47584969f0b48d936b9c3dcee17d583ec45cfe8c402d235eca52a803fa6a67ad",
-    ]
+    blockHashes: string[]
   ): Promise<any> {
     if (blockHashes) {
       //@ts-ignore
       return this.api.rpc.swaps.getSpotPrices(
         this.poolId,
-        typeof inAsset === "string" ? AssetIdFromString(inAsset) : inAsset,
-        typeof outAsset === "string" ? AssetIdFromString(outAsset) : outAsset,
+        AssetIdFromString(inAsset),
+        AssetIdFromString(outAsset),
         blockHashes
       );
     }
-
-    //@ts-ignore
-    return this.api.rpc.swaps.getSpotPrices(this.poolId, inAsset, outAsset);
   }
 
   public async sharesId(): Promise<any> {
