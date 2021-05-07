@@ -13,7 +13,7 @@ const getSpotPrice = async (opts: Options): Promise<void> => {
   const sdk = await SDK.initialize(endpoint);
 
   //@ts-ignore
-  const price = await sdk.api.rpc.swaps.getSpotPrice(poolId, assetIn, assetOut);
+  const price = await sdk.swaps.getSpotPrice(poolId, assetIn, assetOut);
 
   console.log(price);
 

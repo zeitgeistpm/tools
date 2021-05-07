@@ -5,7 +5,7 @@ import {
   unsubOrWarns,
   isValidAddress,
 } from "./polkadot";
-import { KeyringPairOrExtSigner, ExtSigner, CurrencyId } from "../types";
+import { KeyringPairOrExtSigner, ExtSigner, AssetId } from "../types";
 
 export { initApi, initIpfs, signerFromSeed, unsubOrWarns, isValidAddress };
 
@@ -34,11 +34,7 @@ const tolerantJsonParse = (anything) => {
   }
 };
 
-export const CurrencyIdFromString = (
-  stringAsset: string | CurrencyId
-): CurrencyId => {
-  console.log("asset (input):", stringAsset);
-
+export const AssetIdFromString = (stringAsset: string | AssetId): AssetId => {
   // asset= ztg
   if (stringAsset === "ztg") {
     return { ztg: null };
@@ -52,7 +48,7 @@ export const CurrencyIdFromString = (
     }
   }
 
-  // asset= [x,y] | [x,'Long'|'Short'] | CurrencyId
+  // asset= [x,y] | [x,'Long'|'Short'] | AssetId
   const asset =
     typeof stringAsset === "string"
       ? tolerantJsonParse(stringAsset)
@@ -79,7 +75,7 @@ export const CurrencyIdFromString = (
     return { categoricalOutcome: asset.map(Number) };
   }
 
-  // function accepts valid CurrencyId as well as string, so let's cover those
+  // function accepts valid AssetId as well as string, so let's cover those
   if (typeof asset === "object" && !Array.isArray(asset)) {
     if (asset.ztg === null) {
       return { ztg: null };

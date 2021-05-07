@@ -11,7 +11,7 @@ import {
   MarketEnd,
   Report,
   MarketDispute,
-  CurrencyId,
+  AssetId,
   OutcomeAsset,
   PoolResponse,
 } from "../types";
@@ -37,7 +37,7 @@ class Market {
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
-  public marketType: CurrencyId;
+  public marketType: AssetId;
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
@@ -269,15 +269,19 @@ class Market {
     const assetPrices = {};
     const blockHash = await this.api.rpc.chain.getBlockHash(blockNumber);
     const pool = await this.getPool();
-
     if (pool != null) {
       const outAsset = NativeShareId;
       for (const inAsset of pool.assets) {
-        if (inAsset != outAsset) {
+        if (JSON.stringify(inAsset) != JSON.stringify(outAsset)) {
           try {
             const price = await pool.getSpotPrice(inAsset, outAsset, blockHash);
-            assetPrices[inAsset] = price.amount.toString();
-          } catch (error) {}
+            assetPrices[JSON.stringify(inAsset)] = price.toString();
+          } catch (error) {
+            console.log(
+              "error fetching and converting pool.getSpotPrice:",
+              error
+            );
+          }
         }
       }
     }

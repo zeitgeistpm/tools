@@ -276,7 +276,7 @@ class Shares {
     return Shares.shareId(marketId, 2);
   }
 
-  static nativeShareId(): string {
+  static nativeShareId(): any {
     return NativeShareId;
   }
 }

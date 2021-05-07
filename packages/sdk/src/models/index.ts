@@ -228,11 +228,15 @@ export default class Models {
           });
         });
 
+    // const poolId = await market.getPoolId();
+    // const pool = poolId === null ? {} : { pool: poolId };
+
     Object.assign(extendedMarket, {
       ...data,
       marketId,
       metadataString,
       outcomeAssets,
+      // pool,
     });
 
     const extendedMarketResponse = new Market(extendedMarket as any, this.api);
@@ -303,6 +307,8 @@ export default class Models {
   async getAssetsPrices(blockNumber: any): Promise<any> {
     const markets = await this.getAllMarkets();
     let priceData = {};
+    console.log(markets.length, "markets found");
+
     for (const market of markets) {
       const assetPrices = await market.getAssetsPrices(blockNumber);
       priceData = { ...priceData, ...assetPrices };

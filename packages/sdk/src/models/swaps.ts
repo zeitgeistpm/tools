@@ -3,12 +3,13 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import {
   KeyringPairOrExtSigner,
-  CurrencyId,
+  AssetId,
   PoolResponse,
   poolJoinOpts,
 } from "../types";
-import { CurrencyIdFromString, isExtSigner, unsubOrWarns } from "../util";
+import { AssetIdFromString, isExtSigner, unsubOrWarns } from "../util";
 import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
+import { util } from "..";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
@@ -27,7 +28,7 @@ export default class Swap {
   constructor(poolId: number, details: PoolResponse, api: ApiPromise) {
     const { assets, swap_fee, total_weight, weights } = details;
 
-    this.assets = assets;
+    this.assets = assets.map(util.AssetIdFromString);
     this.swapFee = swap_fee;
     this.totalWeight = total_weight;
     this.weights = weights;
@@ -47,16 +48,16 @@ export default class Swap {
   }
 
   public async getSpotPrice(
-    inAsset: string,
-    outAsset: string,
+    inAsset: string | AssetId,
+    outAsset: string | AssetId,
     blockHash?: any
   ): Promise<any> {
     if (blockHash) {
       //@ts-ignore
       return this.api.rpc.swaps.getSpotPrice(
         this.poolId,
-        inAsset,
-        outAsset,
+        AssetIdFromString(inAsset),
+        AssetIdFromString(outAsset),
         blockHash
       );
     }
@@ -72,20 +73,18 @@ export default class Swap {
   }
 
   public async fetchPoolSpotPrices(
-    inAsset: string | CurrencyId,
-    outAsset: string | CurrencyId,
+    inAsset: string | AssetId,
+    outAsset: string | AssetId,
     blockHashes: any[] = [
-      "0x96b3f13b5eff69d1fead2e07d48c708a249996428cdc6e0fef7a76a30905a678",
+      "0x47584969f0b48d936b9c3dcee17d583ec45cfe8c402d235eca52a803fa6a67ad",
     ]
   ): Promise<any> {
     if (blockHashes) {
       //@ts-ignore
       return this.api.rpc.swaps.getSpotPrices(
         this.poolId,
-        typeof inAsset === "string" ? CurrencyIdFromString(inAsset) : inAsset,
-        typeof outAsset === "string"
-          ? CurrencyIdFromString(outAsset)
-          : outAsset,
+        typeof inAsset === "string" ? AssetIdFromString(inAsset) : inAsset,
+        typeof outAsset === "string" ? AssetIdFromString(outAsset) : outAsset,
         blockHashes
       );
     }

@@ -425,14 +425,18 @@ program
   );
 
 program
-  .command("getAssetsPrices <blockNumber>")
+  .command("getAssetsPrices")
+  .option(
+    "-b --block <number>",
+    "The block number at which to get historic prices"
+  )
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((blockNumber: string, opts: { endpoint: string }) =>
-    catchErrorsAndExit(getAssetsPrices, Object.assign(opts, { blockNumber }))
+  .action((opts: { block: number; endpoint: string }) =>
+    catchErrorsAndExit(getAssetsPrices, opts)
   );
 
 program

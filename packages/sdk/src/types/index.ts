@@ -25,7 +25,7 @@ type categoricalOutcomeIndex = [number, number];
 
 type scalarOutcomeIndex = [number, "Long" | "Short"];
 
-export type CurrencyId =
+export type AssetId =
   | CategoricalOutcome
   | ScalarOutcome
   | {
@@ -107,7 +107,7 @@ export type MarketDispute = {
 };
 
 export type PoolResponse = {
-  assets: string[];
+  assets: string[] | AssetId[];
   swap_fee: number;
   total_weight: number;
   weights: any; // { string => number } TODO how to do repr this in TS?

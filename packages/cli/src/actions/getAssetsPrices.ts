@@ -1,17 +1,24 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+// import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK, { util } from "../../../sdk/src";
 
 type Options = {
-  blockNumber: string;
+  block: string | number;
   endpoint: string;
 };
 
 const getAssetsPrices = async (opts: Options): Promise<void> => {
-  const { blockNumber, endpoint } = opts;
+  const { endpoint } = opts;
+  let { block } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
-  const res = await sdk.models.getAssetsPrices(blockNumber);
+  if (block === undefined) {
+    const header = await sdk.api.rpc.chain.getHeader();
+    block = await header.number.toString();
+  }
+  const res = await sdk.models.getAssetsPrices(block);
 
+  console.log("Block:", block);
   console.log(res);
 };
 
