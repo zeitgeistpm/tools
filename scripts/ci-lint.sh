@@ -1,4 +1,4 @@
-yarn lint:cli
+yarn cli:lint
 if [ $? -eq 1 ]
 then
   exit 1
