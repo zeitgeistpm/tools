@@ -10,7 +10,7 @@ type Options = {
 const approveMarket = async (opts: Options): Promise<void> => {
   const { endpoint, marketId, seed } = opts;
 
-  const sdk = await SDK.initialize(endpoint)
+  const sdk = await SDK.initialize(endpoint);
 
   const signer = util.signerFromSeed(seed);
 
