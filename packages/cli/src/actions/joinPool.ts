@@ -10,7 +10,7 @@ type Options = {
 };
 
 // "joinPool" | "joinPoolMultifunc | ""
-const sdkJoinPoolFunctionToUse: string = "joinPoolMultifunc";
+const sdkJoinPoolFunctionToUse = "joinPoolMultifunc";
 
 const joinPool = async (opts: Options): Promise<void> => {
   const { endpoint, seed, poolId, amountIn, amountOut, ...bounds } = opts;
@@ -28,7 +28,7 @@ const joinPool = async (opts: Options): Promise<void> => {
 
   //@ts-ignore
   const res =
-    sdkJoinPoolFunctionToUse === "joinPool"
+    (sdkJoinPoolFunctionToUse as any) === "joinPool"
       ? await pool.joinPool(signer, amountOut, amountIn.split(","))
       : await pool.joinPoolMultifunc(signer, {
           bounds: trimmedBounds as any,

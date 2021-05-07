@@ -36,8 +36,8 @@ export default {
     MarketType: {
       _enum: {
         Categorical: "u16",
-        Scalar: "(u128, u128)"
-      }
+        Scalar: "(u128, u128)",
+      },
     },
     MarketStatus: {
       _enum: [
@@ -63,10 +63,10 @@ export default {
       resolved_outcome: "Option<Outcome>",
     },
     Outcome: {
-      _enum : {
+      _enum: {
         Categorical: "u16",
-        Scalar: "u128"
-      }
+        Scalar: "u128",
+      },
     },
     Report: {
       at: "BlockNumber",
