@@ -159,15 +159,15 @@ export type poolExitBounds = PoolExitForMinAsset | PoolExitForMaxPool;
 
 export type PoolId = number;
 
-export type AssetId = string;
+export type AssetIdStringForTempCompatibility = string;
 
 export type poolJoinOpts = {
-  asset?: AssetId;
+  asset?: AssetIdStringForTempCompatibility;
   bounds: poolJoinBounds;
 };
 
 export type poolExitOpts = {
-  asset?: AssetId;
+  asset?: AssetIdStringForTempCompatibility;
   bounds: poolExitBounds;
 };
 
