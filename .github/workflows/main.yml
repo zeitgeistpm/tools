@@ -28,6 +28,7 @@ jobs:
       - name: lerna bootstrap = Install dependencies, check TypeScript compiliation, lint SDK and CLI
         run: |
           npx lerna bootstrap
+          ./scripts/ci-lint.sh
 
       # - name: Run tests in all packages
       #   run: |
