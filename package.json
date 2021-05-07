@@ -26,7 +26,6 @@
     "clean": "rm -rf packages/**/dist",
     "compile": "tsc --build --force tsconfig.json",
     "lint-all": "yarn cli:lint ; yarn sdk:lint ; yarn type-defs:lint",
-    "prepublish": "yarn sdk:lint-quiet & yarn cli:lint-quiet & yarn compile",
     "cli": "ts-node -r tsconfig-paths/register packages/cli/src/index",
     "cli:lint": "tsc --noEmit && eslint 'packages/cli/src/**/*.ts'",
     "cli:lint-quiet": "tsc --noEmit && eslint 'packages/cli/src/**/*.ts' --quiet",
