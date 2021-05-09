@@ -11,12 +11,11 @@ import {
   MarketEnd,
   Report,
   MarketDispute,
-  marketTypeForHuman,
-  OutcomeAsset,
-  PoolResponse,
+  AssetId,
 } from "../types";
-import { NativeShareId } from "../consts";
 import { isExtSigner, unsubOrWarns } from "../util";
+import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
+import { Option } from "@polkadot/types";
 
 /**
  * The Market class initializes all the market data.
@@ -37,13 +36,13 @@ class Market {
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
-  public marketType: marketTypeForHuman;
+  public marketType: AssetId;
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
   public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
-  public categories: number | null;
+  public categories: string[] | null;
   /** The resolved outcome for the market. */
   public resolvedOutcome: number | null;
   /** The title of the market. */
@@ -53,7 +52,7 @@ class Market {
   /** The metadata string. */
   public metadataString: string;
   /** The share identifiers */
-  public outcomeAssets: OutcomeAsset[];
+  public outcomeAssets: Asset[];
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
@@ -150,7 +149,7 @@ class Market {
     ).toHuman() as number;
   };
 
-  getPool = async (): Promise<Swap> => {
+  getPool = async (): Promise<Swap | null> => {
     const poolId = await this.getPoolId();
     if (poolId == null) {
       return null;
@@ -160,11 +159,12 @@ class Market {
       return null;
     }
 
-    const poolResponse = (
-      await this.api.query.swaps.pools(poolId)
-    ).toJSON() as PoolResponse;
+    const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
-    return new Swap(poolId, poolResponse, this.api);
+    if (pool.isSome) {
+      return new Swap(poolId, pool.unwrap(), this.api);
+    }
+    return null;
   };
 
   getDisputes = async (): Promise<MarketDispute[]> => {
@@ -210,14 +210,21 @@ class Market {
     return new Promise(async (resolve) => {
       // TODO: // sanity check: weights.length should equal outcomes.length+1 (for ZTG)
       // TODO: // weights should each be >= runtime's MinWeight (currently 1e10)
-      console.log("Relative weights: ", weights);
+      console.log(
+        "Relative weights: ",
+        weights
+          .map(Number)
+          .map((x) => x / 1e10)
+          .map((x) => `${x}X1e10`)
+      );
       console.log(
         `If market ${this.marketId} has a different number of outcomes than ${
           weights.length - 1
         }, you might get error {6,13}.\n`
       );
+
       if (this.outcomeAssets) {
-        if (weights.length + 1 !== this.outcomeAssets.length) {
+        if (weights.length !== this.outcomeAssets.length + 1) {
           console.log(
             "Weights length mismatch. Expect an error {6,13}: ProvidedValuesLenMustEqualAssetsLen."
           );
@@ -256,23 +263,18 @@ class Market {
     });
   };
 
-  async getAssetsPrices(blockNumber: any): Promise<any> {
-    const assetPrices = {};
-    const blockHash = await this.api.rpc.chain.getBlockHash(blockNumber);
+  async assetSpotPricesInZtg(
+    blockHash?: any
+  ): Promise<{ [key: string]: string }> {
     const pool = await this.getPool();
-
-    if (pool != null) {
-      const outAsset = NativeShareId;
-      for (const inAsset of pool.assets) {
-        if (inAsset != outAsset) {
-          try {
-            const price = await pool.getSpotPrice(inAsset, outAsset, blockHash);
-            assetPrices[inAsset] = price.amount.toString();
-          } catch (error) {}
-        }
-      }
+    if (!pool) {
+      return null;
+      // throw new Error(
+      //   `No swap pool is deployed for market with id: ${this.marketId}`
+      // );
     }
-    return assetPrices;
+
+    return pool.assetSpotPricesInZtg(blockHash);
   }
 
   async buyCompleteSet(

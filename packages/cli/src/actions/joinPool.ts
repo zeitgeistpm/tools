@@ -26,7 +26,7 @@ const joinPool = async (opts: Options): Promise<void> => {
 
   const pool = await sdk.models.fetchPoolData(poolId);
 
-  //@ts-ignore
+  /* @ts-ignore */
   const res =
     (sdkJoinPoolFunctionToUse as any) === "joinPool"
       ? await pool.joinPool(signer, amountOut, amountIn.split(","))

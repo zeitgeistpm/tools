@@ -4,13 +4,14 @@ import { hexToNumber, hexToString } from "@polkadot/util";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
 import { unsubOrWarns } from "../util";
+import { Pool } from "@zeitgeistpm/types/dist/interfaces/swaps";
+import { Option } from "@polkadot/types";
 
 import {
   MarketEnd,
   MarketId,
   MarketResponse,
   ExtendedMarketResponse,
-  PoolResponse,
   KeyringPairOrExtSigner,
   PoolId,
 } from "../types";
@@ -235,7 +236,10 @@ export default class Models {
       outcomeAssets,
     });
 
-    const extendedMarketResponse = new Market(extendedMarket as any, this.api);
+    const extendedMarketResponse = new Market(
+      (extendedMarket as any) as ExtendedMarketResponse,
+      this.api
+    );
 
     return extendedMarketResponse;
   }
@@ -292,19 +296,22 @@ export default class Models {
     return res;
   }
 
-  async fetchPoolData(poolId: PoolId): Promise<Swap> {
-    const poolResponse = (
-      await this.api.query.swaps.pools(poolId)
-    ).toJSON() as PoolResponse;
+  async fetchPoolData(poolId: PoolId): Promise<Swap | null> {
+    const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
-    return new Swap(poolId, poolResponse, this.api);
+    if (pool.isSome) {
+      return new Swap(poolId, pool.unwrap(), this.api);
+    } else {
+      return null;
+    }
   }
 
-  async getAssetsPrices(blockNumber: any): Promise<any> {
+  async assetSpotPricesInZtg(blockHash?: any): Promise<any> {
     const markets = await this.getAllMarkets();
     let priceData = {};
+
     for (const market of markets) {
-      const assetPrices = await market.getAssetsPrices(blockNumber);
+      const assetPrices = await market.assetSpotPricesInZtg(blockHash);
       priceData = { ...priceData, ...assetPrices };
     }
     return priceData;

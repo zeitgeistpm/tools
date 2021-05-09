@@ -1,1 +1,1 @@
-export const NativeShareId = "0x" + "00".repeat(32);
+export const NativeShareId = { ztg: null };

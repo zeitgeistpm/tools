@@ -1,11 +1,11 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
-//@ts-ignore
 import {
   Market,
   MarketType,
   Outcome,
 } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
+import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
 // Just a market identifier.
 export type MarketId = number;
@@ -25,7 +25,7 @@ type categoricalOutcomeIndex = [number, number];
 
 type scalarOutcomeIndex = [number, "Long" | "Short"];
 
-export type marketTypeForHuman =
+export type AssetId =
   | CategoricalOutcome
   | ScalarOutcome
   | {
@@ -43,8 +43,6 @@ export type ScalarOutcome = {
   scalarOutcome: scalarOutcomeIndex;
 };
 
-export type OutcomeAsset = CategoricalOutcome | ScalarOutcome;
-
 // The market type as returned by the API call to `predictionMarkets.markets`.
 export type MarketResponse = Market;
 
@@ -59,14 +57,14 @@ export type ExtendedMarketResponse = {
   market_type: MarketType;
   market_status: string;
   report: Report | null;
-  categories: number | null;
+  categories: string[] | null;
   resolved_outcome: number | null;
   // new ones
   marketId: number;
   title: string;
   description: string;
   metadataString: string;
-  outcomeAssets: OutcomeAsset[];
+  outcomeAssets: Asset[];
 };
 
 // The extended market data from which a market may be created.
@@ -87,7 +85,7 @@ export type FilteredMarketResponse = {
   title?: string;
   description?: string;
   metadataString?: string;
-  outcomeAssets?: OutcomeAsset[];
+  outcomeAssets?: Asset[];
 };
 
 export type Report = {
@@ -107,7 +105,7 @@ export type MarketDispute = {
 };
 
 export type PoolResponse = {
-  assets: string[];
+  assets: string[] | AssetId[];
   swap_fee: number;
   total_weight: number;
   weights: any; // { string => number } TODO how to do repr this in TS?
@@ -159,15 +157,15 @@ export type poolExitBounds = PoolExitForMinAsset | PoolExitForMaxPool;
 
 export type PoolId = number;
 
-export type AssetId = string;
+export type AssetIdStringForTempCompatibility = string;
 
 export type poolJoinOpts = {
-  asset?: AssetId;
+  asset?: AssetIdStringForTempCompatibility;
   bounds: poolJoinBounds;
 };
 
 export type poolExitOpts = {
-  asset?: AssetId;
+  asset?: AssetIdStringForTempCompatibility;
   bounds: poolExitBounds;
 };
 

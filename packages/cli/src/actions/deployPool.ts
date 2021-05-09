@@ -30,6 +30,8 @@ const deployPool = async (opts: Options): Promise<void> => {
     }
   } else {
     //default
+    // do not exceed: pub const MaxWeight: Balance = 50 * BASE;
+    // (See: /zeitgeist/runtime/src/lib.rs )
     wts = Array(outcomeAssets.length + 1).fill("1".concat("0".repeat(10)));
   }
 

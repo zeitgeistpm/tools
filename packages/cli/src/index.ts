@@ -15,6 +15,7 @@ import viewSwap from "./actions/viewSwap";
 import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
 import getSpotPrice from "./actions/getSpotPrice";
+import viewSpotPrices from "./actions/viewPoolSpotPrices";
 import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 import transfer from "./actions/transfer";
 import redeemShares from "./actions/redeemShares";
@@ -358,14 +359,17 @@ program
   );
 
 program
-  .command("shareBalance <marketId> <shareIndex> <account>")
+  .command("getBalance <addressOrSeed>, <asset>")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((marketId: number, shareIndex: number, account: string) =>
-    catchErrorsAndExit(getShareBalance, { marketId, shareIndex, account })
+  .action((addressOrSeed = "//Alice", asset, opts: { endpoint: string }) =>
+    catchErrorsAndExit(
+      getShareBalance,
+      Object.assign(opts, { addressOrSeed, asset })
+    )
   );
 
 program
@@ -389,6 +393,27 @@ program
   );
 
 program
+  .command("viewSpotPrices <poolId> <assetIn> <assetOut> [blocks...]")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action(
+    (
+      poolId: string,
+      assetIn: string,
+      assetOut: string,
+      blocks: string,
+      opts: { endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        viewSpotPrices,
+        Object.assign(opts, { poolId, assetIn, assetOut, blocks })
+      )
+  );
+
+program
   .command("wrapNativeCurrency <amount>")
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
@@ -401,14 +426,18 @@ program
   );
 
 program
-  .command("getAssetsPrices <blockNumber>")
+  .command("getAssetsPrices")
+  .option(
+    "-b --block <number>",
+    "The block number at which to get historic prices"
+  )
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((blockNumber: string, opts: { endpoint: string }) =>
-    catchErrorsAndExit(getAssetsPrices, Object.assign(opts, { blockNumber }))
+  .action((opts: { block: number; endpoint: string }) =>
+    catchErrorsAndExit(getAssetsPrices, opts)
   );
 
 program

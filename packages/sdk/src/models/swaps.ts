@@ -1,30 +1,31 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
-import { KeyringPairOrExtSigner, PoolResponse, poolJoinOpts } from "../types";
-import { isExtSigner, unsubOrWarns } from "../util";
-import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
+import { KeyringPairOrExtSigner, AssetId, poolJoinOpts } from "../types";
+import { AssetIdFromString, isExtSigner, unsubOrWarns } from "../util";
+import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces/index";
+// import { util } from "..";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
  * providing liquidity to pools and swapping assets.
  */
 export default class Swap {
-  public assets;
-  public swapFee;
-  public totalWeight;
+  public assets: Asset[];
+  public swapFee: string;
+  public totalWeight: string;
   public weights;
-  public poolId;
+  public poolId: number;
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
 
-  constructor(poolId: number, details: PoolResponse, api: ApiPromise) {
+  constructor(poolId: number, details: Pool, api: ApiPromise) {
     const { assets, swap_fee, total_weight, weights } = details;
 
     this.assets = assets;
-    this.swapFee = swap_fee;
-    this.totalWeight = total_weight;
+    this.swapFee = swap_fee.toString();
+    this.totalWeight = total_weight.toString();
     this.weights = weights;
 
     this.poolId = poolId;
@@ -42,22 +43,74 @@ export default class Swap {
   }
 
   public async getSpotPrice(
-    inAsset: string,
-    outAsset: string,
+    inAsset: Asset,
+    outAsset: Asset,
     blockHash?: any
   ): Promise<any> {
-    if (blockHash) {
-      //@ts-ignore
-      return this.api.rpc.swaps.getSpotPrice(
-        this.poolId,
-        inAsset,
-        outAsset,
-        blockHash
-      );
+    if (!blockHash) {
+      blockHash = await this.api.rpc.chain.getBlockHash();
     }
 
     //@ts-ignore
-    return this.api.rpc.swaps.getSpotPrice(this.poolId, inAsset, outAsset);
+    return this.api.rpc.swaps.getSpotPrice(
+      this.poolId,
+      // AssetIdFromString(inAsset),
+      // AssetIdFromString(outAsset),
+      inAsset,
+      outAsset,
+      blockHash
+    );
+  }
+
+  public async assetSpotPricesInZtg(
+    blockHash?: any
+  ): Promise<{ [key: string]: string }> {
+    const prices = {};
+    for (const asset of this.assets) {
+      if (asset.isZtg) {
+        continue;
+      }
+      //@ts-ignore
+      const price = await this.getSpotPrice({ ztg: null }, asset, blockHash);
+      prices[asset.toString()] = price.toString();
+    }
+
+    return prices;
+  }
+
+  public async fetchPoolSpotPricesFromBlockNumbers(
+    inAsset: string | AssetId,
+    outAsset: string | AssetId,
+    blockNumbers: number[]
+  ): Promise<any> {
+    const timer = Date.now();
+    const blockHashes = await Promise.all(
+      blockNumbers.map((block) =>
+        this.api.rpc.chain.getBlockHash(block).then((hash) => hash.toString())
+      )
+    );
+
+    return this.fetchPoolSpotPrices(
+      AssetIdFromString(inAsset),
+      AssetIdFromString(outAsset),
+      blockHashes
+    );
+  }
+
+  public async fetchPoolSpotPrices(
+    inAsset: string | AssetId,
+    outAsset: string | AssetId,
+    blockHashes: string[]
+  ): Promise<any> {
+    if (blockHashes) {
+      //@ts-ignore
+      return this.api.rpc.swaps.getSpotPrices(
+        this.poolId,
+        AssetIdFromString(inAsset),
+        AssetIdFromString(outAsset),
+        blockHashes
+      );
+    }
   }
 
   public async sharesId(): Promise<any> {
