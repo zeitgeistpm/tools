@@ -12,11 +12,10 @@ import {
   Report,
   MarketDispute,
   AssetId,
-  OutcomeAsset,
-  PoolResponse,
 } from "../types";
-import { NativeShareId } from "../consts";
 import { isExtSigner, unsubOrWarns } from "../util";
+import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
+import { Option } from "@polkadot/types";
 
 /**
  * The Market class initializes all the market data.
@@ -43,7 +42,7 @@ class Market {
   /** The reported outcome of the market. Null if the market was not reported yet. */
   public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
-  public categories: number | null;
+  public categories: string[] | null;
   /** The resolved outcome for the market. */
   public resolvedOutcome: number | null;
   /** The title of the market. */
@@ -53,7 +52,7 @@ class Market {
   /** The metadata string. */
   public metadataString: string;
   /** The share identifiers */
-  public outcomeAssets: OutcomeAsset[];
+  public outcomeAssets: Asset[];
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
@@ -150,7 +149,7 @@ class Market {
     ).toHuman() as number;
   };
 
-  getPool = async (): Promise<Swap> => {
+  getPool = async (): Promise<Swap | null> => {
     const poolId = await this.getPoolId();
     if (poolId == null) {
       return null;
@@ -160,11 +159,12 @@ class Market {
       return null;
     }
 
-    const poolResponse = (
-      await this.api.query.swaps.pools(poolId)
-    ).toJSON() as PoolResponse;
+    const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
-    return new Swap(poolId, poolResponse, this.api);
+    if (pool.isSome) {
+      return new Swap(poolId, pool.unwrap(), this.api);
+    }
+    return null;
   };
 
   getDisputes = async (): Promise<MarketDispute[]> => {
@@ -198,12 +198,10 @@ class Market {
           if (method == "PoolCreate") {
             unsubOrWarns(_unsub);
             _resolve(data[0].toString());
-            unsubOrWarns(_unsub);
           }
           if (method == "ExtrinsicFailed") {
             unsubOrWarns(_unsub);
             _resolve("");
-            unsubOrWarns(_unsub);
           }
         });
       }
@@ -265,34 +263,18 @@ class Market {
     });
   };
 
-  async getAssetsPrices(blockNumber: any): Promise<any> {
-    const assetPrices = {};
-    const [blockHash, pool] = await Promise.all([
-      this.api.rpc.chain.getBlockHash(blockNumber),
-      this.getPool(),
-    ]);
-
-    if (pool != null) {
-      const outAsset = NativeShareId;
-      for (const inAsset of pool.assets) {
-        if (JSON.stringify(inAsset) != JSON.stringify(outAsset)) {
-          try {
-            const price = await pool.getSpotPrice(
-              inAsset,
-              outAsset,
-              blockHash.toString()
-            );
-            assetPrices[JSON.stringify(inAsset)] = price.toString();
-          } catch (error) {
-            console.log(
-              "error fetching and converting pool.getSpotPrice:",
-              error
-            );
-          }
-        }
-      }
+  async assetSpotPricesInZtg(
+    blockHash?: any
+  ): Promise<{ [key: string]: string }> {
+    const pool = await this.getPool();
+    if (!pool) {
+      return null;
+      // throw new Error(
+      //   `No swap pool is deployed for market with id: ${this.marketId}`
+      // );
     }
-    return assetPrices;
+
+    return pool.assetSpotPricesInZtg(blockHash);
   }
 
   async buyCompleteSet(

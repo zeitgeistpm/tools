@@ -6,18 +6,17 @@ type Options = {
 };
 
 const getAssetsPrices = async (opts: Options): Promise<void> => {
-  const { endpoint } = opts;
-  let { block } = opts;
+  const { block, endpoint } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
-  if (block === undefined) {
-    const header = await sdk.api.rpc.chain.getHeader();
-    block = await header.number.toString();
-  }
-  const res = await sdk.models.getAssetsPrices(block);
+  const blockHash = block ? await sdk.api.rpc.chain.getBlockHash(block) : null;
 
-  console.log("Block:", block);
+  const res = await sdk.models.assetSpotPricesInZtg(blockHash);
+
+  if (block) {
+    console.log("Block:", block);
+  }
   console.log(res);
 };
 
