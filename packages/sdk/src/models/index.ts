@@ -316,4 +316,64 @@ export default class Models {
     }
     return priceData;
   }
+
+  async getBlockData(blockHash?: any): Promise<any> {
+    console.log(blockHash.toString());
+
+    const data = await this.api.rpc.chain.getBlock(blockHash);
+    console.log(data);
+    return data;
+  }
+
+  async indexTransferRecipients(
+    startBlock = 0,
+    endBlock?: number,
+    arbitrarySet?: number[],
+    filter?: any
+  ): Promise<any[]> {
+    const index = {};
+    const head = this.api.rpc.chain.getHeader();
+    console.log([...Array(endBlock)]);
+
+    const range = [
+      ...Array(
+        Number(endBlock) || (await (await head).number.toNumber())
+      ).keys(),
+    ].slice(startBlock || 0);
+    if (arbitrarySet) {
+      console.log(arbitrarySet);
+    } else {
+      console.log(`${startBlock} to ${endBlock}`);
+      console.log(range);
+    }
+
+    const blockHashes = await Promise.all(
+      (arbitrarySet || range).map((block) =>
+        this.api.rpc.chain.getBlockHash(block)
+      )
+    );
+
+    const extrinsics = await Promise.all(
+      blockHashes.map((hash) =>
+        this.api.rpc.chain
+          .getBlock(hash)
+          .then((block) => block.block.extrinsics)
+      )
+    );
+    console.log("retrieved but not logged at:", Date.now());
+
+    (arbitrarySet || range).forEach((blockNum, idx) => {
+      //@ts-ignore
+      extrinsics[idx].blockNum = blockNum;
+    });
+
+    // console.log(extrinsics.map((e, idx) => e && e[0] && e[0].length ? e[0].length : (e && e[0] && e[0].length ===0 ? 0 : `empty at ${idx}`)));
+
+    // console.log(res);
+
+    // return ["anything"];
+    // return res;
+
+    return extrinsics;
+  }
 }

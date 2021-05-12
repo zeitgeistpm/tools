@@ -16,7 +16,6 @@ import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
 import getSpotPrice from "./actions/getSpotPrice";
 import viewSpotPrices from "./actions/viewPoolSpotPrices";
-import wrapNativeCurrency from "./actions/wrapNativeCurrency";
 import transfer from "./actions/transfer";
 import redeemShares from "./actions/redeemShares";
 import getAssetsPrices from "./actions/getAssetsPrices";
@@ -28,6 +27,7 @@ import approveMarket from "./actions/approveMarket";
 import rejectMarket from "./actions/rejectMarket";
 import poolJoinWithExactAssetAmount from "./actions/poolJoinWithExactAssetAmount";
 import deployKusamaDerby from "./actions/deployKusamaDerby";
+import doIndexyStuff from "./actions/doIndexyStuff";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -414,18 +414,6 @@ program
   );
 
 program
-  .command("wrapNativeCurrency <amount>")
-  .option("--seed <string>", "The signer's seed", "//Alice")
-  .option(
-    "--endpoint <string>",
-    "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
-  )
-  .action((amount: string, opts: { endpoint: string; seed: string }) =>
-    catchErrorsAndExit(wrapNativeCurrency, Object.assign(opts, { amount }))
-  );
-
-program
   .command("getAssetsPrices")
   .option(
     "-b --block <number>",
@@ -538,6 +526,19 @@ program
   )
   .action((marketId: number, opts: { endpoint: string }) =>
     catchErrorsAndExit(viewDisputes, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("data")
+  .option("-s --startBlock <number>")
+  .option("-e --endBlock <number>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((opts: { startBlock; endBlock; endpoint: string }) =>
+    catchErrorsAndExit(doIndexyStuff, opts)
   );
 
 program.parse(process.argv);
