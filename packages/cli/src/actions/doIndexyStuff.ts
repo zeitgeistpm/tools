@@ -39,6 +39,9 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   // const res = await sdk.models.indexTransferRecipients(startBlock || 0, endBlock);
   const res = await sdk.models.indexTransferRecipients(startBlock || 0, endBlock, arbitrarySet);
   
+  let timer = Date.now();
+  console.log("beginning postprocessing at:", timer);
+
   try{    
     const indexSelectedExtrinsic = (args, methodConcatName, wholeBlock)=> {
       if (methodConcatName === "balances::transfer") {
@@ -88,11 +91,10 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
       return ({ methodConcatName });
     }
 
-
     console.log("\n");
     const filteredBlocks = res.map((blockExtrinsics) => {
-      if (blockExtrinsics.length!=1 || blockExtrinsics[0].length!==10) {
-        return {
+      if (blockExtrinsics.length!=1 || blockExtrinsics[0].length!==10) {        
+        return ({
           blockNum: blockExtrinsics.blockNum, 
           extrinsics: blockExtrinsics,
           filteredExtrinsics:
@@ -104,10 +106,10 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
               )
             ))
             .filter(parseExtrinsics)
-        }
+        })
       }
     })
-    .filter(blocks=>blocks.filteredExtrinsics.length);
+    .filter(block=>block && block.filteredExtrinsics.length);
         
     console.log(transferredIn);      
     

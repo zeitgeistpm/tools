@@ -335,6 +335,9 @@ export default class Models {
     const head = this.api.rpc.chain.getHeader();
     console.log([...Array(endBlock)]);
 
+    let currentConnections = 0;
+    let extrinsics = [];
+
     const range = [
       ...Array(
         Number(endBlock) || (await (await head).number.toNumber())
@@ -346,21 +349,46 @@ export default class Models {
       console.log(`${startBlock} to ${endBlock}`);
       console.log(range);
     }
+    console.log(`...makes ${(arbitrarySet || range).length} blocks`);
 
-    const blockHashes = await Promise.all(
-      (arbitrarySet || range).map((block) =>
-        this.api.rpc.chain.getBlockHash(block)
-      )
-    );
+    let timer = Date.now();
+    console.log("beginning retrieval at:", timer);
 
-    const blocks = await Promise.all(
-      blockHashes.map((hash) =>
-        this.api.rpc.chain.getBlock(hash).then((block) => block.block)
-      )
-    );
-    console.log("retrieved but not logged at:", Date.now());
+    try {
+      const blockHashes = await Promise.all(
+        (arbitrarySet || range).map((block, idx) => {
+          currentConnections++;
+          if (timer - Date.now() > 30000) {
+            console.log(`Progress: ${idx}`);
+            timer = Date.now();
+          }
+          return this.api.rpc.chain.getBlockHash(block);
+        })
+      );
 
-    const extrinsics = blocks.map((block) => block.extrinsics);
+      currentConnections = 0;
+      timer = Date.now();
+      const blocks = await Promise.all(
+        blockHashes.map((hash, idx) => {
+          currentConnections++;
+          if (timer - Date.now() > 30000) {
+            console.log(`Progress: ${idx}`);
+            timer = Date.now();
+          }
+          return this.api.rpc.chain.getBlock(hash).then((block) => block.block);
+        })
+      );
+      console.log("retrieved but not logged at:", Date.now());
+      currentConnections = 0;
+
+      extrinsics = blocks.map((block) => block.extrinsics);
+    } catch (e) {
+      console.log("Oops at:", Date.now());
+      console.log(
+        `Oh, dear - was it too many connections? There are ${currentConnections}`
+      );
+      throw e;
+    }
 
     (arbitrarySet || range).forEach((blockNum, idx) => {
       //@ts-ignore
@@ -373,6 +401,7 @@ export default class Models {
 
     // return ["anything"];
     // return res;
+    console.log("connections:", currentConnections);
 
     return extrinsics;
   }
