@@ -353,14 +353,14 @@ export default class Models {
       )
     );
 
-    const extrinsics = await Promise.all(
+    const blocks = await Promise.all(
       blockHashes.map((hash) =>
-        this.api.rpc.chain
-          .getBlock(hash)
-          .then((block) => block.block.extrinsics)
+        this.api.rpc.chain.getBlock(hash).then((block) => block.block)
       )
     );
     console.log("retrieved but not logged at:", Date.now());
+
+    const extrinsics = blocks.map((block) => block.extrinsics);
 
     (arbitrarySet || range).forEach((blockNum, idx) => {
       //@ts-ignore

@@ -27,7 +27,7 @@ import approveMarket from "./actions/approveMarket";
 import rejectMarket from "./actions/rejectMarket";
 import poolJoinWithExactAssetAmount from "./actions/poolJoinWithExactAssetAmount";
 import deployKusamaDerby from "./actions/deployKusamaDerby";
-import doIndexyStuff from "./actions/doIndexyStuff";
+import indexExtrinsicsUnstable from "./actions/doIndexyStuff";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -538,7 +538,7 @@ program
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((opts: { startBlock; endBlock; endpoint: string }) =>
-    catchErrorsAndExit(doIndexyStuff, opts)
+    catchErrorsAndExit(indexExtrinsicsUnstable, opts)
   );
 
 program.parse(process.argv);

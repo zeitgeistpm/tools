@@ -8,18 +8,13 @@ type Options = {
   endpoint: string;
 };
 
-const arbitrarySet= [
-  0, 775, 
-  // 7725,7726,7744,7745, 7775, 7776,7777,7778, 7779,7780,7781,7782,7783, 7784,7785, 7786, 
-  // 8355, 8420, 8427, 8464,8466,
-  // 9382,9780, 
-  // 10152,10207,10229, 10231, 10233,10237, 10252,10269, 10271, 10301, 10334,10477,10478, 10480,10482, 10495,
-  // 10704,10721,10731, 10737, 10739, 10748, 10783,10790, 10832,
-  11319,11322,11323,11325,11371,11373,11375,
-  21742,21897, 22380, 22383
-];
+const transferredIn = {};
 
-const doIndexyStuff = async (opts: Options): Promise<void> => {
+const indexableExtrinsics = ["balances::transfer", "balances::transfer"];
+
+const arbitrarySet = null;
+
+const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   console.log('opts', opts);
   
   const { startBlock, endBlock, endpoint } = opts;
@@ -43,102 +38,80 @@ const doIndexyStuff = async (opts: Options): Promise<void> => {
   // console.log("startBlock:", startBlock);
   // const res = await sdk.models.indexTransferRecipients(startBlock || 0, endBlock);
   const res = await sdk.models.indexTransferRecipients(startBlock || 0, endBlock, arbitrarySet);
-
-try{
   
+  try{    
+    const indexSelectedExtrinsic = (args, methodConcatName, wholeBlock)=> {
+      if (methodConcatName === "balances::transfer") {
+        // Note different capitalisation: .toHuman().args[x].id  vs. args[0].toHuman().Id)  
+        const recipient = args[0].toHuman().Id;        
+        const balance = Number(args[1]);
+        if (isNaN(balance)) {
+          console.log("Expected balance as second argument, got:",args,"of which second argument converts to",Number(args[1]));          
+          throw new Error(`${args[1]} did not converts to a numerical balance in ${wholeBlock.blockNum}- ${methodConcatName}`);
+        }
 
-  const blacklist=singleExtrinsic=>{
-    if (!singleExtrinsic.method) {
-      console.log('Uh uh, no method');     
-    }
-    const toHuman= singleExtrinsic.method.toHuman();
-    const methString = `${toHuman.section}::${toHuman.method}`;
-    
-    if (methString === "timestamp::set") {
-      console.log(`\nmethString=${methString}, return ${false}`);      
-      return false;
-    }
+        if (!transferredIn[recipient]) {
+          transferredIn[recipient] = {};
+        }
+        console.log(`${balance}->${recipient}`);
+        
 
-    
-    console.log(`\n${singleExtrinsic.blockNum}: ${methString}`);
-    console.log(toHuman);
-    console.log(singleExtrinsic.toHuman());
-    
-    return methString
-  }
-
-
-  console.log("\n");
-  const ting = res.map((blockExtrinsics, idx) => {
-    if (blockExtrinsics.length!=1 || blockExtrinsics[0].length!==10) {
-      return {
-        idx, 
-        blockNum: blockExtrinsics.blockNum, 
-        blockExtrinsics,
-        // bEtH : blockExtrinsics.toHuman(),
-        bEtHFiltered : blockExtrinsics
-          .map(singleExtrinsic=>(
-            Object.assign(singleExtrinsic, {blockNum: blockExtrinsics.blockNum} )
-          ))
-          .filter(blacklist),
-        // blockExtrinsics: blockExtrinsics.filter(blacklist).map(ext=>ext.toHuman())
+        const asset=`{"ztg":"null"}`;
+        if (!transferredIn[recipient][asset]) {
+          transferredIn[recipient][asset] = 0;
+        }
+        
+        transferredIn[recipient][asset] += balance;  
+        return([balance, asset, recipient]);
       }
     }
-  })
-   ;
-  console.log('(1st) mapped at:', Date.now());
-  
 
-  console.log('ting', ting);
-  if (ting.length>1) {
-    console.log('ting toHuman', ting.map(t=>t.blockExtrinsics.toHuman()));
-    console.log('ting method toHuman', ting.map(t=>t.blockExtrinsics.map(singleExtrinsic=>({
-      ...singleExtrinsic.method.toHuman(),
-      ...singleExtrinsic.method.args,
-      argsStringifed: JSON.stringify(singleExtrinsic.method.args),
-      blockNum: t.blockExtrinsics.blockNum
-      }))));
-    console.log();
-    
+    //@ts-ignore
+    const parseExtrinsics=(singleExtrinsic, idx, _blockExtrinsics)=>{
+      if (!singleExtrinsic.method) {
+        console.log('Uh uh, no method');     
+      }
+      
+      const toHuman= singleExtrinsic.method.toHuman();
+      const methodConcatName = `${toHuman.section}::${toHuman.method}`;
+      
+      if (methodConcatName === "timestamp::set") {
+        console.log(`\n${singleExtrinsic.blockNum}-${idx}: methodConcatName=${methodConcatName}, ignore.`);      
+        return false;
+      }      
+      console.log(`${singleExtrinsic.blockNum}-${idx}: ${methodConcatName}`);
 
-  }
-  
-  console.log("\n");
-  const methods = res.map((blockExtrinsics) =>
-    blockExtrinsics.map((mid) => mid.method.toJSON())
-  );
-  console.log(
-    "methods with callIndex other than 0x0800:",
-    methods.filter((arr) =>
-      arr.every((method) => method.callIndex !== "0x0800")
-    )
-  );
+      if (indexableExtrinsics.includes(methodConcatName)) {
+        indexSelectedExtrinsic(singleExtrinsic.args, methodConcatName, _blockExtrinsics);
+      }
 
-  console.log("\n");
-  console.log(
-    "methods with args other than now:",
-    methods.filter((arr, idx) => {
-      if (idx%250===0) {console.log(idx);}      
-      return arr.every((method) => !method.args || Object.keys(method.args).length !== 1) ?
-      [idx, arr] : false
+      return ({ methodConcatName });
+    }
+
+
+    console.log("\n");
+    const filteredBlocks = res.map((blockExtrinsics) => {
+      if (blockExtrinsics.length!=1 || blockExtrinsics[0].length!==10) {
+        return {
+          blockNum: blockExtrinsics.blockNum, 
+          extrinsics: blockExtrinsics,
+          filteredExtrinsics:
+            blockExtrinsics
+            .map(singleExtrinsic=>(
+              Object.assign(
+                singleExtrinsic, 
+                { blockNum: blockExtrinsics.blockNum, }
+              )
+            ))
+            .filter(parseExtrinsics)
+        }
+      }
     })
-  );
-}catch(e){console.log(e)};
-  
-  // console.log("\n");
-  // console.log(JSON.stringify(methods.map(methods=> methods.map(m=> m.args))));
-  
-
-  
-
-
-  // console.log('\n');
-  // console.log(method.toJSON());
-  // console.log(nonce.toString(), signature.toString(), signer.toString(), isSigned.toString(), tip.toString(), args.toString());
-
-  // const res = await sdk.models.getBlockData(blockHash);
-
-  // console.log(res.block.extrinsics);
+    .filter(blocks=>blocks.filteredExtrinsics.length);
+        
+    console.log(transferredIn);      
+    
+  } catch(e) {console.log(e)};    
 };
 
-export default doIndexyStuff;
+export default indexExtrinsicsUnstable;
