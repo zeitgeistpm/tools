@@ -485,8 +485,18 @@ class Market {
       const { status } = result;
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
 

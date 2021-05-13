@@ -279,11 +279,22 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
     /// Quick helpers for readability
@@ -378,11 +389,22 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
 
@@ -427,11 +449,22 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
 
@@ -479,11 +512,22 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
 
