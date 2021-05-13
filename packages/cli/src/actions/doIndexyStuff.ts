@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 // import SDK, { util } from "@zeitgeistpm/sdk";
 import SDK, { util } from "../../../sdk/src/";
+import getShareBalance from "./getShareBalance";
 
 type Options = {
   startBlock?: number;
@@ -14,10 +15,21 @@ const indexableExtrinsics = ["balances::transfer", "balances::transfer"];
 
 const arbitrarySet = null;
 
+const assets = [
+  `{"ztg":"null"}`,
+];
+
+const spotPrice = {
+  '{"ztg":"null"}' : 1,
+};
+
 const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   console.log('opts', opts);
   
   const { startBlock, endBlock, endpoint } = opts;
+
+  let timer= Date.now();
+  timer= Date.now();
 
   const sdk = await SDK.initialize(endpoint);
   console.log('Begin at ', Date.now());
@@ -39,7 +51,7 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   // const res = await sdk.models.indexTransferRecipients(startBlock || 0, endBlock);
   const res = await sdk.models.indexTransferRecipients(startBlock || 0, endBlock, arbitrarySet);
   
-  let timer = Date.now();
+  // timer = Date.now();
   console.log("beginning postprocessing at:", timer);
 
   try{    
@@ -111,9 +123,67 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
     })
     .filter(block=>block && block.filteredExtrinsics.length);
         
+    console.log("blocks filtered at:", Date.now());    
     console.log(transferredIn);      
     
   } catch(e) {console.log(e)};    
+
+  console.log('pre-balancesChange');
+  const balancesChange = await Promise.all(
+    Object.keys(transferredIn).map(async player => {    
+      const change = { player };
+
+      console.log('pre-await');    
+      const responsesAsync=
+          assets.map(async asset=>
+            asset === `{"ztg":"null"}`
+              ? await sdk.api.query.system.account(player).then((res) => res.data)
+              : await sdk.api.query.tokens.accounts(player, asset)
+          )
+      
+
+      const responses= await Promise.all(responsesAsync);          
+      responses
+        .forEach((newBalance, idx)=>{
+          console.log('newBalance.toHuman()', newBalance.toHuman());
+          console.log('newBalance.to JSON()', newBalance.toJSON());
+          // @ts-ignore
+          console.log('newBalance.toJSON().free', newBalance.toJSON().free);
+          // @ts-ignore
+          change[assets[idx]] = (newBalance.toJSON().free || 0) - (transferredIn[player][assets[idx] || 0]);
+          console.log(change, change[assets[idx]]);
+        })
+
+      console.log(change);      
+      return change;
+    })
+  )
+
+  console.log('post-balancesChange');
+  console.log('balancesChange', balancesChange);
+  
+
+  const profit = Object.keys(transferredIn).map((player, idx) => ({
+    ...transferredIn[player],
+    player,
+    profit: assets.reduce((total, asset)=> 
+        total + balancesChange[idx][asset] * spotPrice[asset] ,
+        0
+      )
+  }))
+    .sort((a,b)=>b.profit-a.profit)
+
+  console.log(`timer was: ${timer}`);
+  
+  console.log(`completed at: ${Date.now()}: ${(Date.now()-timer)/1000}s.\n`);
+  profit.forEach((player, idx)=>{
+    console.log(`\nPLACED: ${idx+1}...`);
+    console.log(`with total ${player.profit>0 ? "WINNINGS" : "LOSSES"} of ${player.profit/1e10} ZTG -`);    
+    console.log(`${player.player}`);
+    
+  })
+
+
 };
 
 export default indexExtrinsicsUnstable;
