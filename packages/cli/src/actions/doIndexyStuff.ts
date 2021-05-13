@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
 // import SDK, { util } from "@zeitgeistpm/sdk";
 import SDK, { util } from "../../../sdk/src/";
-import getShareBalance from "./getShareBalance";
 
 type Options = {
+  marketId?: number;
   startBlock?: number;
   endBlock?: number;
   endpoint: string;
@@ -13,7 +13,15 @@ const transferredIn = {};
 
 const indexableExtrinsics = ["balances::transfer", "balances::transfer"];
 
-const arbitrarySet = null;
+const arbitrarySet = [
+0, 775, 
+7725,7726,7744,7745, 7775, 7776,7777,7778, 7779,7780,7781,7782,7783, 7784,7785, 7786, 
+8355, 8420, 8427, 8464,8466,
+9382,9780, 
+10152,10207,10229, 10231, 10233,10237, 10252,10269, 10271, 10301, 10334,10477,10478, 10480,10482, 10495,
+10704,10721,10731, 10737, 10739, 10748, 10783,10790, 10832,
+11319,11322,11323,11325,11371,11373,11375,
+21742,21897,];
 
 const assets = [
   `{"ztg":"null"}`,
@@ -26,13 +34,28 @@ const spotPrice = {
 const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   console.log('opts', opts);
   
-  const { startBlock, endBlock, endpoint } = opts;
+  const { marketId, startBlock, endBlock, endpoint } = opts;
 
   let timer= Date.now();
   timer= Date.now();
 
   const sdk = await SDK.initialize(endpoint);
   console.log('Begin at ', Date.now());
+
+  const outcomeAssets = (marketId === undefined)
+    ? []
+    : sdk.models.fetchMarketData(Number(marketId))
+        .then(marketData=>{
+          if (marketData.report === null) {
+            throw new Error(`Market ${marketId} exists, with marketStatus ${marketData.marketStatus} but is not reported.`)
+          }
+          console.log(marketData.outcomeAssets);
+          // TODO: check report status matches for non-categorical outcomes
+          marketData.outcomeAssets.forEach((asset, idx)=>{
+            spotPrice[JSON.stringify(asset)] = Number(Number(marketData.report) === idx)
+          })
+          return marketData.outcomeAssets;          
+        });
 
   let latestBlock = 0;
   if (!endBlock) {
@@ -141,17 +164,18 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
               : await sdk.api.query.tokens.accounts(player, asset)
           )
       
-
+      await Promise.all(assets);
       const responses= await Promise.all(responsesAsync);          
       responses
         .forEach((newBalance, idx)=>{
+          // TODO: test for non-ZTG assets
           console.log('newBalance.toHuman()', newBalance.toHuman());
           console.log('newBalance.to JSON()', newBalance.toJSON());
           // @ts-ignore
           console.log('newBalance.toJSON().free', newBalance.toJSON().free);
           // @ts-ignore
           change[assets[idx]] = (newBalance.toJSON().free || 0) - (transferredIn[player][assets[idx] || 0]);
-          console.log(change, change[assets[idx]]);
+          // console.log(change, change[assets[idx]]);
         })
 
       console.log(change);      
@@ -159,9 +183,7 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
     })
   )
 
-  console.log('post-balancesChange');
-  console.log('balancesChange', balancesChange);
-  
+  console.log('balancesChange', balancesChange);  
 
   const profit = Object.keys(transferredIn).map((player, idx) => ({
     ...transferredIn[player],
@@ -172,18 +194,18 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
       )
   }))
     .sort((a,b)=>b.profit-a.profit)
-
-  console.log(`timer was: ${timer}`);
   
   console.log(`completed at: ${Date.now()}: ${(Date.now()-timer)/1000}s.\n`);
   profit.forEach((player, idx)=>{
     console.log(`\nPLACED: ${idx+1}...`);
-    console.log(`with total ${player.profit>0 ? "WINNINGS" : "LOSSES"} of ${player.profit/1e10} ZTG -`);    
+    if (player.profit) {
+      console.log(`with total ${player.profit>0 ? "WINNINGS" : "LOSSES"} of ${player.profit/1e10} ZTG -`);    
+    } else {
+      console.log(`(BROKE EVEN)`);      
+    }
     console.log(`${player.player}`);
     
   })
-
-
 };
 
 export default indexExtrinsicsUnstable;

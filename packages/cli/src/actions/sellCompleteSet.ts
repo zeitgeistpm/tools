@@ -17,7 +17,11 @@ const sellCompleteSet = async (opts: Options): Promise<void> => {
   const market = await sdk.models.fetchMarketData(Number(marketId));
   const res = await market.sellCompleteSet(signer, Number(amount));
 
-  console.log(res);
+  if (res) {
+    console.log(
+      `${signer.address} sold complete set of ${amount} market ${marketId} outcomes on network ${endpoint}`
+    );
+  }
   return;
 };
 

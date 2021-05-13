@@ -281,17 +281,26 @@ class Market {
     signer: KeyringPairOrExtSigner,
     amount: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> {
+  ): Promise<string> {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _resolve: (value: string | PromiseLike<string>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "BoughtCompleteSet") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+        });
       }
     };
 
@@ -320,17 +329,26 @@ class Market {
     signer: KeyringPairOrExtSigner,
     amount: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> {
+  ): Promise<string> {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _resolve: (value: string | PromiseLike<string>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "SoldCompleteSet") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+        });
       }
     };
 

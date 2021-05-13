@@ -529,7 +529,8 @@ program
   );
 
 program
-  .command("data")
+  .command("indexWinners")
+  .option("-m --marketId <number>")
   .option("-s --startBlock <number>")
   .option("-e --endBlock <number>")
   .option(
@@ -537,7 +538,7 @@ program
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((opts: { startBlock; endBlock; endpoint: string }) =>
+  .action((opts: { marketId; startBlock; endBlock; endpoint: string }) =>
     catchErrorsAndExit(indexExtrinsicsUnstable, opts)
   );
 
