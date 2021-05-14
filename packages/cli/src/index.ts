@@ -14,6 +14,7 @@ import viewMarket from "./actions/viewMarket";
 import viewSwap from "./actions/viewSwap";
 import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
+import getShareBalances from "./actions/getShareBalances";
 import getSpotPrice from "./actions/getSpotPrice";
 import viewSpotPrices from "./actions/viewPoolSpotPrices";
 import transfer from "./actions/transfer";
@@ -370,6 +371,18 @@ program
       getShareBalance,
       Object.assign(opts, { addressOrSeed, asset })
     )
+  );
+
+program
+  .command("getBalances <addressOrSeed>")
+  .option("-m -marketId <number>")
+  .option("--endpoint <string>", "The endpoint URL of the API connection")
+  .action(
+    (addressOrSeed = "//Alice", opts: { marketId: number; endpoint: string }) =>
+      catchErrorsAndExit(
+        getShareBalances,
+        Object.assign(opts, { addressOrSeed })
+      )
   );
 
 program

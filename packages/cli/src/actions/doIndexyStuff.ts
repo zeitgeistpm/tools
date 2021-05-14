@@ -15,21 +15,7 @@ const promiseQueue = [];
 
 const indexableExtrinsics = ["balances::transfer", "balances::transferKeepAlive", "balances::transfer"];
 
-const arbitrarySet = [
-52239, 52681, 52682, 52683, 52684, 52685, 52686, 52687, 52815]
-
-//  [
-// 21014, 21016, 21019];
-
-// [
-// 0, 775, 
-// 7725,7726,7744,7745, 7775, 7776,7777,7778, 7779,7780,7781,7782,7783, 7784,7785, 7786, 
-// 8355, 8420, 8427, 8464,8466,
-// 9382,9780, 
-// 10152,10207,10229, 10231, 10233,10237, 10252,10269, 10271, 10301, 10334,10477,10478, 10480,10482, 10495,
-// 10704,10721,10731, 10737, 10739, 10748, 10783,10790, 10832,
-// 11319,11322,11323,11325,11371,11373,11375,
-// 21742,21897,];
+const arbitrarySet = [ 21014,21016, 21019, 21076, 21080, 21083, 33143, 33146 ];
 
 const assets = [
   `{"ztg":"null"}`,
@@ -110,8 +96,7 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
           return false;
         } else {
           throw new Error (`Expected balances::Transfer event or failure after extrinsic ${methodConcatName} called. Is this an unhandled case?`);
-        }
-        
+        }        
       }
       console.log(`Don't know how to check the validity of ${methodConcatName}`);
       return "Unhandled case";
@@ -170,7 +155,6 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
         }));
       }
 
-      console.log(`queue lewngth ${promiseQueue.length}. Returning after ${methodConcatName} ,checkedValid:`, checkedValid);
       return ({ methodConcatName });
     }
 
@@ -199,39 +183,35 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
     
   } catch(e) {console.log(e)};    
   
-  console.log('promiseQueue', promiseQueue);
   await Promise.all(promiseQueue);
-  console.log('promiseQueue again:', promiseQueue);
-
   const balancesChange = await Promise.all(
     Object.keys(transferredIn).map(async player => {    
       const change = { player };
 
-      const responsesAsync=
-          assets.map(async asset=>
-            asset === `{"ztg":"null"}`
-              ? await sdk.api.query.system.account(player).then((res) => res.data)
-              : await sdk.api.query.tokens.accounts(player, asset)
-          )
+      const responses=
+        assets.map(async asset=>
+          asset === `{"ztg":"null"}`
+            ? await sdk.api.query.system.account(player).then((res) => res.data)
+            : await sdk.api.query.tokens.accounts(player, asset)
+        )
       
       await Promise.all(assets);
-      const responses= await Promise.all(responsesAsync);          
-      responses
+      (await Promise.all(responses))
         .forEach((newBalance, idx)=>{
-          // TODO: test for non-ZTG assets
-          console.log('newBalance.toHuman()', newBalance.toHuman());
-          console.log('newBalance.to JSON()', newBalance.toJSON());
-          // @ts-ignore
-          console.log('newBalance.toJSON().free', newBalance.toJSON().free);
-          // @ts-ignore
-          console.log('isHex(newBalance.toJSON().free)', isHex(newBalance.toJSON().free));
-          // @ts-ignore
-          console.log('hexToBn(newBalance.toJSON().free)', hexToBn(newBalance.toJSON().free));
-          // @ts-ignore
-          console.log('hexToBn(newBalance.toJSON().free - 1)', hexToBn(newBalance.toJSON().free) - 1);
+          // // TODO: test for non-ZTG assets
+          // console.log('newBalance.toHuman()', newBalance.toHuman());
+          // console.log('newBalance.to JSON()', newBalance.toJSON());
+          // // @ts-ignore
+          // console.log('newBalance.toJSON().free', newBalance.toJSON().free);
+          // // @ts-ignore
+          // console.log('isHex(newBalance.toJSON().free)', isHex(newBalance.toJSON().free));
+          // // @ts-ignore
+          // console.log('hexToBn(newBalance.toJSON().free)', hexToBn(newBalance.toJSON().free));
+          // // @ts-ignore
+          // console.log('hexToBn(newBalance.toJSON().free + 0)', hexToBn(newBalance.toJSON().free) + 0);
           
           // @ts-ignore
-          change[assets[idx]] = (newBalance.toJSON().free || 0) - (transferredIn[player][assets[idx] || 0]);
+          change[assets[idx]] = (newBalance.toJSON().free || 0) - (transferredIn[player][assets[idx] || 0]) + 0;
           // console.log(change, change[assets[idx]]);
         })
 
