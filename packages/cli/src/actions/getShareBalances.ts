@@ -1,5 +1,4 @@
-// import SDK, { util } from "@zeitgeistpm/sdk";
-import SDK, { util } from "../../../sdk/src";
+import SDK, { util } from "@zeitgeistpm/sdk";
 
 type Options = {
   addressOrSeed: string;
@@ -15,7 +14,7 @@ const getShareBalances = async (opts: Options): Promise<void> => {
   const assets: any = ["ztg"];
   let address, signer;
 
-  // this is crazy and I don;t understand it :/
+  // this is crazy and I don't understand it :/
   //@ts-ignore
   const marketId = opts.marketId || MarketId;
 
@@ -51,9 +50,15 @@ const getShareBalances = async (opts: Options): Promise<void> => {
     console.log("Fetching outcome assets for market", marketId);
 
     const market = await sdk.models.fetchMarketData(Number(marketId));
+    const poolId = await market.getPoolId();
+
     market.outcomeAssets.forEach((marketAsset) => {
       assets.push(marketAsset.toJSON());
     });
+
+    if (poolId !== null) {
+      assets.push({ poolShare: Number(poolId) });
+    }
   }
 
   const balances = assets.map(async (asset) => {
@@ -65,7 +70,10 @@ const getShareBalances = async (opts: Options): Promise<void> => {
             util.AssetIdFromString(asset)
           );
 
-    console.log(`\n${address} \nbalance of`, asset.toHuman ? asset.toHuman() : asset);
+    console.log(
+      `\n${address} \nbalance of`,
+      asset.toHuman ? asset.toHuman() : asset
+    );
     console.log("", data.toHuman());
   });
 
