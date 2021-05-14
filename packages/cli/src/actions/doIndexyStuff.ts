@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 // import SDK, { util } from "@zeitgeistpm/sdk";
 import SDK, { util } from "../../../sdk/src/";
+import { hexToBn, isHex } from "@polkadot/util";
 
 type Options = {
   marketId?: number;
@@ -10,18 +11,25 @@ type Options = {
 };
 
 const transferredIn = {};
+const promiseQueue = [];
 
-const indexableExtrinsics = ["balances::transfer", "balances::transfer"];
+const indexableExtrinsics = ["balances::transfer", "balances::transferKeepAlive", "balances::transfer"];
 
 const arbitrarySet = [
-0, 775, 
-7725,7726,7744,7745, 7775, 7776,7777,7778, 7779,7780,7781,7782,7783, 7784,7785, 7786, 
-8355, 8420, 8427, 8464,8466,
-9382,9780, 
-10152,10207,10229, 10231, 10233,10237, 10252,10269, 10271, 10301, 10334,10477,10478, 10480,10482, 10495,
-10704,10721,10731, 10737, 10739, 10748, 10783,10790, 10832,
-11319,11322,11323,11325,11371,11373,11375,
-21742,21897,];
+52239, 52681, 52682, 52683, 52684, 52685, 52686, 52687, 52815]
+
+//  [
+// 21014, 21016, 21019];
+
+// [
+// 0, 775, 
+// 7725,7726,7744,7745, 7775, 7776,7777,7778, 7779,7780,7781,7782,7783, 7784,7785, 7786, 
+// 8355, 8420, 8427, 8464,8466,
+// 9382,9780, 
+// 10152,10207,10229, 10231, 10233,10237, 10252,10269, 10271, 10301, 10334,10477,10478, 10480,10482, 10495,
+// 10704,10721,10731, 10737, 10739, 10748, 10783,10790, 10832,
+// 11319,11322,11323,11325,11371,11373,11375,
+// 21742,21897,];
 
 const assets = [
   `{"ztg":"null"}`,
@@ -78,8 +86,39 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   console.log("beginning postprocessing at:", timer);
 
   try{    
+    const isNotInvalid = async (extrinsic, methodConcatName, wholeBlock)=> {
+      const { blockNum } = extrinsic;
+      console.log(`check if ${methodConcatName} extrinsic is invalid`);
+      
+      if (methodConcatName.startsWith("balances::transfer")) {
+        console.log('extrinsic.toHuman()', extrinsic.toHuman());
+        
+        const hash = await sdk.api.rpc.chain.getBlockHash(blockNum);
+        console.log(blockNum, 'hash', (hash).toHuman());        
+        
+        const events = await await sdk.api.query.system.events.at(hash);
+        const methods = events
+          //@ts-ignore
+          .filter(event=> event.toJSON().phase.applyExtrinsic > 0)
+          .map(event=> `${event.event.section}::${event.event.method}`);          
+        
+        console.log(blockNum, 'event methods are', methods);
+        
+        if (methods.includes("system::ExtrinsicSuccess") && methods.includes("balances::Transfer")) {
+          return true;
+        } else if (methods.includes("system::ExtrinsicFailed")) {
+          return false;
+        } else {
+          throw new Error (`Expected balances::Transfer event or failure after extrinsic ${methodConcatName} called. Is this an unhandled case?`);
+        }
+        
+      }
+      console.log(`Don't know how to check the validity of ${methodConcatName}`);
+      return "Unhandled case";
+    }
+
     const indexSelectedExtrinsic = (args, methodConcatName, wholeBlock)=> {
-      if (methodConcatName === "balances::transfer") {
+      if (methodConcatName.startsWith("balances::transfer")) {
         // Note different capitalisation: .toHuman().args[x].id  vs. args[0].toHuman().Id)  
         const recipient = args[0].toHuman().Id;        
         const balance = Number(args[1]);
@@ -105,7 +144,7 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
     }
 
     //@ts-ignore
-    const parseExtrinsics=(singleExtrinsic, idx, _blockExtrinsics)=>{
+    const parseExtrinsics = (singleExtrinsic, idx, _blockExtrinsics) => {
       if (!singleExtrinsic.method) {
         console.log('Uh uh, no method');     
       }
@@ -119,10 +158,19 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
       }      
       console.log(`${singleExtrinsic.blockNum}-${idx}: ${methodConcatName}`);
 
+      let checkedValid = null;
       if (indexableExtrinsics.includes(methodConcatName)) {
-        indexSelectedExtrinsic(singleExtrinsic.args, methodConcatName, _blockExtrinsics);
+        promiseQueue.push(new Promise(async (resolve, reject) => {
+            checkedValid = await isNotInvalid(singleExtrinsic, methodConcatName, _blockExtrinsics);
+            console.log('got result for checkedValid:',checkedValid );          
+          if (checkedValid) {
+            indexSelectedExtrinsic(singleExtrinsic.args, methodConcatName, _blockExtrinsics);          
+          };
+          resolve(null);
+        }));
       }
 
+      console.log(`queue lewngth ${promiseQueue.length}. Returning after ${methodConcatName} ,checkedValid:`, checkedValid);
       return ({ methodConcatName });
     }
 
@@ -150,13 +198,15 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
     console.log(transferredIn);      
     
   } catch(e) {console.log(e)};    
+  
+  console.log('promiseQueue', promiseQueue);
+  await Promise.all(promiseQueue);
+  console.log('promiseQueue again:', promiseQueue);
 
-  console.log('pre-balancesChange');
   const balancesChange = await Promise.all(
     Object.keys(transferredIn).map(async player => {    
       const change = { player };
 
-      console.log('pre-await');    
       const responsesAsync=
           assets.map(async asset=>
             asset === `{"ztg":"null"}`
@@ -174,11 +224,18 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
           // @ts-ignore
           console.log('newBalance.toJSON().free', newBalance.toJSON().free);
           // @ts-ignore
+          console.log('isHex(newBalance.toJSON().free)', isHex(newBalance.toJSON().free));
+          // @ts-ignore
+          console.log('hexToBn(newBalance.toJSON().free)', hexToBn(newBalance.toJSON().free));
+          // @ts-ignore
+          console.log('hexToBn(newBalance.toJSON().free - 1)', hexToBn(newBalance.toJSON().free) - 1);
+          
+          // @ts-ignore
           change[assets[idx]] = (newBalance.toJSON().free || 0) - (transferredIn[player][assets[idx] || 0]);
           // console.log(change, change[assets[idx]]);
         })
 
-      console.log(change);      
+      console.log('change', change);      
       return change;
     })
   )

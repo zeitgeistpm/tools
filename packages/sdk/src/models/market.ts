@@ -482,7 +482,8 @@ class Market {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
         events.forEach(({ phase, event: { data, method, section } }) => {

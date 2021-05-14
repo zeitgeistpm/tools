@@ -470,9 +470,9 @@ export default class Swap {
 
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
-      assetIn,
+      AssetIdFromString(assetIn),
       assetAmountIn,
-      assetOut,
+      AssetIdFromString(assetOut),
       minAmountOut,
       maxPrice
     );
@@ -533,9 +533,9 @@ export default class Swap {
 
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
-      assetIn,
+      AssetIdFromString(assetIn),
       maxAmountIn,
-      assetOut,
+      AssetIdFromString(assetOut),
       assetAmountOut,
       maxPrice
     );

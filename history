@@ -1,0 +1,1009 @@
+  188  git checkout SDK-CLI-tokens-pallet2
+  189  git merge ls-accountdata-clash
+  190  git checkout SDK-CLI-tokens-pallet
+  191  git merge ls-accountdata-clash
+  192  git stash pop
+  193  zgcli countMarkets
+  194  cd /home/dips/code/zeitgeist/tools/packages/cli/src/actions/getShareBalance.ts ..
+  195  cp /home/dips/code/zeitgeist/tools/packages/cli/src/actions/getShareBalance.ts ..
+  196  cp /home/dips/code/zeitgeist/tools/packages/cli/src/index.ts ..
+  197  git merge ls-accountdata-clash 
+  198  git diff
+  199  git log
+  200  zgcli countMarkets
+  201  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm
+  202  zgcli countMarkets
+  203  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm
+  204  zgcli countMarkets
+  205  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm
+  206  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm  --endpoint ws://localhost:9944
+  207  zgcli buyCompleteSet 0 3000000300  --endpoint ws://localhost:9944
+  208  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm
+  209  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm  --endpoint ws://localhost:9944
+  210  zgcli getMarket 0  --endpoint ws://localhost:9944
+  211  zgcli viewMarket 0  --endpoint ws://localhost:9944
+  212  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm  --endpoint ws://localhost:9944
+  213  zgcli buyCompleteSet 0 3000000300  --endpoint ws://localhost:9944
+  214  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm  --endpoint ws://localhost:9944
+  215  zgcli createMarket qpq gyg 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 10000 --endpoint ws://localhost:9944
+  216  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm  --endpoint ws://localhost:9944
+  217  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" those4assets  --endpoint ws://localhost:9944
+  218  zgcli getBalance 0 "//Alice" those4assets  --endpoint ws://localhost:9944
+  219  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" those4assets  --endpoint ws://localhost:9944
+  220  zgcli getBalance 0 "//Alice" those4assets  --endpoint ws://localhost:9944
+  221  zgcli createMarket qpq gyg 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 10000 --endpoint ws://localhost:9944
+  222  zgcli getBalance 0 "//Alice" those4assets  --endpoint ws://localhost:9944
+  223  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" those4assets  --endpoint ws://localhost:9944
+  224  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY mmm  --endpoint ws://localhost:9944
+  225  zgcli buyCompleteSet 0 3000000300  --endpoint ws://localhost:9944
+  226  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" those4assets  --endpoint ws://localhost:9944
+  227  zgcli deployPool 0  --endpoint ws://localhost:9944
+  228  ../showpallets 
+  229  ../showerrors predictionmarkets
+  230  ../showerrors prediction-markets
+  231  zgcli approve 0  --endpoint ws://localhost:9944
+  232  zgcli approveMarket 0  --endpoint ws://localhost:9944
+  233  zgcli deployPool 0  --endpoint ws://localhost:9944
+  234  ../showerrors swaps
+  235  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" those4assets  --endpoint ws://localhost:9944
+  236  node
+  237  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" those4assets  --endpoint ws://localhost:9944
+  238  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" pool0  --endpoint ws://localhost:9944
+  239  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" ztg  --endpoint ws://localhost:9944
+  240  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" [0,0]  --endpoint ws://localhost:9944
+  241  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" [0,'Long']  --endpoint ws://localhost:9944
+  242  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" "[0,'Long']"  --endpoint ws://localhost:9944
+  243  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY "//Alice" '[0,"Long"]'  --endpoint ws://localhost:9944
+  244  zgcli getAllMarkets -f marketType
+  245  zgcli getMarket 3
+  246  zgcli viewMarket 3
+  247  node
+  248  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY  '[0,"Long"]'  --endpoint ws://localhost:9944
+  249  git add .
+  250  git branch 
+  251  git diff 
+  252  git diff HEAD
+  253  git add .
+  254  git commit -m "CLI shareBalance parses provided addressOrSeed. address, or seed parameter, and asset parameter in the format ztg, [X,Y], '[X,"Long"]', '[X,"Short"]' or poolX and displays appropriate asset balance, calling sdk.api.query.system.account/ sdk.api.query.tokens.accounts directly;
+  255  To be improved and added to SDK ;)"
+  256  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  257  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  258  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  259  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  260  # alias lerna="node node_modules/lerna/cli.js "
+  261  zgcliquick help
+  262  zgcli help
+  263  ../showerrors 
+  264  kate ../showerrors 
+  265  chmod 755 ../showpallets 
+  266  ../showpallets 
+  267  ../showerrors Swaps
+  268  ../showerrors swaps
+  269  ../showerrors sudo
+  270  cli
+  271  yarn cli
+  272  echo $PWD
+  273  alias zzz=$PWD/packages
+  274  ll
+  275  alias zzz="$PWD/../showerrors"
+  276  alias
+  277  zzz
+  278  yarn
+  279  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  280  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  281  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  282  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  283  # alias lerna="node node_modules/lerna/cli.js "
+  284  zgcli help
+  285  ~/exchangesal
+  286  ~/exchangesall 
+  287  locate kate
+  288  clear
+  289  locate kate
+  290  rm /home/dips/.config/katemetainfos
+  291  rm /home/dips/.config/katerc
+  292  rm /home/dips/.config/katevi
+  293  rm /home/dips/.config/katevirc 
+  294  rm /home/dips/.config/session/kate_101ab14113614800016*
+  295  rm /home/dips/.local/share/kate
+  296  rm -rf /home/dips/.local/share/kate
+  297  rm /home/dips/.local/share/kat
+  298  kate
+  299  sudo apt purge kate
+  300  cat /home/dips/.config/katemetainfos
+  301  cat /home/dips/.config/katerc
+  302  cat /home/dips/.config/katevirc
+  303  cat /home/dips/.local/share/kate
+  304  cat /home/dips/.local/share/kate/anonymous.katesession 
+  305  cat /home/dips/.local/share/kate/sessions/
+  306  rm -rf /home/dips/.local/share/kate/sessions/
+  307  cat /home/dips/.locat /home/dips/.config/session/kate_101ab141136148000162004692500000014440017_1620058206_829378
+  308  cat /home/dips/.locat /home/dips/.config/session/kate_101ab141136148000161936656000000014380147_1620039387_165265 
+  309  sudo apt purge kate
+  310  sudo apt remove kate
+  311  sudo apt purge kate
+  312  sudo apt install kate
+  313  ps aux |grep kate
+  314  killall -9 kate
+  315  ps aux |grep kate
+  316  sudo apt purge kate
+  317  locat ekate
+  318  locate kate
+  319  clear
+  320  locate kate
+  321  locate kate |grep swp
+  322  mkdir kate
+  323  cd kate 
+  324  mv /home/dips/Desktop/.random questions for Anthony.kate-swp .
+  325  mv /home/dips/Desktop/.todo - staking.kate-swp .
+  326  mv "/home/dips/Desktop/EVENTS/Recordings to either watch or move to Stuff | Tech projects and research and hackathons/.ZK London autumn 2020.kate-swp" .
+  327  mv /home/dips/Desktop/Encode Club/.chainlink-polkadot build.kate-swp .
+  328  mv /home/dips/Desktop/Learnings/.Polkadot.kate-swp .
+  329  mv "/home/dips/Desktop/Learnings/React/.React Fiber.kate-swp" .
+  330  mv "/home/dips/Desktop/Learnings/React/.redos saga gen sig hypothesis.kate-swp" .
+  331  mv "/home/dips/Desktop/Learnings/React/.some ways to pass down props and Components.kate-swp" .
+  332  mv /home/dips/Desktop/Learnings/d3/.requests.kate-swp .
+  333  mv "/home/dips/Desktop/LinksnTODOs and all the (non-tech) backups to organise/backups - NOT OLD but still need organising from Sep 2020 move/dupes from NEW Desktop (already elsewhere)/Installs/Java, Android and IDEs/.Install android emulator via Android Studio.kate-swp" .
+  334  mv "/home/dips/Desktop/LinksnTODOs and all the (non-tech) backups to organise/backups - NOT OLD but still need organising from Sep 2020 move/logins and accounts to organise/.LOGINS 10.20.kate-swp" .
+  335  mv "/home/dips/Desktop/LinksnTODOs and all the (non-tech) backups to organise/backups - more to check through/HOME (TEMP)/randomCode/pyMessabout/TITLES/.memory leak monitoring.kate-swp" .
+  336  mv "/home/dips/Desktop/STUFF/INSTALLS Computer and Hardware/Installs/Java, Android and IDEs/.Install android emulator via Android Studio.kate-swp" .
+  337  mv "/home/dips/Desktop/STUFF/Jobs - most recent only/current/Ada College/materials/UI - Interactive User Interface Design/.links and references.kate-swp" .
+  338  mv "/home/dips/Desktop/zeitgeist deets/CLI SDK code notes/.errors to rationalise.kate-swp" .
+  339  mv "/home/dips/Desktop/zeitgeist deets/CLI SDK code notes/bucket/.week ending 16th April functions tesed.kate-swp" .
+  340  mv "/home/dips/Desktop/zeitgeist deets/onboarding and deets/.deets.kate-swp
+  341  /home/dips/Desktop/zeitgeist deets/substrate - SDK/.enumerating extrinsics - and substrate research.kate-swp" .
+  342  mv "/home/dips/addys/.checked 24 OCt.kate-swp" .
+  343  cd ..
+  344  mv kate/ ~/Desktop/
+  345  ll
+  346  ll ~/Desktop/kate/
+  347  cd Desktop/zeitgeist\ deets/CLI\ SDK\ code\ notes/bucket/
+  348  diff Issue59*
+  349  ll
+  350  killall -9 firefox
+  351  ps aux |grep firefox
+  352  ps aux |grep mozilla
+  353  ~/exchanges
+  354  make run
+  355  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  356  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  357  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  358  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  359  # alias lerna="node node_modules/lerna/cli.js "
+  360  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  361  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  362  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  363  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  364  # alias lerna="node node_modules/lerna/cli.js "
+  365  cd code/zeitgeist/
+  366  ipfs QmVxquduq36yfmLFX6BB8g41mCcY8A4tRQj3p2DZp9GCNf
+  367  ipfs get QmVxquduq36yfmLFX6BB8g41mCcY8A4tRQj3p2DZp9GCNf
+  368  node
+  369  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  370  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  371  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  372  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  373  # alias lerna="node node_modules/lerna/cli.js "
+  374  code packages/cli
+  375  code packages/sdk
+  376  code ../zeitgeist/
+  377  code .
+  378  yarn cli:lint
+  379  git branch 
+  380  git diff SDK-CLI-tokens-pallet2
+  381  git branch - SDK-CLI-tokens-pallet2
+  382  git branch -d SDK-CLI-tokens-pallet2
+  383  git branch
+  384  zgcli createMarket qpq gyg 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 10000 --endpoint ws://localhost:9944
+  385  git checkout main 
+  386  git pull origin main
+  387  git checkout SDK-CLI-tokens-pallet 
+  388  git merge main
+  389  git add .
+  390  git merge "merged in nonspecific improvements"
+  391  git commit -m "merged in nonspecific improvements"
+  392  git push origin SDK-CLI-tokens-pallet 
+  393  git checkout main
+  394  cd "/home/dips/Desktop/zeitgeist deets/substrate - SDK/Apps types/"
+  395  diff 6th\ May\ -\ showing\ balances\ -\ nonzero\ balances\ untested TYPES\ 28\ April\ chain\ 0xbcfb4b934acc 
+  396  cd ~/code/zeitgeist/tools
+  397  zgcli viewMarkets -f MarketType MarketStatus
+  398  git branch 
+  399  git checkout -b investigateTypeProbs
+  400  git stash
+  401  git branch -d investigateTypeProbs
+  402  git branch 
+  403  git checkout ma
+  404  git checkout main
+  405  git branch -d investigateTypeProbs
+  406  git checkout SDK-CLI-tokens-pallet 
+  407  git checkout -b investigateTypeProbs
+  408  zgcli createMarket qpq gyg 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 10000 --endpoint ws://localhost:9944
+  409  zgcli viewMarkets -f MarketType MarketStatus
+  410  zgcliquick viewMarkets -f MarketType MarketStatus
+  411  zgcli viewMarkets -f MarketType MarketStatus
+  412  zgcli viewAllMarkets -f MarketType MarketStatus
+  413  zgcli getAllMarkets -f Market
+  414  zgcli viewAllMarkets -f marketType marketStatus
+  415  zgcli getwAllMarkets -f marketType marketStatus
+  416  zgcli getAllMarkets -f marketType marketStatus
+  417  zgcli viewMarket 44
+  418  zgcli viewMarket 3
+  419  git branch 
+  420  git diff
+  421  yarn compile
+  422  git diff
+  423  git stash
+  424  git branch -d investigateTypeProbs
+  425  git checkout main
+  426  git branch -d investigateTypeProbs
+  427  git branch -D investigateTypeProbs
+  428  git branch 
+  429  git log
+  430  git branch -d ls-accountdata-clash 
+  431  git branch 
+  432  git log
+  433  git branch -d git-hooks 
+  434  git branch 
+  435  git log 
+  436  git log |grep ls-fix-eslint
+  437  git branch -d ls-fix-eslint 
+  438  git branch 
+  439  git diff eslint 
+  440  git checkout eslint 
+  441  git log
+  442  git branch 
+  443  git diff lint-cli 
+  444  git branch 
+  445  git log
+  446  git branch -m eslint-to30Apr-old
+  447  git branch 
+  448  git branch -d test-PR56-Add-typesAlias 
+  449  git checkout main 
+  450  git branch -d test-PR56-Add-typesAlias 
+  451  git diff lint-cli 
+  452  git branch -d lint-cli 
+  453  git branch 
+  454  git checkout eslint-to30Apr-old 
+  455  git branch -m old-eslint-to30Apr
+  456  git checkout master 
+  457  git log
+  458  git branch -m old-master-to3May-rename
+  459  git branch 
+  460  git checkout main 
+  461  git checkout merge-multiple-branches 
+  462  git diff main
+  463  git branch -m old-merge-multiple-branches-contains-getallpools
+  464  git checkout main 
+  465  git branch 
+  466  git diff SDK-CLI-tokens-pallet 
+  467  git branch 
+  468  git diff getSpotPrices 
+  469  git checkout getSpotPrices 
+  470  git merge SDK-CLI-tokens-pallet 
+  471  yarn compile
+  472  git add .
+  473  git commit -m "merge in getShareBalance in early state from SDK-CLI-tokens-pallet branch"
+  474  git diff
+  475  git add .#
+  476  git add .
+  477  git commit -m "rename type MarketTypeForHuman as CurrencyId;
+  478  NB type CurrencyId = {categoricalOutcome: [number, number]} | {scalarOutcome: [number, "Long" | "Short"]} | {ztg: null} | {poolShare: number} ;
+  479  in order to reuse for  Id-ing Currencies"
+  480  yarn compile
+  481  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  482  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  483  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  484  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  485  # alias lerna="node node_modules/lerna/cli.js "
+  486  zgcli help
+  487  kate
+  488  sudo apt  install kate
+  489  git status
+  490  git add .
+  491  git commit -m "CLI shareBalance parses provided addressOrSeed. address, or seed parameter, and asset parameter in the format ztg, [X,Y], '[X,"Long"]', '[X,"Short"]' or poolX and displays appropriate asset balance, calling sdk.api.query.system.account/ sdk.api.query.tokens.accounts directly;
+  492  history |grep commit
+  493  git commit -m "CLI shareBalance parses provided addressOrSeed. address, or seed parameter, and asset parameter in the format ztg, [X,Y], '[X,"Long"]', '[X,"Short"]' or poolX and displays appropriate asset balance, calling sdk.api.query.system.account/ sdk.api.query.tokens.accounts directly;"
+  494  git add .
+  495  ggit commit "add a type solve circular typescript srror"
+  496  yarn compile
+  497  git add .
+  498  git commit "add a type solve circular typescript srror"
+  499  git commit -m "add a type solve circular typescript srror"
+  500  git log
+  501  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  502  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  503  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  504  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  505  # alias lerna="node node_modules/lerna/cli.js "
+  506  ./starttheday 
+  507  make run
+  508  cd zeitgeist/
+  509  make run
+  510  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  511  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  512  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  513  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  514  # alias lerna="node node_modules/lerna/cli.js "
+  515  node
+  516  code zeitgeist/tools/packages/sdk/
+  517  htop
+  518  cat jed
+  519  sudo openvpn ~/ie.protonvpn.com.udp.ovpn 
+  520  ping 192.168.2.100
+  521  cd "/home/dips/Desktop/STUFF/INSTALLS Computer and Hardware/Installs/Firefox and chrome/"
+  522  scp ublock\ filters\ working\ better\ 5.21 zim@192.168.2.100:
+  523  ssh -o "StrictHostKeyChecking accept-new" zim@192.168.2.100
+  524  cat /home/dips/.ssh/known_hosts
+  525  sudo ssh -o "StrictHostKeyChecking accept-new" zim@192.168.2.100
+  526  scp ublock\ filters\ working\ better\ 5.21 zim@192.168.2.100:
+  527  ll /home/dips/.ssh/known_hosts
+  528  sudo ssh -o "StrictHostKeyChecking accept-new" zim@192.168.2.100
+  529  scp ublock\ filters\ working\ better\ 5.21 zim@192.168.2.100:
+  530  sudo scp ublock\ filters\ working\ better\ 5.21 zim@192.168.2.100:
+  531  scp ublock\ filters\ working\ better\ 5.21 zim@192.168.2.100:
+  532  ssh-keyscan -t rsa -H bitbucket.org 
+  533  ssh-keyscan -t ecdsa -H 192.168.2.100
+  534  cat  /home/dips/.ssh/known_hosts
+  535  ssh-keyscan -t ecdsa -H 192.168.2.100 >>  /home/dips/.ssh/known_hosts
+  536  scp ublock\ filters\ working\ better\ 5.21 zim@192.168.2.100:
+  537  ifconfig 
+  538  dmseg |grep BLOCK
+  539  dmesg |grep BLOCK
+  540  dmesg -t |grep BLOCK
+  541  man dmesg
+  542  dmesg -T |grep BLOCK
+  543  cat jed
+  544  cd ~
+  545  cat jed
+  546  sudo openvpn ~/ie.protonvpn.com.udp.ovpn 
+  547  cat ledgerlive.pem 
+  548  cat jed
+  549  sudo openvpn ~/ie.protonvpn.com.udp.ovpn 
+  550  cat jed
+  551  sudo openvpn ~/ie.protonvpn.com.udp.ovpn 
+  552  code packages/cli/
+  553  code packages/sdk/
+  554  code .
+  555  code ../zeitgeist/
+  556  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  557  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  558  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  559  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  560  # alias lerna="node node_modules/lerna/cli.js "
+  561  zgcli viewSpotPrices 0 ztg [0,0]
+  562  zgcli viewSpotPrices 1 ztg [0,0]
+  563  zgcli viewSpotPrices 1 ztg [1,0]
+  564  clear
+  565  zgcli viewSpotPrices 0 ztg [0,0]
+  566  zgcli viewSpotPrices 1 ztg [1,0]
+  567  zgcli viewSpotPrices 2 ztg [2,0]
+  568  zgcli getAssetsPrices 2204
+  569  history
+  570  zgcli getAssetsPrices 2204
+  571  zgcli viewSpotPrices 2 ztg [2,0]
+  572  zgcli getAssetsPrices 2204
+  573  zgcli viewSpotPrices 2 ztg [2,0]
+  574  zgcli viewSpotPrices 2 ztg [2,0] [2204]
+  575  yarn compile
+  576  git add .
+  577  git commit -m "CLI viewSpotPrices accepts poolId, assetIn and assetOut (necessarily as strings, also as fleixbly described strings which AssetIDFromString will accept), and an array of blconumbers, which calls fetchPoolSpotPricesFromBlockNumbers; fetchPoolSpotPricesFromBlockNumbers converts to hashes concurrently and calls fetchPoolSpotPrices 
+  578  "
+  579  git commit -m "CLI viewSpotPrices accepts poolId, assetIn and assetOut (necessarily as strings, also as fleixbly described strings which AssetIDFromString will accept), and an array of blconumbers, which calls fetchPoolSpotPricesFromBlockNumbers; fetchPoolSpotPricesFromBlockNumbers converts to hashes concurrently and calls fetchPoolSpotPrices 
+  580  "
+  581  git add .
+  582  git commit -m "CLI viewSpotPrices accepts poolId, assetIn and assetOut (necessarily as strings, also as fleixbly described strings which AssetIDFromString will accept), and an array of blconumbers, which calls fetchPoolSpotPricesFromBlockNumbers; fetchPoolSpotPricesFromBlockNumbers converts to hashes concurrently and calls fetchPoolSpotPrices 
+  583  "
+  584  git commit -m "CLI viewSpotPrices accepts poolId, assetIn and assetOut (necessarily as strings, also as fleixbly described strings which AssetIDFromString will accept), and an array of block numbers, which calls fetchPoolSpotPricesFromBlockNumbers;
+  585  Swaps.fetchPoolSpotPricesFromBlockNumbers is a converter which converts to hashes concurrently and calls Swaps.fetchPoolSpotPrices;
+  586  which returns the prices to be converted toString by orginal caller"
+  587  git push origin getSpotPrices 
+  588  zgcli marketCount
+  589  zgcli countMarkets
+  590  git branch 
+  591  git checkout main 
+  592  git pull origin main 
+  593  git checkout getSpotPrices
+  594  git merge main 
+  595  rm packages/sdk/src/models/shares.ts
+  596  git add .
+  597  git commit -m "merged PR62 (CI script and removal of unused shares.ts)"
+  598  yarn compile
+  599  git reset --soft HEAD^
+  600  git add .
+  601  git commit -m "merged PR62 (CI script and removal of unused shares.ts)"
+  602  git push origin getSpotPrices 
+  603  code packages/cli/
+  604  code packages/type-defs/
+  605  code .
+  606  code ../zeitgeist/
+  607  history
+  608  zgcli viewSpotPrices 2 ztg [2,0] [2204]
+  609  zgcli getAssetsPrices 2204
+  610  zgcli viewSpotPrices 2 ztg [2,0] [44100#]
+  611  zgcli viewSpotPrices 2 ztg [2,0] [44100]
+  612  zgcli viewSpotPrices 2 ztg [2,0] [2204]
+  613  git pull origin getSpotPrices 
+  614  zgcli getAssetsPrices 44100
+  615  yarn compile
+  616  zgcli getAssetsPrices 44100
+  617  alias
+  618  cat ~/code/zeitgeist/tools/packages/cli/src/actions/getAssetsPrices.ts 
+  619  zgcli getAssetsPrices 44100
+  620  cat ~/code/zeitgeist/tools/packages/cli/src/actions/getAssetsPrices.ts 
+  621  git stash
+  622  git pull origin getSpotPrices 
+  623  zgcli getAssetsPrices 44100
+  624  yarn compile
+  625  zgcli getAssetsPrices 44100
+  626  killall -9 code
+  627  yarn compile
+  628  clear
+  629  zgcli getAssetsPrices 0xdfdcf2a62fd3db36af1f0a42e91cf6ac79e3dad6065a6cb2dc0b3c72ff8b8b48
+  630  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  631  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  632  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  633  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  634  # alias lerna="node node_modules/lerna/cli.js "
+  635  zgcli getAssetsPrices 0xdfdcf2a62fd3db36af1f0a42e91cf6ac79e3dad6065a6cb2dc0b3c72ff8b8b48
+  636  zgcli getAssetsPrices 2004
+  637  clear
+  638  zgcli getAssetsPrices 2004
+  639  zgcli getAllMarketIds
+  640  zgcli viewMarket 2
+  641  zgcli createMarket someother thing 5D2L4ghyiYE8p2z7VNJo9JYwRuc8uzPWtMBqdVyvjRcsnw4P 5000
+  642  zgcli createMarket someother thing 5D2L4ghyiYE8p2z7VNJo9JYwRuc8uzPWtMBqdVyvjRcsnw4P 5000 --seed "always iron cry salon joke lake rescue sound execute hire tragic legal"
+  643  zgcli getAllMarkets
+  644  zgcli getAssetsPrices 2004
+  645  zgcli getAssetsPrices 2204
+  646  clear
+  647  zgcli getAssetsPrices 2204
+  648  zgcli getAssetsPrices -b 2204
+  649  zgcli getAssetsPrices -b 2600
+  650  zgcli getAssetsPrices -b 2204
+  651  zgcli getAssetsPrices 2204
+  652  zgcli getAssetsPrices -b 2204
+  653  zgcli getAssetsPrices 
+  654  zgcli getAssetsPrices #
+  655  zgcli getAssetsPrices 
+  656  yarn compile
+  657  git add .
+  658  git diff
+  659  git diff HEAD
+  660  git add .
+  661  git commit -m "util.CurrencyIdFromString() renamed AssetIdFromString() ;
+  662  CLI getAssetsPrices optionally accepts a block number (defaults to current block), then calls sdk.models.getAssetsPrices;
+  663  sdk.models.getAssetsPrices works to return an array of string Balances indexed by stringified AssetId , still iterating over markets, then calling Market.getAssetsPrices to iterate over pool assets to call get_spot_price;
+  664  fetchPoolSpotPrices incomplete"
+  665  git commit -m "util.CurrencyIdFromString() renamed AssetIdFromString() ;
+  666  CLI getAssetsPrices optionally accepts a block number (defaults to current block), then calls sdk.models.getAssetsPrices;
+  667  sdk.models.getAssetsPrices works to return an array of string Balances indexed by stringified AssetId , still iterating over markets, then calling Market.getAssetsPrices to iterate over pool assets to call get_spot_price;
+  668  fetchPoolSpotPrices incomplete"
+  669  git add .
+  670  git commit -m "util.CurrencyIdFromString() renamed AssetIdFromString() ;
+  671  CLI getAssetsPrices optionally accepts a block number (defaults to current block), then calls sdk.models.getAssetsPrices;
+  672  sdk.models.getAssetsPrices works to return an array of string Balances indexed by stringified AssetId , still iterating over markets, then calling Market.getAssetsPrices to iterate over pool assets to call get_spot_price;
+  673  fetchPoolSpotPrices incomplete"
+  674  git add .
+  675  git commit -m "util.CurrencyIdFromString() renamed AssetIdFromString() ;
+  676  CLI getAssetsPrices optionally accepts a block number (defaults to current block), then calls sdk.models.getAssetsPrices;
+  677  sdk.models.getAssetsPrices works to return an array of string Balances indexed by stringified AssetId , still iterating over markets, then calling Market.getAssetsPrices to iterate over pool assets to call get_spot_price;
+  678  fetchPoolSpotPrices incomplete"
+  679  git branch 
+  680  git push origin getSpotPrices 
+  681  zgcli getAssetsPrices 
+  682  zgcli getSpotPrice 0 ztg [0,0]
+  683  zgcli getAssetsPrices 
+  684  zgcli getSpotPrice 1 ztg [0,0]
+  685  zgcli getAssetsPrices 
+  686  zgcli getSpotPrice 1 ztg [0,0]
+  687  zgcli getAssetsPrices 
+  688  yarn compile
+  689  history
+  690  zgcli getSpotPrice 1 ztg [0,0]
+  691  zgcli getSpotPrices 
+  692  zgcli getSpotPrices 1 ztg [1,0]
+  693  zgcli viewSpotPrices 1 ztg [1,0]
+  694  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  695  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  696  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  697  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  698  # alias lerna="node node_modules/lerna/cli.js "
+  699  zgcli viewMarket 44
+  700  zgcli getAllMarkets
+  701  zgcli getAllMarkets -f pool
+  702  zgcli getAllMarkets 
+  703  node
+  704  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  705  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  706  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  707  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  708  # alias lerna="node node_modules/lerna/cli.js "
+  709  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe ztg
+  710  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe [0,0]
+  711  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe [0,'Long']
+  712  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe "[0,'Long']"
+  713  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe '[0,"Long"]'
+  714  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe ztg
+  715  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe pool4
+  716  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe pool:4
+  717  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe "{poolShare:4}"
+  718  zgcli getBalance 5D5VJQkvKjrzZpa3PdZn99VQvs4uRHVN5AM4req4GzZ4suGe '{"poolShare":4}'
+  719  git add .
+  720  git commit -m "util.CurrencyIdFromString accepts reasonably flexible input:
+  721   . ztg | poolX | poolShareX | pool:X |
+  722   . accurate JSON.sringified CurrencyId |
+  723   . accurate JSON.strignified OutcomeIndex | 
+  724   . the above, but not JSON.stringified
+  725   and returns a valid CurrencyId;
+  726  util.isValidAddress does what you expect (also accepts no-string input which retuns false) ;
+  727  getBalance take the above inputs as params, calls getShareBalance, which logs result from system.account or tokens.accounts as appropriate"
+  728  git add .
+  729  git commit -m "util.CurrencyIdFromString accepts reasonably flexible input:
+  730   . ztg | poolX | poolShareX | pool:X |
+  731   . accurate JSON.sringified CurrencyId |
+  732   . accurate JSON.strignified OutcomeIndex | 
+  733   . the above, but not JSON.stringified
+  734   and returns a valid CurrencyId;
+  735  util.isValidAddress does what you expect (also accepts no-string input which retuns false) ;
+  736  getBalance take the above inputs as params, calls getShareBalance, which logs result from system.account or tokens.accounts as appropriate"
+  737  git branch 
+  738  git push origin getSpotPrices 
+  739  yarn compile
+  740  git add .
+  741  git commit "renamed AssetId, being a type string used only as a member of poolJoinOpts (type of params to PoolJoinMultiFunc) .. to AssetIdStringForTempCompatibility
+  742  - pending reuse of the name AssetId for the more specific type (currently named CurrencyId), which will absorb this type"
+  743  git commit -m "renamed AssetId, being a type string used only as a member of poolJoinOpts (type of params to PoolJoinMultiFunc) .. to AssetIdStringForTempCompatibility
+  744  - pending reuse of the name AssetId for the more specific type (currently named CurrencyId), which will absorb this type"
+  745  zgcli help
+  746  clear
+  747  zgcli help
+  748  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  749  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  750  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  751  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  752  # alias lerna="node node_modules/lerna/cli.js "
+  753  ~/exchanges
+  754  node 
+  755  ~/exchanges
+  756  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  757  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  758  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  759  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  760  # alias lerna="node node_modules/lerna/cli.js "
+  761  firefox -n && firefox https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fbp-rpc.zeitgeist.pm&types=eNqNUT1rwzAQ%2FStBUwte2qGEEArFdPBQHOLSoYtR5YtrauuMPkJN8H%2FvnZQYUTJkEbp3757ePZ3Ei7XgxOYkatB%2B4EsuHbRoOiX70juFA4iNuHuT5gdc0WSrc38qdAO%2F9yITFTGlucqNrR3aznWomZzj8NVp6eiBVJ86O8S%2B%2BpaGS%2F%2FwuCbo07Xcm2ea88aAVlPRlAfCou0UTsHUYVB7InQvdQuFVr233TH45FeyFZ%2FsLLp%2Bn0bqXY9jkYprUflPk40uO92qEXblyWiA%2BcoAJ8QrKYVeU5Y0EVCKkeBIzS%2FAuYemPkCIj8NDI1XPVaoBmoOK4690z8QATjbSSYI%2FQG39%2BpnBQKhdCCNNJhPWSeftglaxzISBEQ25F%2BXInrb7ULOYAYv9EZoal%2B%2B%2BhDTPf1Fk1fE%3D &firefox https://discord.com/channels/@me/812282845891919923 https://discord.com/channels/@me/833674848923942942 https://discord.com/channels/737780518313000960/817041223201587230 https://discord.com/channels/737780518313000960/790974102009675797 &  code -n ~/code/zeitgeist/tools & \ 
+  762  cd ~/code/zeitgeist/docs/
+  763  fg 1
+  764  exit
+  765  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  766  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  767  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  768  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  769  # alias lerna="node node_modules/lerna/cli.js "
+  770  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  771  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  772  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  773  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  774  # alias lerna="node node_modules/lerna/cli.js "
+  775  zgcli data 
+  776  zgcli getAllMarkets -f marketStatus marketType
+  777  zgcli deployPool 4 --seed "artwork minimum lion acquire beauty question six goose utility treat enlist helmet"
+  778  ../showerrors swaps
+  779  zgcli deployPool 4 --seed "artwork minimum lion acquire beauty question six goose utility treat enlist helmet"
+  780  git add .
+  781  git log
+  782  git add .
+  783  ggit commit -m "CLI data accepts start and end block, passed through to "
+  784  git add .
+  785  git commit -m "CLI data accepts start and end block, passed through to [
+  786    0, 775, 
+  787    7725,7726,7744,7745, 7775, 7776,7777,7778, 7779,7780,7781,7782,7783, 7784,7785, 7786, 
+  788    8355, 8420, 8427, 8464,8466,
+  789    9382,9780, 
+  790    10152,10207,10229, 10231, 10233,10237, 10252,10269, 10271, 10301, 10334,10477,10478, 10480,10482, 10495,
+  791    10704,10721,10731, 10737, 10739, 10748, 10783,10790, 10832,
+  792    11319,11322,11323,11325,11371,11373,
+  793    11375,
+  794    21742,21897, 22380, 22383, 23074, 23120, 24609, 24656,
+  795     24814,
+  796    25652,
+  797  ffgit commit -m "CLI data accepts start and end block, passed through to indexExtrinsicsUnstable"
+  798  git add .
+  799  git commit -m "CLI data accepts start and end block, passed through to indexExtrinsicsUnstable;
+  800  no CLI option to accept arbitrary array of blocks, but if 3rd param arbitrarySet is passed to Models.indexTransferRecipients, this *will override* the range generated by startBlock and endBlock;
+  801  indexTransferRecipients will retrieve extrinsics for all blocks;
+  802  these are currently parsed in the CLI function indexExtrinsicsUnstable, which:
+  803  . filters out blocks which contain only timestamp::set;
+  804  . filters out timestamp.set from other blocks;
+  805  . selects balances::transfer (and *NOT* currently currency transfer) from those blocks and updates an index, on the recipients' addresses, with total transferred in.
+  806  - It is slow - this is due to post-response processing of response objects."
+  807  git add .
+  808  git commit -m "adds try...catch and 30s progress update around the many WS connections which are initated in parallel"
+  809  git add .
+  810  git commit -m "adds try...catch and 30s progress update around the many WS connections which are initated in parallel"
+  811  git push origin getSpotPrices 
+  812  node
+  813  yarn compile
+  814  yarn sdk:lint
+  815  yarn cli:lint
+  816  node
+  817  git add .
+  818  git commit -m "CLI data tallies profit by player over given range, sorts and logs as 'PLACED: n; <address>; Total WINNINGS/ LOSSES: z';
+  819  "
+  820  git push origin getSpotPrices 
+  821  zgcli viewMarket 4
+  822  zgcli getAllMarkets - marketStatus
+  823  zgcli getAllMarkets -f marketStatus
+  824  zgcli viewMarket 45
+  825  cat jed
+  826  sudo openvpn ~/ie.protonvpn.com.udp.ovpn 
+  827  htop
+  828  cat /proc/cpuinfo 
+  829  sensors
+  830  sudo apt install lm-sensors
+  831  sudo sensors-detect
+  832  sensors
+  833  ~/exchangesall 
+  834  ~/exchanges
+  835  ~/exchangesall 
+  836  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  837  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  838  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  839  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  840  # alias lerna="node node_modules/lerna/cli.js "
+  841  code .
+  842  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  843  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  844  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  845  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  846  # alias lerna="node node_modules/lerna/cli.js "
+  847  git branch 
+  848  git clone https://github.com/lsaether/subscraper.git
+  849  cd subscraper/
+  850  code .
+  851  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+  852  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+  853  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+  854  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+  855  # alias lerna="node node_modules/lerna/cli.js "
+  856  code packages/cli/
+  857  zgcli data 2
+  858  yarn compile
+  859  yarn
+  860  yarn compile
+  861  zgcli data 2
+  862  zgcli data 0
+  863  zgcli data -s 3
+  864  zgcli data 0
+  865  clear
+  866  zgcli data 0 4
+  867  zgcli data 0
+  868  clear
+  869  zgcli data 0 4
+  870  clear
+  871  zgcli data 0 4
+  872  clear
+  873  zgcli data 0 4
+  874  node
+  875  zgcli data 0 4
+  876  node
+  877  zgcli data 0 4
+  878  zgcli data -s 0 -e 4
+  879  zgcli data -s 12500
+  880  zgcli data -s 12500 -e 12550
+  881  yarn compile
+  882  zgcliquick data -s 12500 -e 12550
+  883  zgcli help
+  884  ll /home/dips/code/zeitgeist/tools/packages/cli/dist/
+  885  yarn clean
+  886  yarn compile
+  887  yarn cli data
+  888  cat ./tsconfig.json 
+  889  tsc --build --force ./tsconfig.json 
+  890  tsc --build --force tsconfig.json 
+  891  yarn compile
+  892  yarn cli data
+  893  alias
+  894  ~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts
+  895  cd ../
+  896  mkdir backup
+  897  cd tools/
+  898  find * . |grep tsconfig.json
+  899  packages/sdk/tsconfig.json
+  900  packages/types/tsconfig.json
+  901  packages/type-defs/tsconfig.json
+  902  packages/cli/tsconfig.json
+  903  tsconfig.json
+  904  cat packages/*/tsconfig.json |grep aseUrl
+  905  cat packages/*/tsconfig.json 
+  906  yarn compile
+  907  ts-node -r tsconfig-paths/register packages/cli/src/index
+  908  alias
+  909  ~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node -r tsconfig-paths/register packages/cli/src/index
+  910  ~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node -v -r tsconfig-paths/register packages/cli/src/index
+  911  man ts-node
+  912  zgcli data -s 1 -e 4
+  913  zgcli data -s 21337
+  914  clear
+  915  zgcli data -s 21337
+  916  clear
+  917  zgcli data -s 21337
+  918  clear
+  919  zgcli data -s 21337
+  920  clear
+  921  zgcli data -s 21337
+  922  clear
+  923  zgcli data -s 21337
+  924  clear
+  925  zgcli data -s 21337
+  926  clear
+  927  zgcli data -s 21337
+  928  clear
+  929  zgcli data -s 21337
+  930  clear
+  931  zgcli data -s 21337
+  932  clear
+  933  zgcli data -s 21337
+  934  zgcli data 
+  935  zgcli data -s 21337
+  936  zgcli data 
+  937  clear
+  938  zgcli data 
+  939  clear
+  940  zgcli data 
+  941  clear
+  942  zgcli data 
+  943  clear
+  944  zgcli data 
+  945  clear
+  946  zgcli data 
+  947  zgcli data -s 22600
+  948  clear
+  949  zgcli data -s 22600
+  950  clear
+  951  zgcli data -s 22600
+  952  clear
+  953  zgcli data -s 22600
+  954  clear
+  955  zgcli data -s 22600
+  956  clear
+  957  zgcli data -s 22600
+  958  clear
+  959  zgcli data -s 22600
+  960  clear
+  961  zgcli data -s 22600
+  962  clear
+  963  zgcli data -s 22600
+  964  clear
+  965  zgcli data -s 22600
+  966  clear
+  967  zgcli data -s 22600
+  968  yarn sdk:lint:fix
+  969  yarn sdk:lint-fix
+  970  yarn cli:lint-fix
+  971  git add .
+  972  git commit -m "parses historic blocks and can compare block numbers, extrinsic methods and args "
+  973  zgcli data -s 22600
+  974  clear
+  975  zgcli data -s 22600
+  976  clear
+  977  zgcli data -s 22600
+  978  clear
+  979  zgcli data -s 22600
+  980  clear
+  981  zgcli data -s 22600
+  982  clear
+  983  zgcli data -s 22600
+  984  clear
+  985  zgcli data -s 22600
+  986  clear
+  987  zgcli data -s 22600
+  988  clear
+  989  zgcli data -s 22600
+  990  clear
+  991  zgcli data -s 22600
+  992  clear
+  993  zgcli data -s 22600
+  994  clear
+  995  zgcli data -s 22600
+  996  clear
+  997  zgcli data -s 22600
+  998  clear
+  999  zgcli data -s 22600
+ 1000  clear
+ 1001  zgcli data -s 22600
+ 1002  clear
+ 1003  zgcli data -s 22600
+ 1004  clear
+ 1005  zgcli data -s 22600
+ 1006  clear
+ 1007  zgcli data -s 22600
+ 1008  clear
+ 1009  zgcli data -s 22600
+ 1010  clear
+ 1011  zgcli data -s 22600
+ 1012  clear
+ 1013  zgcli data -s 22600
+ 1014  clear
+ 1015  zgcli data -s 22600
+ 1016  clear
+ 1017  zgcli data -s 22600
+ 1018  clear
+ 1019  zgcli data -s 22600
+ 1020  clear
+ 1021  zgcli data -s 22600
+ 1022  clear
+ 1023  zgcli data -s 22600
+ 1024  clear
+ 1025  zgcli data -s 22600
+ 1026  clear
+ 1027  zgcli data -s 22600
+ 1028  clear
+ 1029  zgcli data -s 22600
+ 1030  clear
+ 1031  zgcli data -s 22600
+ 1032  clear
+ 1033  zgcli data -s 22600
+ 1034  clear
+ 1035  zgcli data -s 22600
+ 1036  clear
+ 1037  zgcli data -s 22600
+ 1038  clear
+ 1039  zgcli data -s 22600
+ 1040  clear
+ 1041  zgcli data -s 22600
+ 1042  clear
+ 1043  zgcli data -s 22600
+ 1044  zgcli data -s 27000
+ 1045  zgcli data -s 27000 -e 27010
+ 1046  zgcli data -s 27000 
+ 1047  zgcli data 
+ 1048  zgcli getBalance 5GGwEu3xQoAbxX65p6KKEHv97WUoqZRUfJuoTZf3Jc7hFoC7 ztg
+ 1049  zgcli data 
+ 1050  clear
+ 1051  zgcli data 
+ 1052  clear
+ 1053  zgcli data 
+ 1054  zgcli indexWinners
+ 1055  ifconfig 
+ 1056  ssh 192.168.2.100
+ 1057  scp zim@192.168.2.100:addys521 .
+ 1058  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+ 1059  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+ 1060  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+ 1061  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+ 1062  # alias lerna="node node_modules/lerna/cli.js "
+ 1063  zgcli help
+ 1064  git branch 
+ 1065  git log
+ 1066  mkdir backup
+ 1067  git clone https://github.com/zeitgeistpm/tools.git
+ 1068  mv tools/ backup/
+ 1069  mv backup/ ..
+ 1070  cd ../backup/tools/
+ 1071  npm i
+ 1072  ll
+ 1073  rm package-lock.json
+ 1074  yarn
+ 1075  yarn cli data 
+ 1076  yarn compile
+ 1077  yarn cli data 
+ 1078  yarn cli help
+ 1079  git branch 
+ 1080  git pull origin getSpotPrices
+ 1081  git checkout origin getSpotPrices
+ 1082  git checkout  getSpotPrices
+ 1083  yarn cli help
+ 1084  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+ 1085  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+ 1086  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+ 1087  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+ 1088  # alias lerna="node node_modules/lerna/cli.js "
+ 1089  killall -9 code
+ 1090  code ../docs/
+ 1091  cd ../docs/
+ 1092  git log
+ 1093  git pull origin main 
+ 1094  git add .
+ 1095  git commit -m "tidied up troubleshooting.md"
+ 1096  git push origin main 
+ 1097  git merge origin main 
+ 1098  git pull origin main 
+ 1099  git add .
+ 1100  git commit -m "tidied up troubleshooting.md"
+ 1101  git push origin main 
+ 1102  git add .
+ 1103  git commit -m "updated how-to-participate-in-derby.md"
+ 1104  git push origin main 
+ 1105  cd ../tools/
+ 1106  code packages/sdk/
+ 1107  code packages/cli/
+ 1108  zgcli getAllMarkets -f marketType merketStatus
+ 1109  zgcli getAllMarkets -f marketType marketStatus
+ 1110  node
+ 1111  code .
+ 1112  zgcli getAllMarkets -f marketType marketStatus
+ 1113  yarn cli:lint
+ 1114  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+ 1115  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+ 1116  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+ 1117  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+ 1118  # alias lerna="node node_modules/lerna/cli.js "
+ 1119  cd ../docs/
+ 1120  git pull origin 
+ 1121  git pull origin main 
+ 1122  cat package
+ 1123  cat package.json 
+ 1124  npm start
+ 1125  export TS_NODE_PROJECT=~/code/zeitgeist/tools/packages/cli/tsconfig.json 
+ 1126  ## or include the path as: zgcli= ts-node --project $TS_NODE_PROJECT ~/code...
+ 1127  alias zgcli="~/code/zeitgeist/tools/packages/cli/node_modules/.bin/ts-node ~/code/zeitgeist/tools/packages/cli/src/index.ts "
+ 1128  alias zgcliquick="node ~/code/zeitgeist/tools/packages/cli/dist/index.js "
+ 1129  # alias lerna="node node_modules/lerna/cli.js "
+ 1130  zgcli getBalance ztg --endpoint ws://localhost:9944 
+ 1131  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY ztg --endpoint ws://localhost:9944 
+ 1132  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY [0,1] --endpoint ws://localhost:9944 
+ 1133  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY [4,1] --endpoint ws://localhost:9944 
+ 1134  zgcli buyCompleteSet 4 3000000000000 --endpoint ws://localhost:9944 
+ 1135  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY ztg --endpoint ws://localhost:9944 
+ 1136  node
+ 1137  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY ztg --endpoint ws://localhost:9944 
+ 1138  clear
+ 1139  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY ztg --endpoint ws://localhost:9944 
+ 1140  clear
+ 1141  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY ztg --endpoint ws://localhost:9944 
+ 1142  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY [4,0] --endpoint ws://localhost:9944 
+ 1143  zgcli buyCompleteSet 4 3000000000000 --endpoint ws://localhost:9944 
+ 1144  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY ztg --endpoint ws://localhost:9944 
+ 1145  zgcli buyCompleteSet 4 3000000000000 --endpoint ws://localhost:9944 
+ 1146  node
+ 1147  zgcli buyCompleteSet 4 3000000000000 --endpoint ws://localhost:9944 
+ 1148  git add .
+ 1149  git commit -m "SDK buyCompleteSet / sellCompleteSet bug no longer falsely report success -
+fixed always _resolve(true). resolve vlaues are now strings (Event or '') "
+ 1150  git commit -m "SDK buyCompleteSet / sellCompleteSet bug no longer falsely report success -
+fixed always _resolve(true). resolve vlaues are now strings (Event or '') "
+ 1151  git add .
+ 1152  git commit -m "SDK buyCompleteSet / sellCompleteSet bug no longer falsely report success -
+fixed always _resolve(true). resolve vlaues are now strings (Event or '') "
+ 1153  git add .
+ 1154  git commit -m "SDK redeemShares; joinPoolMulitifunc; exitPool; swapExactAmountIn; swapExactAmountOut no longer falsely report success -
+all resolve true on method=='ExtrinsicSuccess', false on 'ExtrinsicFailed';
+Need further testing as to whether these are acheivable conditions"
+ 1155  git reset --soft HEAD^
+ 1156  git add .
+ 1157  git commit -m "SDK redeemShares; joinPoolMulitifunc; exitPool; swapExactAmountIn; swapExactAmountOut no longer falsely report success -
+all resolve true on method=='ExtrinsicSuccess', false on 'ExtrinsicFailed';
+Need further testing as to whether these are acheivable conditions"
+ 1158  git reset --soft HEAD^
+ 1159  git add .
+ 1160  git commit -m "SDK redeemShares; joinPoolMulitifunc; exitPool; swapExactAmountIn; swapExactAmountOut no longer falsely report success -
+all resolve true on method=='ExtrinsicSuccess', false on 'ExtrinsicFailed';
+Need further testing as to whether these are acheivable conditions"
+ 1161  git push origin getSpotPrices 
+ 1162  zgcli buyCompleteSet 4 3000000000000 --endpoint ws://localhost:9944 
+ 1163  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY ztg --endpoint ws://localhost:9944 
+ 1164  ../showpallets 
+ 1165  ../showerrors prediction-markets
+ 1166  zgcli getAllMarkets -f marketStatus marketType
+ 1167  zgcli getAllMarkets 
+ 1168  zgcli getAllMarkets  --endpoint ws://localhost:9944 
+ 1169  zgcli getAllMarkets -f marketStatus marketType end 
+ 1170  zgcli getAllMarkets -f marketStatus marketType end --endpoint ws://localhost:9944 
+ 1171  zgcli createMarket abc def 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 125888000 --endpoint ws://localhost:9944
+ 1172  clear
+ 1173  zgcli swapExactAmountIn 0 ztg 3000000000 [5,1] 1
+ 1174  zgcli swapExactAmountIn 0 ztg 3000000000 [5,1] 1 1000000000000
+ 1175  zgcli swapExactAmountIn 0 ztg 3000000000 [5,1] 1 1000000000000  --endpoint ws://localhost:9944 
+ 1176  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY ztg  --endpoint ws://localhost:9944 
+ 1177  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY [5,1]  --endpoint ws://localhost:9944 
+ 1178  zgcli getBalance 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY [5,0]  --endpoint ws://localhost:9944 
+ 1179  zgcli reportMarket 5 1
+ 1180  zgcli reportMarket 5 1  --endpoint ws://localhost:9944 
+ 1181  zgcli report 5 1  --endpoint ws://localhost:9944 
+ 1182  zgcli report 4 1  --endpoint ws://localhost:9944 
+ 1183  zgcli viewMarket 5 -f end
+ 1184  zgcli viewMarket 5 
+ 1185  zgcli viewMarket 5 cliamant
+ 1186  zgcli viewMarket 5 --endpoint ws://localhost:9944 
+ 1187  history >history

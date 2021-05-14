@@ -1,4 +1,5 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+// import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK, { util } from "../../../sdk/src";
 
 type Options = {
   addressOrSeed: string;
@@ -48,7 +49,7 @@ const getShareBalance = async (opts: Options): Promise<void> => {
           util.AssetIdFromString(asset)
         );
 
-  console.log("", data.toJSON());
+  console.log("", data.toHuman());
 };
 
 export default getShareBalance;
