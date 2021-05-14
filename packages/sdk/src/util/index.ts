@@ -33,10 +33,7 @@ const tolerantJsonParse = (anything) => {
   }
 };
 
-export const AssetIdFromString = (
-  stringAsset: string | AssetId,
-  casing = "camel"
-): AssetId => {
+export const AssetIdFromString = (stringAsset: string | AssetId): AssetId => {
   // asset= ztg
   if (stringAsset === "ztg") {
     return { ztg: null };

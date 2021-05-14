@@ -54,8 +54,6 @@ export default class Swap {
     //@ts-ignore
     return this.api.rpc.swaps.getSpotPrice(
       this.poolId,
-      // sdk.api.createType("Asset", util.AssetIdFromString(assetIn)),
-      // sdk.api.createType("Asset", util.AssetIdFromString(assetOut)),
       typeof inAsset === "string" ? AssetIdFromString(inAsset) : inAsset,
       typeof outAsset === "string" ? AssetIdFromString(outAsset) : outAsset,
       blockHash

@@ -97,11 +97,11 @@ program
   .command("viewMarket <marketId>")
   .option(
     "--address <string>",
-    "An address on which to report ownership of shares."
+    "An address on which to report ownership of assets."
   )
   .option(
     "--seed <string>",
-    "A seed from which to calculate an address on which to report ownership of shares",
+    "A seed from which to calculate an address on which to report ownership of assets",
     "//Alice"
   )
   .option(
