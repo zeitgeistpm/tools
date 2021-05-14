@@ -384,9 +384,6 @@ export default class Models {
       extrinsics = blocks.map((block) => block.extrinsics);
     } catch (e) {
       console.log("Oops at:", Date.now());
-      console.log(
-        `Oh, dear - was it too many connections? There are ${currentConnections}`
-      );
       throw e;
     }
 
@@ -395,12 +392,6 @@ export default class Models {
       extrinsics[idx].blockNum = blockNum;
     });
 
-    // console.log(extrinsics.map((e, idx) => e && e[0] && e[0].length ? e[0].length : (e && e[0] && e[0].length ===0 ? 0 : `empty at ${idx}`)));
-
-    // console.log(res);
-
-    // return ["anything"];
-    // return res;
     console.log("connections:", currentConnections);
 
     return extrinsics;
