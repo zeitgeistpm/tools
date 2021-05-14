@@ -27,14 +27,16 @@ export const isExtSigner = (
 
 const tolerantJsonParse = (anything) => {
   try {
-    console.log(JSON.parse(anything));
     return JSON.parse(anything);
   } catch (e) {
     throw new Error("asset was not ztg, poolX or valid JSON");
   }
 };
 
-export const AssetIdFromString = (stringAsset: string | AssetId): AssetId => {
+export const AssetIdFromString = (
+  stringAsset: string | AssetId,
+  casing = "camel"
+): AssetId => {
   // asset= ztg
   if (stringAsset === "ztg") {
     return { ztg: null };
