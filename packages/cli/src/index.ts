@@ -1,6 +1,7 @@
 import program from "commander";
 
 import buyCompleteSet from "./actions/buyCompleteSet";
+import getBlockHashes from "./actions/blockHashes";
 import createMarket from "./actions/createMarket";
 import cancelPendingMarket from "./actions/cancelPendingMarket";
 import disputeMarket from "./actions/disputeMarket";
@@ -91,6 +92,19 @@ program
         createMarket,
         Object.assign(opts, { title, description, oracle, end })
       )
+  );
+
+program
+  .command("blockHashes")
+  .option("-b, --blocks [blocks...]", "the blocks to retrieve hashes of")
+  .option("--link", "Include a block explorer link", true)
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((opts: { blocks: number[]; link: boolean; endpoint: string }) =>
+    catchErrorsAndExit(getBlockHashes, Object.assign(opts))
   );
 
 program
