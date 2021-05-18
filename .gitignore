@@ -8,3 +8,4 @@ view.sh
 out
 test_seed
 lerna-debug.log
+package-lock.json
