@@ -1,14 +1,16 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+// import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK, { util } from "../../../sdk/src";
 import { hexToBn, isHex } from "@polkadot/util";
 
 type Options = {
   marketId?: number;
   startBlock?: number;
   endBlock?: number;
+  displayHashes?: boolean;
   endpoint: string;
 };
 
-const transferredIn = {};
+const successfulTransfers = {};
 const promiseQueue = [];
 
 const indexableExtrinsics = [
@@ -30,7 +32,7 @@ const spotPrice = {
 const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   console.log("opts", opts);
 
-  const { marketId, startBlock, endBlock, endpoint } = opts;
+  const { marketId, startBlock, endBlock, displayHashes, endpoint } = opts;
 
   // eslint-disable-next-line
   let timer= Date.now();
@@ -86,8 +88,18 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
       if (methodConcatName.startsWith("balances::transfer")) {
         console.log("extrinsic.toHuman()", extrinsic.toHuman());
 
-        const hash = await sdk.api.rpc.chain.getBlockHash(blockNum);
-        console.log(blockNum, "hash", hash.toHuman());
+        let hash;
+        try {
+          hash = await sdk.api.rpc.chain.getBlockHash(blockNum);
+          if (displayHashes) {
+            console.log(blockNum, "hash", hash.toHuman());
+          }
+        } catch (e) {
+          console.log(
+            `Error calling getBlockHash. Block: ${blockNum}, hash: ${hash.toHuman()}`
+          );
+          throw e;
+        }
 
         const events = await await sdk.api.query.system.events.at(hash);
         const methods = events
@@ -104,16 +116,21 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
           return true;
         } else if (methods.includes("system::ExtrinsicFailed")) {
           return false;
+        } else if (methods.includes("system::ExtrinsicSuccess")) {
+          console.log(
+            `Expected balances::Transfer event or failure after extrinsic ${methodConcatName} called in block ${blockNum}. This must mean that somebody transferred to themselves.`
+          );
         } else {
           throw new Error(
-            `Expected balances::Transfer event or failure after extrinsic ${methodConcatName} called. Is this an unhandled case?`
+            `Hanging extrinsic: ${methodConcatName} called in block ${blockNum} did not result in either system::ExtrinsicFailed or system::ExtrinsicSuccess wtihin the same block. This should never happen.`
           );
         }
       }
       console.log(
         `Don't know how to check the validity of ${methodConcatName}`
       );
-      return "Unhandled case";
+      // Unhandled case - do not return true/false;
+      return;
     };
 
     const indexSelectedExtrinsic = (args, methodConcatName, wholeBlock) => {
@@ -133,17 +150,17 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
           );
         }
 
-        if (!transferredIn[recipient]) {
-          transferredIn[recipient] = {};
+        if (!successfulTransfers[recipient]) {
+          successfulTransfers[recipient] = {};
         }
         console.log(`${balance}->${recipient}`);
 
         const asset = `{"ztg":"null"}`;
-        if (!transferredIn[recipient][asset]) {
-          transferredIn[recipient][asset] = 0;
+        if (!successfulTransfers[recipient][asset]) {
+          successfulTransfers[recipient][asset] = 0;
         }
 
-        transferredIn[recipient][asset] += balance;
+        successfulTransfers[recipient][asset] += balance;
         return [balance, asset, recipient];
       }
     };
@@ -170,7 +187,11 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
               methodConcatName,
               _blockExtrinsics
             );
-            console.log("got result for checkedValid:", checkedValid);
+            console.log(
+              `${singleExtrinsic.blockNum}${
+                checkedValid ? " contains a valid transfer." : ": No transfers."
+              }`
+            );
             if (checkedValid) {
               indexSelectedExtrinsic(
                 singleExtrinsic.args,
@@ -187,15 +208,29 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
     };
 
     console.log("\n");
+    console.log("res:", res);
+
+    console.log("\n");
     const filteredBlocks = res
       .map((blockExtrinsics) => {
         if (blockExtrinsics.length != 1 || blockExtrinsics[0].length !== 10) {
+          if (!Array.isArray(blockExtrinsics)) {
+            console.log(
+              `blockExtrinsics: (${typeof blockExtrinsics})`,
+              blockExtrinsics
+            );
+            console.log(`response length: ${res.length}`);
+            throw new Error("SDK returned malformed data");
+          }
+
           return {
+            // @ts-ignore
             blockNum: blockExtrinsics.blockNum,
             extrinsics: blockExtrinsics,
             filteredExtrinsics: blockExtrinsics
               .map((singleExtrinsic) =>
                 Object.assign(singleExtrinsic, {
+                  // @ts-ignore
                   blockNum: blockExtrinsics.blockNum,
                 })
               )
@@ -206,14 +241,15 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
       .filter((block) => block && block.filteredExtrinsics.length);
 
     console.log("blocks filtered at:", Date.now());
-    console.log(transferredIn);
+    console.log(successfulTransfers);
   } catch (e) {
+    console.log("Failure in CLI function indexExtrinsicsUnstable.");
     console.log(e);
   }
 
   await Promise.all(promiseQueue);
   const balancesChange = await Promise.all(
-    Object.keys(transferredIn).map(async (player) => {
+    Object.keys(successfulTransfers).map(async (player) => {
       const change = { player };
 
       const responses = assets.map(async (asset) =>
@@ -227,7 +263,7 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
         change[assets[idx]] =
           // @ts-ignore
           (newBalance.toJSON().free || 0) -
-          transferredIn[player][assets[idx] || 0] +
+          successfulTransfers[player][assets[idx] || 0] +
           0;
       });
 
@@ -237,9 +273,9 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
 
   console.log("balancesChange", balancesChange);
 
-  const profit = Object.keys(transferredIn)
+  const profit = Object.keys(successfulTransfers)
     .map((player, idx) => ({
-      ...transferredIn[player],
+      ...successfulTransfers[player],
       player,
       profit: assets.reduce(
         (total, asset) => total + balancesChange[idx][asset] * spotPrice[asset],

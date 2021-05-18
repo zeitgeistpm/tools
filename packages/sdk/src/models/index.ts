@@ -22,11 +22,17 @@ import Swap from "./swaps";
 
 export { Market, Swap };
 
+type Options = {
+  MAX_RPC_REQUESTS?: number;
+};
+
 export default class Models {
   private api: ApiPromise;
+  MAX_RPC_REQUESTS: number;
 
-  constructor(api: ApiPromise) {
+  constructor(api: ApiPromise, opts: Options = {}) {
     this.api = api;
+    this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
   }
 
   /**
@@ -335,7 +341,7 @@ export default class Models {
     const head = this.api.rpc.chain.getHeader();
     console.log([...Array(endBlock)]);
 
-    let currentConnections = 0;
+    let outstandingRequests = 0;
     let extrinsics = [];
 
     const range = [
@@ -349,41 +355,102 @@ export default class Models {
       console.log(`${startBlock} to ${endBlock}`);
       console.log(range);
     }
-    console.log(`...makes ${(arbitrarySet || range).length} blocks`);
+
+    const chunkSize = (arbitrarySet || range).length;
+    console.log(`...makes ${chunkSize} blocks`);
 
     let timer = Date.now();
-    console.log("beginning retrieval at:", timer);
+
+    if (chunkSize > this.MAX_RPC_REQUESTS) {
+      const chunks = [];
+      const whole = arbitrarySet ? [...arbitrarySet] : range;
+
+      console.log(
+        `Blocks exceed MAX_RPC_REQUESTS (${this.MAX_RPC_REQUESTS}). Chunking at: ${timer}`
+      );
+
+      while (whole.length) {
+        chunks.push(whole.splice(0, this.MAX_RPC_REQUESTS));
+      }
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      const chunkedExtrinsics: any[] = chunks.map((_) => new Promise(() => {}));
+
+      const outerTrigger = chunks.reduce(async (trigger, chunk, idx) => {
+        await trigger;
+        console.log(
+          `Chunk ${idx}: ${idx * this.MAX_RPC_REQUESTS}-${
+            (idx + 1) * this.MAX_RPC_REQUESTS - 1
+          }:`
+        );
+
+        chunkedExtrinsics[idx] = await this.indexTransferRecipients(0, 0, chunk, filter);
+        console.log(`Chunk ${idx}: extrinsics fetched at: ${Date.now()}`);
+
+        return await chunkedExtrinsics[idx];
+      }, chunks[0]);
+
+      // Native Array.flat requires TS lib: "es2019" || "es2019.array" which conflict with ipfs-core-types
+      const arrayFlat1 = (arr) => arr.reduce((a, b) => a.concat(b), []);
+
+      await outerTrigger;
+
+      console.log(`All extrinsics fetched at ${Date.now}`);
+
+      const result = Promise.all(arrayFlat1(chunkedExtrinsics));
+      return await result;
+    }
+
+    console.log("beginning retrieval at:", Date.now());
 
     try {
       const blockHashes = await Promise.all(
         (arbitrarySet || range).map((block, idx) => {
-          currentConnections++;
-          if (timer - Date.now() > 30000) {
-            console.log(`Progress: ${idx}`);
+          outstandingRequests++;
+          if (Date.now() - timer > 30000) {
+            console.log(`Progress: ${idx}/${chunkSize}`);
             timer = Date.now();
           }
           return this.api.rpc.chain.getBlockHash(block);
         })
       );
 
-      currentConnections = 0;
+      outstandingRequests = 0;
       timer = Date.now();
-      const blocks = await Promise.all(
+      const blocks = Promise.all(
         blockHashes.map((hash, idx) => {
-          currentConnections++;
-          if (timer - Date.now() > 30000) {
+          outstandingRequests++;
+          if (Date.now() - timer > 30000) {
             console.log(`Progress: ${idx}`);
             timer = Date.now();
           }
-          return this.api.rpc.chain.getBlock(hash).then((block) => block.block);
+
+          try {
+            return this.api.rpc.chain
+              .getBlock(hash)
+              .then((block) => block.block);
+          } catch (e) {
+            console.log("Oops at:", Date.now());
+            console.log(hash);
+
+            console.log("Requests outstanding:", outstandingRequests);
+          }
         })
       );
-      console.log("retrieved but not logged at:", Date.now());
-      currentConnections = 0;
+      console.log(
+        (arbitrarySet || range)[0], "-",
+        (arbitrarySet || range)[chunkSize - 1], ","
+      );
+      console.log(" chunk sent at:", Date.now());
 
-      extrinsics = blocks.map((block) => block.extrinsics);
-    } catch (e) {
+      await blocks;
+      outstandingRequests = 0;
+      console.log("retrieved but not logged at:", Date.now());
+
+      extrinsics = (await blocks).map((block) => block.extrinsics);
+    } 
+    catch (e) {
       console.log("Oops at:", Date.now());
+      console.log("Requests outstanding:", outstandingRequests);
       throw e;
     }
 
@@ -392,7 +459,7 @@ export default class Models {
       extrinsics[idx].blockNum = blockNum;
     });
 
-    console.log("connections:", currentConnections);
+    console.log("Requests outstanding:", outstandingRequests);
 
     return extrinsics;
   }
