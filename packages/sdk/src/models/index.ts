@@ -383,7 +383,12 @@ export default class Models {
           }:`
         );
 
-        chunkedExtrinsics[idx] = await this.indexTransferRecipients(0, 0, chunk, filter);
+        chunkedExtrinsics[idx] = await this.indexTransferRecipients(
+          0,
+          0,
+          chunk,
+          filter
+        );
         console.log(`Chunk ${idx}: extrinsics fetched at: ${Date.now()}`);
 
         return await chunkedExtrinsics[idx];
@@ -437,8 +442,10 @@ export default class Models {
         })
       );
       console.log(
-        (arbitrarySet || range)[0], "-",
-        (arbitrarySet || range)[chunkSize - 1], ","
+        (arbitrarySet || range)[0],
+        "-",
+        (arbitrarySet || range)[chunkSize - 1],
+        ","
       );
       console.log(" chunk sent at:", Date.now());
 
@@ -447,8 +454,7 @@ export default class Models {
       console.log("retrieved but not logged at:", Date.now());
 
       extrinsics = (await blocks).map((block) => block.extrinsics);
-    } 
-    catch (e) {
+    } catch (e) {
       console.log("Oops at:", Date.now());
       console.log("Requests outstanding:", outstandingRequests);
       throw e;
