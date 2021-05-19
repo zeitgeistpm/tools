@@ -29,7 +29,7 @@ import approveMarket from "./actions/approveMarket";
 import rejectMarket from "./actions/rejectMarket";
 import poolJoinWithExactAssetAmount from "./actions/poolJoinWithExactAssetAmount";
 import deployKusamaDerby from "./actions/deployKusamaDerby";
-import indexExtrinsicsUnstable from "./actions/doIndexyStuff";
+import indexExtrinsicsUnstable from "./actions/indexWinners";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
