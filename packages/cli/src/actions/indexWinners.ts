@@ -1,3 +1,4 @@
+import fs from "fs";
 import SDK, { util } from "@zeitgeistpm/sdk";
 import { hexToBn, isHex } from "@polkadot/util";
 
@@ -5,6 +6,7 @@ type Options = {
   marketId?: number;
   startBlock?: number;
   endBlock?: number;
+  outFile?: string;
   displayHashes?: boolean;
   endpoint: string;
 };
@@ -29,9 +31,29 @@ const spotPrice = {
 };
 
 const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
-  console.log("opts", opts);
+  console.log("options:", opts);
 
-  const { marketId, startBlock, endBlock, displayHashes, endpoint } = opts;
+  const {
+    marketId,
+    startBlock,
+    endBlock,
+    outFile,
+    displayHashes,
+    endpoint,
+  } = opts;
+
+  if (outFile) {
+    fs.promises
+      .access(outFile, fs.constants.W_OK)
+      .then(() => {
+        console.log(`WARNING! ${outFile} exists and will be overwritten.`);
+      })
+      .catch((err) => {
+        if (err.code !== "ENOENT") {
+          throw err;
+        }
+      });
+  }
 
   // eslint-disable-next-line
   let timer= Date.now();
@@ -286,19 +308,46 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   console.log(
     `completed at: ${Date.now()}: ${(Date.now() - timer) / 1000}s.\n`
   );
-  profit.forEach((player, idx) => {
-    console.log(`\nPLACED: ${idx + 1}...`);
-    if (player.profit) {
-      console.log(
-        `with total ${player.profit > 0 ? "WINNINGS" : "LOSSES"} of ${
-          player.profit / 1e10
-        } ZTG -`
+
+  // @ts-ignore
+  const lock = new Promise((resolve, reject) => {
+    let csvStream;
+    if (outFile) {
+      csvStream = fs.createWriteStream(outFile);
+      csvStream.write(
+        `"Player","ZTG received","Balances ZTG value","Profit"\n`
       );
+      csvStream.on("finish", resolve);
     } else {
-      console.log(`(BROKE EVEN)`);
+      resolve("No file output to await :)");
     }
-    console.log(`${player.player}`);
+
+    profit.forEach((player, idx) => {
+      console.log(`\nPLACED: ${idx + 1}...`);
+      if (player.profit) {
+        console.log(
+          `with total ${player.profit > 0 ? "WINNINGS" : "LOSSES"} of ${
+            player.profit / 1e10
+          } ZTG -`
+        );
+      } else {
+        console.log(`(BROKE EVEN)`);
+      }
+      console.log(`${player.player}`);
+
+      if (outFile) {
+        csvStream.write(
+          `${player.player},${player[`{"ztg":"null"}`] / 1e10},${
+            player.profit / 1e10
+          }\n`
+        );
+      }
+    });
+
+    csvStream.end();
   });
+
+  await lock;
 };
 
 export default indexExtrinsicsUnstable;

@@ -560,13 +560,15 @@ program
   .option("-m --marketId <number>")
   .option("-s --startBlock <number>")
   .option("-e --endBlock <number>")
+  .option("-o --outFile <string>")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((opts: { marketId; startBlock; endBlock; endpoint: string }) =>
-    catchErrorsAndExit(indexExtrinsicsUnstable, opts)
+  .action(
+    (opts: { marketId; startBlock; endBlock; outFile; endpoint: string }) =>
+      catchErrorsAndExit(indexExtrinsicsUnstable, opts)
   );
 
 program.parse(process.argv);
