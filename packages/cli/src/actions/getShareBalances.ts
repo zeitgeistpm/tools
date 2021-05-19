@@ -10,13 +10,9 @@ type Options = {
 
 const getShareBalances = async (opts: Options): Promise<void> => {
   //@ts-ignore
-  const { addressOrSeed, seed, MarketId, endpoint } = opts;
+  const { addressOrSeed, seed, marketId, endpoint } = opts;
   const assets: any = ["ztg"];
   let address, signer;
-
-  // this is crazy and I don't understand it :/
-  //@ts-ignore
-  const marketId = opts.marketId || MarketId;
 
   const sdk = await SDK.initialize(endpoint);
 
