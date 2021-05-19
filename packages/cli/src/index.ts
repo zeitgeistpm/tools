@@ -389,7 +389,7 @@ program
 
 program
   .command("getBalances <addressOrSeed>")
-  .option("-m -marketId <number>")
+  .option("-m --marketId <number>")
   .option("--endpoint <string>", "The endpoint URL of the API connection")
   .action(
     (addressOrSeed = "//Alice", opts: { marketId: number; endpoint: string }) =>
