@@ -1,5 +1,4 @@
-// import SDK, { util } from "@zeitgeistpm/sdk";
-import SDK, { util } from "../../../sdk/src";
+import SDK, { util } from "@zeitgeistpm/sdk";
 import { hexToBn, isHex } from "@polkadot/util";
 
 type Options = {
