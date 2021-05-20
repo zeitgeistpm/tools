@@ -1,3 +1,4 @@
+import { ApiPromise } from "@polkadot/api";
 import { initIpfs } from "./ipfs";
 import {
   initApi,
@@ -6,6 +7,7 @@ import {
   isValidAddress,
 } from "./polkadot";
 import { KeyringPairOrExtSigner, ExtSigner, AssetId } from "../types";
+import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
 export { initApi, initIpfs, signerFromSeed, unsubOrWarns, isValidAddress };
 
@@ -33,7 +35,40 @@ const tolerantJsonParse = (anything) => {
   }
 };
 
-export const AssetIdFromString = (stringAsset: string | AssetId): AssetId => {
+// Is stringAsset comparable to an outcome, ie is it already some kind of Asset (reference type)
+// TODO: test success and failure cases
+export const isAsset = (asset) => "isScalarOutcome" in asset;
+
+export const AssetTypeFromString = (
+  stringAsset: string | AssetId | Asset,
+  api?: ApiPromise
+): Asset => {
+  if (isAsset(stringAsset)) {
+    // @ts-ignore
+    return stringAsset;
+  }
+
+  if (!api) {
+    throw new Error(
+      "SDK must be initialised and an `api` passed in order to crate a reference type"
+    );
+  }
+  return api.createType("Asset", AssetIdFromString(stringAsset));
+};
+
+export const AssetIdFromString = (
+  stringAsset: string | AssetId | Asset,
+  api?: ApiPromise
+): Asset | AssetId => {
+  if (isAsset(stringAsset)) {
+    // @ts-ignore
+    return stringAsset;
+  }
+
+  if (api && api.createType) {
+    return AssetTypeFromString(stringAsset, api);
+  }
+
   // asset= ztg
   if (stringAsset === "ztg") {
     return { ztg: null };

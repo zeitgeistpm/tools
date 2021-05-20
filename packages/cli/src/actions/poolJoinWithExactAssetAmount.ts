@@ -22,8 +22,8 @@ const poolJoinWithExactAssetAmount = async (opts: Options): Promise<void> => {
   const res = await pool.poolJoinWithExactAssetAmount(
     signer,
     JSON.parse(assetIn),
-    assetAmount,
-    minPoolAmount
+    Number(assetAmount),
+    Number(minPoolAmount)
   );
 };
 

@@ -32,10 +32,10 @@ const swapExactAmountIn = async (opts: Options): Promise<void> => {
   const res = await pool.swapExactAmountIn(
     signer,
     assetIn,
-    assetAmountIn,
+    Number(assetAmountIn),
     assetOut,
-    minAmountOut,
-    maxPrice
+    Number(minAmountOut),
+    Number(maxPrice)
   );
   console.log(res);
 };

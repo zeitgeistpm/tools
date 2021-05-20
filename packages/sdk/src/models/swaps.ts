@@ -77,8 +77,8 @@ export default class Swap {
   }
 
   public async fetchPoolSpotPricesFromBlockNumbers(
-    inAsset: string | AssetId,
-    outAsset: string | AssetId,
+    inAsset: string | Asset | AssetId,
+    outAsset: string | Asset | AssetId,
     blockNumbers: number[]
   ): Promise<any> {
     const timer = Date.now();
@@ -96,8 +96,8 @@ export default class Swap {
   }
 
   public async fetchPoolSpotPrices(
-    inAsset: string | AssetId,
-    outAsset: string | AssetId,
+    inAsset: string | Asset | AssetId,
+    outAsset: string | Asset | AssetId,
     blockHashes: string[]
   ): Promise<any> {
     if (blockHashes) {
@@ -207,9 +207,9 @@ export default class Swap {
 
   poolJoinWithExactAssetAmount = async (
     signer: KeyringPairOrExtSigner,
-    assetIn: any,
-    assetAmount: any,
-    minPoolAmount: any,
+    assetIn: Asset,
+    assetAmount: number,
+    minPoolAmount: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     // Define the default callback if none is provided by the invoker of this function.
@@ -242,6 +242,66 @@ export default class Swap {
       assetIn,
       assetAmount,
       minPoolAmount
+    );
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
+  };
+
+  poolJoinWithExactPoolAmount = async (
+    signer: KeyringPairOrExtSigner,
+    assetIn: Asset,
+    PoolAmount: number,
+    maxAssetAmount: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    // Define the default callback if none is provided by the invoker of this function.
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
+      }
+    };
+
+    // Create the transaction type and supply it with the arguments.
+    const tx = this.api.tx.swaps.poolJoinWithExactAssetAmount(
+      this.poolId,
+      assetIn,
+      PoolAmount,
+      maxAssetAmount
     );
 
     return new Promise(async (resolve) => {
@@ -378,8 +438,8 @@ export default class Swap {
 
   exitPool = async (
     signer: KeyringPairOrExtSigner,
-    poolAmountIn: string,
-    minAmountsOut: string[],
+    poolAmountIn: number,
+    minAmountsOut: number[],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
@@ -433,13 +493,133 @@ export default class Swap {
     });
   };
 
+  poolExitWithExactAssetAmount = async (
+    signer: KeyringPairOrExtSigner,
+    assetOut: Asset,
+    assetAmount: number,
+    maxPoolAmount: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    // Define the default callback if none is provided by the invoker of this function.
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
+      }
+    };
+
+    // Create the transaction type and supply it with the arguments.
+    const tx = this.api.tx.swaps.poolExitWithExactAssetAmount(
+      this.poolId,
+      assetOut,
+      assetAmount,
+      maxPoolAmount
+    );
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
+  };
+
+  poolExitWithExactPoolAmount = async (
+    signer: KeyringPairOrExtSigner,
+    assetOut: Asset,
+    PoolAmount: number,
+    minAssetAmount: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    // Define the default callback if none is provided by the invoker of this function.
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
+      }
+    };
+
+    // Create the transaction type and supply it with the arguments.
+    const tx = this.api.tx.swaps.poolExitWithExactAssetAmount(
+      this.poolId,
+      assetOut,
+      PoolAmount,
+      minAssetAmount
+    );
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
+  };
+
   swapExactAmountIn = async (
     signer: KeyringPairOrExtSigner,
-    assetIn: string,
-    assetAmountIn: string,
-    assetOut: string,
-    minAmountOut: string,
-    maxPrice: string,
+    assetIn: string | Asset,
+    assetAmountIn: number,
+    assetOut: string | Asset,
+    minAmountOut: number,
+    maxPrice: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
@@ -498,11 +678,11 @@ export default class Swap {
 
   swapExactAmountOut = async (
     signer: KeyringPairOrExtSigner,
-    assetIn: string,
-    maxAmountIn: string,
-    assetOut: string,
-    assetAmountOut: string,
-    maxPrice: string,
+    assetIn: string | Asset,
+    maxAmountIn: number,
+    assetOut: string | Asset,
+    assetAmountOut: number,
+    maxPrice: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
