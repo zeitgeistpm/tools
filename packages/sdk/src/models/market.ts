@@ -11,7 +11,7 @@ import {
   MarketEnd,
   Report,
   MarketDispute,
-  AssetId,
+  AssetShortform,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
@@ -36,7 +36,7 @@ class Market {
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
-  public marketType: AssetId;
+  public marketType: AssetShortform;
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
@@ -77,6 +77,7 @@ class Market {
       description,
       metadataString,
       outcomeAssets,
+      poolId,
     } = market;
 
     this.creator = creator;
@@ -95,6 +96,7 @@ class Market {
     this.description = description;
     this.metadataString = metadataString;
     this.outcomeAssets = outcomeAssets;
+    this.poolId = poolId;
 
     this.api = api;
   }

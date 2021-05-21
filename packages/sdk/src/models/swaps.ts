@@ -1,8 +1,8 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
-import { KeyringPairOrExtSigner, AssetId, poolJoinOpts } from "../types";
-import { AssetIdFromString, isExtSigner, unsubOrWarns } from "../util";
+import { KeyringPairOrExtSigner, AssetShortform, poolJoinOpts } from "../types";
+import { AssetTypeFromString, isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces/index";
 // import { util } from "..";
 
@@ -54,8 +54,8 @@ export default class Swap {
     //@ts-ignore
     return this.api.rpc.swaps.getSpotPrice(
       this.poolId,
-      typeof inAsset === "string" ? AssetIdFromString(inAsset) : inAsset,
-      typeof outAsset === "string" ? AssetIdFromString(outAsset) : outAsset,
+      typeof inAsset === "string" ? AssetTypeFromString(inAsset) : inAsset,
+      typeof outAsset === "string" ? AssetTypeFromString(outAsset) : outAsset,
       blockHash
     );
   }
@@ -76,9 +76,21 @@ export default class Swap {
     return prices;
   }
 
+  public async fetchPoolSpotPricesFromBlockNumbersForgiving(
+    inAsset: string | Asset | AssetShortform,
+    outAsset: string | Asset | AssetShortform,
+    blockNumbers: number[]
+  ): Promise<any> {
+    return this.fetchPoolSpotPricesFromBlockNumbers(
+      AssetTypeFromString(inAsset),
+      AssetTypeFromString(outAsset),
+      blockNumbers
+    );
+  }
+
   public async fetchPoolSpotPricesFromBlockNumbers(
-    inAsset: string | Asset | AssetId,
-    outAsset: string | Asset | AssetId,
+    inAsset: Asset,
+    outAsset: Asset,
     blockNumbers: number[]
   ): Promise<any> {
     const timer = Date.now();
@@ -88,24 +100,32 @@ export default class Swap {
       )
     );
 
+    return this.fetchPoolSpotPrices(inAsset, outAsset, blockHashes);
+  }
+
+  public async fetchPoolSpotPricesForgiving(
+    inAsset: string | Asset | AssetShortform,
+    outAsset: string | Asset | AssetShortform,
+    blockHashes: string[]
+  ): Promise<any> {
     return this.fetchPoolSpotPrices(
-      AssetIdFromString(inAsset),
-      AssetIdFromString(outAsset),
+      AssetTypeFromString(inAsset),
+      AssetTypeFromString(outAsset),
       blockHashes
     );
   }
 
   public async fetchPoolSpotPrices(
-    inAsset: string | Asset | AssetId,
-    outAsset: string | Asset | AssetId,
+    inAsset: Asset,
+    outAsset: Asset,
     blockHashes: string[]
   ): Promise<any> {
     if (blockHashes) {
       //@ts-ignore
       return this.api.rpc.swaps.getSpotPrices(
         this.poolId,
-        AssetIdFromString(inAsset),
-        AssetIdFromString(outAsset),
+        inAsset,
+        outAsset,
         blockHashes
       );
     }
@@ -205,6 +225,22 @@ export default class Swap {
     });
   };
 
+  poolJoinWithExactAssetAmountForgiving = async (
+    signer: KeyringPairOrExtSigner,
+    assetIn: Asset | AssetShortform | string,
+    assetAmount: number,
+    minPoolAmount: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    return this.poolJoinWithExactAssetAmount(
+      signer,
+      AssetTypeFromString(assetIn),
+      assetAmount,
+      minPoolAmount,
+      callback
+    );
+  };
+
   poolJoinWithExactAssetAmount = async (
     signer: KeyringPairOrExtSigner,
     assetIn: Asset,
@@ -263,6 +299,22 @@ export default class Swap {
         });
       }
     });
+  };
+
+  poolJoinWithExactPoolAmountForgiving = async (
+    signer: KeyringPairOrExtSigner,
+    assetIn: Asset | AssetShortform | string,
+    PoolAmount: number,
+    maxAssetAmount: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    return this.poolJoinWithExactPoolAmount(
+      signer,
+      AssetTypeFromString(assetIn),
+      PoolAmount,
+      maxAssetAmount,
+      callback
+    );
   };
 
   poolJoinWithExactPoolAmount = async (
@@ -326,6 +378,7 @@ export default class Swap {
   };
 
   /** Three substrate join_pool_xxx functions in one
+   *  param types are forgiving
    */
   joinPoolMultifunc = async (
     signer: KeyringPairOrExtSigner,
@@ -371,8 +424,8 @@ export default class Swap {
       if (!areAllUndefined("poolAmount", "poolMax", "assetMin", "assetMax")) {
         throw new Error("Too many asset and pool bounds were specified.");
       }
-      if (areAllUndefined("assetId")) {
-        throw new Error("Missing assetId.");
+      if (areAllUndefined("asset")) {
+        throw new Error("Missing parameter: asset");
       }
 
       tx = this.api.tx.swaps.poolJoinWithExactAssetAmount(
@@ -382,20 +435,20 @@ export default class Swap {
         opts.bounds.poolMin
       );
     } else if (isLikeNum("poolAmount") && isLikeNum("assetMax")) {
-      // PoolJoinForMaxAsset, with assetId optional
+      // PoolJoinForMaxAsset, with asset optional
       if (!areAllUndefined("assetAmount", "poolMin", "poolMax", "assetMin")) {
         throw new Error("Too many asset and pool bounds were specified.");
       }
-      if (!areAllUndefined("assetId") && Array.isArray(opts.bounds.assetMax)) {
+      if (!areAllUndefined("asset") && Array.isArray(opts.bounds.assetMax)) {
         throw new Error("Too many asset maxima were specified.");
       } else if (
-        areAllUndefined("assetId") &&
+        areAllUndefined("asset") &&
         !Array.isArray(opts.bounds.assetMax)
       ) {
         opts.bounds.assetMax = [opts.bounds.assetMax];
       }
 
-      tx = areAllUndefined("assetId")
+      tx = areAllUndefined("asset")
         ? this.api.tx.swaps.poolJoin(
             this.poolId,
             opts.bounds.poolAmount,
@@ -410,7 +463,7 @@ export default class Swap {
     } else {
       console.log(opts.bounds);
       throw new Error(`Incorrect asset and pool bounds in params to joinPool. Valid combinations are:\n
-        poolId, assetId, bounds = { poolAmount, assetMax } \n
+        poolId, asset, bounds = { poolAmount, assetMax } \n
         poolId, bounds = { poolAmount, assetMax } \n
         poolId, bounds = { assetAmount, poolMin } \n`);
     }
@@ -493,6 +546,22 @@ export default class Swap {
     });
   };
 
+  poolExitWithExactAssetAmountForgiving = async (
+    signer: KeyringPairOrExtSigner,
+    assetOut: Asset | AssetShortform | string,
+    assetAmount: number,
+    maxPoolAmount: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    return this.poolExitWithExactAssetAmount(
+      signer,
+      AssetTypeFromString(assetOut),
+      assetAmount,
+      maxPoolAmount,
+      callback
+    );
+  };
+
   poolExitWithExactAssetAmount = async (
     signer: KeyringPairOrExtSigner,
     assetOut: Asset,
@@ -551,6 +620,22 @@ export default class Swap {
         });
       }
     });
+  };
+
+  poolExitWithExactPoolAmountForgiving = async (
+    signer: KeyringPairOrExtSigner,
+    assetOut: Asset | AssetShortform | string,
+    PoolAmount: number,
+    minAssetAmount: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    return this.poolExitWithExactPoolAmount(
+      signer,
+      AssetTypeFromString(assetOut),
+      PoolAmount,
+      minAssetAmount,
+      callback
+    );
   };
 
   poolExitWithExactPoolAmount = async (
@@ -613,11 +698,31 @@ export default class Swap {
     });
   };
 
+  swapExactAmountInForgiving = async (
+    signer: KeyringPairOrExtSigner,
+    assetIn: Asset | AssetShortform | string,
+    assetAmountIn: number,
+    assetOut: Asset | AssetShortform | string,
+    minAmountOut: number,
+    maxPrice: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    return this.swapExactAmountIn(
+      signer,
+      AssetTypeFromString(assetIn),
+      assetAmountIn,
+      AssetTypeFromString(assetOut),
+      minAmountOut,
+      maxPrice,
+      callback
+    );
+  };
+
   swapExactAmountIn = async (
     signer: KeyringPairOrExtSigner,
-    assetIn: string | Asset,
+    assetIn: Asset,
     assetAmountIn: number,
-    assetOut: string | Asset,
+    assetOut: Asset,
     minAmountOut: number,
     maxPrice: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -648,9 +753,9 @@ export default class Swap {
 
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
-      AssetIdFromString(assetIn),
+      AssetTypeFromString(assetIn),
       assetAmountIn,
-      AssetIdFromString(assetOut),
+      AssetTypeFromString(assetOut),
       minAmountOut,
       maxPrice
     );
@@ -676,11 +781,31 @@ export default class Swap {
     });
   };
 
+  swapExactAmountOutForgiving = async (
+    signer: KeyringPairOrExtSigner,
+    assetIn: Asset | AssetShortform | string,
+    maxAmountIn: number,
+    assetOut: Asset | AssetShortform | string,
+    assetAmountOut: number,
+    maxPrice: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    return this.swapExactAmountOut(
+      signer,
+      AssetTypeFromString(assetIn),
+      maxAmountIn,
+      AssetTypeFromString(assetOut),
+      assetAmountOut,
+      maxPrice,
+      callback
+    );
+  };
+
   swapExactAmountOut = async (
     signer: KeyringPairOrExtSigner,
-    assetIn: string | Asset,
+    assetIn: Asset,
     maxAmountIn: number,
-    assetOut: string | Asset,
+    assetOut: Asset,
     assetAmountOut: number,
     maxPrice: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -711,9 +836,9 @@ export default class Swap {
 
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
-      AssetIdFromString(assetIn),
+      AssetTypeFromString(assetIn),
       maxAmountIn,
-      AssetIdFromString(assetOut),
+      AssetTypeFromString(assetOut),
       assetAmountOut,
       maxPrice
     );

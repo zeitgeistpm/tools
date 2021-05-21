@@ -6,7 +6,7 @@ import {
   unsubOrWarns,
   isValidAddress,
 } from "./polkadot";
-import { KeyringPairOrExtSigner, ExtSigner, AssetId } from "../types";
+import { KeyringPairOrExtSigner, ExtSigner, AssetShortform } from "../types";
 import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
 export { initApi, initIpfs, signerFromSeed, unsubOrWarns, isValidAddress };
@@ -37,10 +37,13 @@ const tolerantJsonParse = (anything) => {
 
 // Is stringAsset comparable to an outcome, ie is it already some kind of Asset (reference type)
 // TODO: test success and failure cases
-export const isAsset = (asset) => typeof asset === "object" && "isScalarOutcome" in asset;
+export const isAsset = (asset) =>
+  typeof asset === "object" &&
+  !Array.isArray(asset) &&
+  "isScalarOutcome" in asset;
 
 export const AssetTypeFromString = (
-  stringAsset: string | AssetId | Asset,
+  stringAsset: string | AssetShortform | Asset,
   api?: ApiPromise
 ): Asset => {
   if (isAsset(stringAsset)) {
@@ -53,13 +56,13 @@ export const AssetTypeFromString = (
       "SDK must be initialised and an `api` passed in order to crate a reference type"
     );
   }
-  return api.createType("Asset", AssetIdFromString(stringAsset));
+  return api.createType("Asset", AssetShortformFromString(stringAsset));
 };
 
-export const AssetIdFromString = (
-  stringAsset: string | AssetId | Asset,
+const AssetShortformFromString = (
+  stringAsset: string | AssetShortform | Asset,
   api?: ApiPromise
-): Asset | AssetId => {
+): Asset | AssetShortform => {
   if (isAsset(stringAsset)) {
     // @ts-ignore
     return stringAsset;
@@ -82,7 +85,7 @@ export const AssetIdFromString = (
     }
   }
 
-  // asset= [x,y] | [x,'Long'|'Short'] | AssetId
+  // asset= [x,y] | [x,'Long'|'Short'] | AssetShortform
   const asset =
     typeof stringAsset === "string"
       ? tolerantJsonParse(stringAsset)
@@ -109,7 +112,7 @@ export const AssetIdFromString = (
     return { categoricalOutcome: asset.map(Number) };
   }
 
-  // function accepts valid AssetId as well as string, so let's cover those
+  // input was valid AssetShortform
   if (typeof asset === "object" && !Array.isArray(asset)) {
     if (asset.ztg === null) {
       return { ztg: null };

@@ -25,7 +25,7 @@ type categoricalOutcomeIndex = [number, number];
 
 type scalarOutcomeIndex = [number, "Long" | "Short"];
 
-export type AssetId =
+export type AssetShortform =
   | CategoricalOutcome
   | ScalarOutcome
   | {
@@ -65,6 +65,7 @@ export type ExtendedMarketResponse = {
   description: string;
   metadataString: string;
   outcomeAssets: Asset[];
+  poolId?: number | null;
 };
 
 // The extended market data from which a market may be created.
@@ -86,6 +87,7 @@ export type FilteredMarketResponse = {
   description?: string;
   metadataString?: string;
   outcomeAssets?: Asset[];
+  poolId?: number | null;
 };
 
 export type Report = {
@@ -105,7 +107,7 @@ export type MarketDispute = {
 };
 
 export type PoolResponse = {
-  assets: string[] | AssetId[];
+  assets: string[] | AssetShortform[];
   swap_fee: number;
   total_weight: number;
   weights: any; // { string => number } TODO how to do repr this in TS?
@@ -157,15 +159,15 @@ export type poolExitBounds = PoolExitForMinAsset | PoolExitForMaxPool;
 
 export type PoolId = number;
 
-export type AssetIdStringForTempCompatibility = string;
+export type AssetForgiving = Asset | AssetShortform | string;
 
 export type poolJoinOpts = {
-  asset?: AssetIdStringForTempCompatibility;
+  asset?: AssetForgiving;
   bounds: poolJoinBounds;
 };
 
 export type poolExitOpts = {
-  asset?: AssetIdStringForTempCompatibility;
+  asset?: AssetForgiving;
   bounds: poolExitBounds;
 };
 

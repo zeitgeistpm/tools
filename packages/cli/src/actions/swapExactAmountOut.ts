@@ -31,9 +31,9 @@ const swapExactAmountOut = async (opts: Options): Promise<void> => {
   const pool = await sdk.models.fetchPoolData(poolId);
   const res = await pool.swapExactAmountOut(
     signer,
-    assetIn,
+    util.AssetTypeFromString(assetIn),
     Number(maxAmountIn),
-    assetOut,
+    util.AssetTypeFromString(assetOut),
     Number(assetAmountOut),
     Number(maxPrice)
   );

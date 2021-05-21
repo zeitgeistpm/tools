@@ -45,7 +45,7 @@ const getShareBalance = async (opts: Options): Promise<void> => {
       ? await sdk.api.query.system.account(address).then((res) => res.data)
       : await sdk.api.query.tokens.accounts(
           address,
-          util.AssetIdFromString(asset)
+          util.AssetTypeFromString(asset)
         );
 
   console.log("", data.toHuman());
