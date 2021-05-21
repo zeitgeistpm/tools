@@ -5,7 +5,7 @@ import {
   MarketType,
   Outcome,
 } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
-import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
+import { Asset, Address } from "@zeitgeistpm/types/dist/interfaces/index";
 
 // Just a market identifier.
 export type MarketId = number;
@@ -174,3 +174,5 @@ export type poolExitOpts = {
 export type ExtSigner = { address: string; signer: Signer };
 
 export type KeyringPairOrExtSigner = KeyringPair | ExtSigner;
+
+export type BlockHash = string;

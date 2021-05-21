@@ -1,9 +1,14 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
-import { KeyringPairOrExtSigner, AssetShortform, poolJoinOpts } from "../types";
+import {
+  KeyringPairOrExtSigner,
+  AssetShortform,
+  poolJoinOpts,
+  BlockHash,
+} from "../types";
 import { AssetTypeFromString, isExtSigner, unsubOrWarns } from "../util";
-import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces/index";
+import { Asset, Pool, Address } from "@zeitgeistpm/types/dist/interfaces/index";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
@@ -44,7 +49,7 @@ export default class Swap {
     inAsset: string | Asset,
     outAsset: string | Asset,
     blockHash?: any
-  ): Promise<any> => {
+  ): Promise<number> => {
     if (!blockHash) {
       blockHash = await this.api.rpc.chain.getBlockHash();
     }
@@ -59,7 +64,7 @@ export default class Swap {
   };
 
   assetSpotPricesInZtg = async (
-    blockHash?: any
+    blockHash?: BlockHash
   ): Promise<{ [key: string]: string }> => {
     const prices = {};
     for (const asset of this.assets) {
@@ -105,18 +110,18 @@ export default class Swap {
     }
   };
 
-  sharesId = async (): Promise<any> => {
+  sharesId = async (): Promise<Asset> => {
     //@ts-ignore
     const res = await this.api.rpc.swaps.poolSharesId(this.poolId);
 
     return res;
   };
 
-  accountId = async (): Promise<any> => {
+  accountId = async (): Promise<Address> => {
     //@ts-ignore
     const res = await this.api.rpc.swaps.poolAccountId(this.poolId);
 
-    return res;
+    return res as Address;
   };
 
   // /// Unimplemented:
@@ -629,8 +634,8 @@ export default class Swap {
     getSpotPrice: async (
       inAsset: Asset | AssetShortform | string,
       outAsset: Asset | AssetShortform | string,
-      blockHash?: any
-    ): Promise<any> =>
+      blockHash?: string
+    ): Promise<number> =>
       this.getSpotPrice(
         AssetTypeFromString(inAsset),
         AssetTypeFromString(outAsset),
