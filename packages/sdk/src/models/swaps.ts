@@ -4,7 +4,6 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { KeyringPairOrExtSigner, AssetShortform, poolJoinOpts } from "../types";
 import { AssetTypeFromString, isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces/index";
-// import { util } from "..";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
@@ -622,7 +621,6 @@ export default class Swap {
       }
     });
   };
-
 
   /**
    * Wrappers for functions in this class, which are more forgiving of type in the parameters accepted
