@@ -43,8 +43,8 @@ export default class Swap {
   }
 
   public async getSpotPrice(
-    inAsset: Asset,
-    outAsset: Asset,
+    inAsset: string | Asset,
+    outAsset: string | Asset,
     blockHash?: any
   ): Promise<any> {
     if (!blockHash) {
@@ -54,10 +54,8 @@ export default class Swap {
     //@ts-ignore
     return this.api.rpc.swaps.getSpotPrice(
       this.poolId,
-      // AssetIdFromString(inAsset),
-      // AssetIdFromString(outAsset),
-      inAsset,
-      outAsset,
+      typeof inAsset === "string" ? AssetIdFromString(inAsset) : inAsset,
+      typeof outAsset === "string" ? AssetIdFromString(outAsset) : outAsset,
       blockHash
     );
   }
@@ -279,11 +277,22 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
     /// Quick helpers for readability
@@ -378,11 +387,22 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
 
@@ -427,19 +447,30 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
 
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
-      assetIn,
+      AssetIdFromString(assetIn),
       assetAmountIn,
-      assetOut,
+      AssetIdFromString(assetOut),
       minAmountOut,
       maxPrice
     );
@@ -479,19 +510,30 @@ export default class Swap {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
       }
     };
 
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
-      assetIn,
+      AssetIdFromString(assetIn),
       maxAmountIn,
-      assetOut,
+      AssetIdFromString(assetOut),
       assetAmountOut,
       maxPrice
     );

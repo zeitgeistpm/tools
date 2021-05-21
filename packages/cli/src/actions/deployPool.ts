@@ -36,10 +36,16 @@ const deployPool = async (opts: Options): Promise<void> => {
   }
 
   const res = await market.deploySwapPool(signer, wts);
+  const poolId = await market.getPoolId();
 
   console.log(res);
+  if (poolId !== null) {
+    console.log(
+      `Canonical pool for market ${marketId} deployed - pool ID: ${poolId}`
+    );
+  }
 
-  process.exit(0);
+  // process.exit(0);
 };
 
 export default deployPool;

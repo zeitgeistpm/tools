@@ -22,11 +22,17 @@ import Swap from "./swaps";
 
 export { Market, Swap };
 
+type Options = {
+  MAX_RPC_REQUESTS?: number;
+};
+
 export default class Models {
   private api: ApiPromise;
+  MAX_RPC_REQUESTS: number;
 
-  constructor(api: ApiPromise) {
+  constructor(api: ApiPromise, opts: Options = {}) {
     this.api = api;
+    this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
   }
 
   /**
@@ -315,5 +321,152 @@ export default class Models {
       priceData = { ...priceData, ...assetPrices };
     }
     return priceData;
+  }
+
+  async getBlockData(blockHash?: any): Promise<any> {
+    console.log(blockHash.toString());
+
+    const data = await this.api.rpc.chain.getBlock(blockHash);
+    console.log(data);
+    return data;
+  }
+
+  async indexTransferRecipients(
+    startBlock = 0,
+    endBlock?: number,
+    arbitrarySet?: number[],
+    filter?: any
+  ): Promise<any[]> {
+    const index = {};
+    const head = this.api.rpc.chain.getHeader();
+    console.log([...Array(endBlock)]);
+
+    let outstandingRequests = 0;
+    let extrinsics = [];
+
+    const range = [
+      ...Array(
+        Number(endBlock) || (await (await head).number.toNumber())
+      ).keys(),
+    ].slice(startBlock || 0);
+    if (arbitrarySet) {
+      console.log(arbitrarySet);
+    } else {
+      console.log(`${startBlock} to ${endBlock}`);
+      console.log(range);
+    }
+
+    const chunkSize = (arbitrarySet || range).length;
+    console.log(`...makes ${chunkSize} blocks`);
+
+    let timer = Date.now();
+
+    if (chunkSize > this.MAX_RPC_REQUESTS) {
+      const chunks = [];
+      const whole = arbitrarySet ? [...arbitrarySet] : range;
+
+      console.log(
+        `Blocks exceed MAX_RPC_REQUESTS (${this.MAX_RPC_REQUESTS}). Chunking at: ${timer}`
+      );
+
+      while (whole.length) {
+        chunks.push(whole.splice(0, this.MAX_RPC_REQUESTS));
+      }
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      const chunkedExtrinsics: any[] = chunks.map((_) => new Promise(() => {}));
+
+      const outerTrigger = chunks.reduce(async (trigger, chunk, idx) => {
+        await trigger;
+        console.log(
+          `Chunk ${idx}: ${idx * this.MAX_RPC_REQUESTS}-${
+            (idx + 1) * this.MAX_RPC_REQUESTS - 1
+          }:`
+        );
+
+        chunkedExtrinsics[idx] = await this.indexTransferRecipients(
+          0,
+          0,
+          chunk,
+          filter
+        );
+        console.log(`Chunk ${idx}: extrinsics fetched at: ${Date.now()}`);
+
+        return await chunkedExtrinsics[idx];
+      }, chunks[0]);
+
+      // Native Array.flat requires TS lib: "es2019" || "es2019.array" which conflict with ipfs-core-types
+      const arrayFlat1 = (arr) => arr.reduce((a, b) => a.concat(b), []);
+
+      await outerTrigger;
+
+      console.log(`All extrinsics fetched at ${Date.now}`);
+
+      const result = Promise.all(arrayFlat1(chunkedExtrinsics));
+      return await result;
+    }
+
+    console.log("beginning retrieval at:", Date.now());
+
+    try {
+      const blockHashes = await Promise.all(
+        (arbitrarySet || range).map((block, idx) => {
+          outstandingRequests++;
+          if (Date.now() - timer > 30000) {
+            console.log(`Progress: ${idx}/${chunkSize}`);
+            timer = Date.now();
+          }
+          return this.api.rpc.chain.getBlockHash(block);
+        })
+      );
+
+      outstandingRequests = 0;
+      timer = Date.now();
+      const blocks = Promise.all(
+        blockHashes.map((hash, idx) => {
+          outstandingRequests++;
+          if (Date.now() - timer > 30000) {
+            console.log(`Progress: ${idx}`);
+            timer = Date.now();
+          }
+
+          try {
+            return this.api.rpc.chain
+              .getBlock(hash)
+              .then((block) => block.block);
+          } catch (e) {
+            console.log("Oops at:", Date.now());
+            console.log(hash);
+
+            console.log("Requests outstanding:", outstandingRequests);
+          }
+        })
+      );
+      console.log(
+        (arbitrarySet || range)[0],
+        "-",
+        (arbitrarySet || range)[chunkSize - 1],
+        ","
+      );
+      console.log(" chunk sent at:", Date.now());
+
+      await blocks;
+      outstandingRequests = 0;
+      console.log("retrieved but not logged at:", Date.now());
+
+      extrinsics = (await blocks).map((block) => block.extrinsics);
+    } catch (e) {
+      console.log("Oops at:", Date.now());
+      console.log("Requests outstanding:", outstandingRequests);
+      throw e;
+    }
+
+    (arbitrarySet || range).forEach((blockNum, idx) => {
+      //@ts-ignore
+      extrinsics[idx].blockNum = blockNum;
+    });
+
+    console.log("Requests outstanding:", outstandingRequests);
+
+    return extrinsics;
   }
 }

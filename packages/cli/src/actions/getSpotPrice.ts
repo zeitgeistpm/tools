@@ -13,11 +13,16 @@ const getSpotPrice = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
-  const pool = await sdk.models.fetchPoolData(Number(poolId));
-  //@ts-ignore
-  const price = await pool.getSpotPrice(assetIn, assetOut, blockHash);
+  const AssetIn = sdk.api.createType("Asset", util.AssetIdFromString(assetIn));
+  const AssetOut = sdk.api.createType(
+    "Asset",
+    util.AssetIdFromString(assetOut)
+  );
 
-  console.log(price.toString());
+  const pool = await sdk.models.fetchPoolData(Number(poolId));
+  const price = await pool.getSpotPrice(AssetIn, AssetOut, blockHash);
+
+  console.log(`${price}`);
 };
 
 export default getSpotPrice;

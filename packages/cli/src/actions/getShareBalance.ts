@@ -48,7 +48,7 @@ const getShareBalance = async (opts: Options): Promise<void> => {
           util.AssetIdFromString(asset)
         );
 
-  console.log("", data.toJSON());
+  console.log("", data.toHuman());
 };
 
 export default getShareBalance;

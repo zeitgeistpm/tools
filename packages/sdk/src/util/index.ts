@@ -27,7 +27,6 @@ export const isExtSigner = (
 
 const tolerantJsonParse = (anything) => {
   try {
-    console.log(JSON.parse(anything));
     return JSON.parse(anything);
   } catch (e) {
     throw new Error("asset was not ztg, poolX or valid JSON");
