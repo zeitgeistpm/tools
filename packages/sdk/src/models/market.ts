@@ -53,6 +53,8 @@ class Market {
   public metadataString: string;
   /** The share identifiers */
   public outcomeAssets: Asset[];
+  /** The poolId of market's canonical pool, null if none, undefined if unknown */
+  public poolId: number | null | undefined;
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
@@ -144,25 +146,28 @@ class Market {
   }
 
   getPoolId = async (): Promise<number | null> => {
-    return (
+    this.poolId = (
       await this.api.query.predictionMarkets.marketToSwapPool(this.marketId)
     ).toHuman() as number;
+    return this.poolId;
   };
 
   getPool = async (): Promise<Swap | null> => {
-    const poolId = await this.getPoolId();
-    if (poolId == null) {
+    this.poolId = await this.getPoolId();
+    if (this.poolId == null) {
       return null;
     }
 
-    if (poolId == null) {
+    if (this.poolId == null) {
       return null;
     }
 
-    const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
+    const pool = (await this.api.query.swaps.pools(
+      this.poolId
+    )) as Option<Pool>;
 
     if (pool.isSome) {
-      return new Swap(poolId, pool.unwrap(), this.api);
+      return new Swap(this.poolId, pool.unwrap(), this.api);
     }
     return null;
   };
@@ -178,8 +183,8 @@ class Market {
     weights: string[],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> => {
-    const poolId = await this.getPoolId();
-    if (poolId) {
+    this.poolId = await this.getPoolId();
+    if (this.poolId) {
       throw new Error("Pool already exists for this market.");
     }
 

@@ -18,7 +18,9 @@ const viewMarket = async (opts: Options): Promise<void> => {
   }
 
   const market = await sdk.models.fetchMarketData(Number(marketId));
+  const poolId = market.getPoolId();
   console.log(market.toJSONString());
+  console.log(`Pool Id: `, await poolId);
 };
 
 export default viewMarket;

@@ -37,7 +37,7 @@ const tolerantJsonParse = (anything) => {
 
 // Is stringAsset comparable to an outcome, ie is it already some kind of Asset (reference type)
 // TODO: test success and failure cases
-export const isAsset = (asset) => "isScalarOutcome" in asset;
+export const isAsset = (asset) => typeof asset === "object" && "isScalarOutcome" in asset;
 
 export const AssetTypeFromString = (
   stringAsset: string | AssetId | Asset,
