@@ -101,13 +101,13 @@ class Market {
     this.api = api;
   }
 
-  toJSONString(): string {
+  toJSONString = (): string => {
     const market = Object.assign({}, this);
     delete market.api;
     return JSON.stringify(market, null, 2);
-  }
+  };
 
-  toFilteredJSONString(filter?: string[] | null): string {
+  toFilteredJSONString = (filter?: string[] | null): string => {
     const market = Object.assign({}, this);
     delete market.api;
     if (!filter) {
@@ -115,7 +115,7 @@ class Market {
     } else {
       return JSON.stringify(Market.filterMarketData(market, filter), null, 2);
     }
-  }
+  };
 
   static filterMarketData(
     market: ExtendedMarketResponse | MarketResponse | Market,
@@ -135,7 +135,7 @@ class Market {
     return res;
   }
 
-  async getEndTimestamp(): Promise<number> {
+  getEndTimestamp = async (): Promise<number> => {
     if ("timestamp" in this.end) {
       return this.end.timestamp;
     }
@@ -145,7 +145,7 @@ class Market {
     const blockNum = head.number.toNumber();
     const diffInMs = 6000 * (this.end.block - blockNum);
     return now + diffInMs;
-  }
+  };
 
   getPoolId = async (): Promise<number | null> => {
     this.poolId = (
@@ -270,9 +270,9 @@ class Market {
     });
   };
 
-  async assetSpotPricesInZtg(
+  assetSpotPricesInZtg = async (
     blockHash?: any
-  ): Promise<{ [key: string]: string }> {
+  ): Promise<{ [key: string]: string }> => {
     const pool = await this.getPool();
     if (!pool) {
       return null;
@@ -282,13 +282,13 @@ class Market {
     }
 
     return pool.assetSpotPricesInZtg(blockHash);
-  }
+  };
 
-  async buyCompleteSet(
+  buyCompleteSet = async (
     signer: KeyringPairOrExtSigner,
     amount: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<string> {
+  ): Promise<string> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -330,13 +330,13 @@ class Market {
           );
       }
     });
-  }
+  };
 
-  async sellCompleteSet(
+  sellCompleteSet = async (
     signer: KeyringPairOrExtSigner,
     amount: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<string> {
+  ): Promise<string> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -378,13 +378,13 @@ class Market {
           );
       }
     });
-  }
+  };
 
-  async reportOutcome(
+  reportOutcome = async (
     signer: KeyringPairOrExtSigner,
     outcome: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<string> {
+  ): Promise<string> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -428,13 +428,13 @@ class Market {
           );
       }
     });
-  }
+  };
 
-  async dispute(
+  dispute = async (
     signer: KeyringPairOrExtSigner,
     outcome: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<string> {
+  ): Promise<string> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -478,12 +478,12 @@ class Market {
           );
       }
     });
-  }
+  };
 
-  async redeemShares(
+  redeemShares = async (
     signer: KeyringPairOrExtSigner,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> {
+  ): Promise<boolean> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
@@ -527,12 +527,12 @@ class Market {
           );
       }
     });
-  }
+  };
 
-  async approve(
+  approve = async (
     signer: KeyringPairOrExtSigner,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<string> {
+  ): Promise<string> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -579,12 +579,12 @@ class Market {
         );
       }
     });
-  }
+  };
 
-  async reject(
+  reject = async (
     signer: KeyringPairOrExtSigner,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<string> {
+  ): Promise<string> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -631,12 +631,12 @@ class Market {
         );
       }
     });
-  }
+  };
 
-  async cancelAdvised(
+  cancelAdvised = async (
     signer: KeyringPairOrExtSigner,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<string> {
+  ): Promise<string> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -680,7 +680,7 @@ class Market {
           );
       }
     });
-  }
+  };
 }
 
 export default Market;
