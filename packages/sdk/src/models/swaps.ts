@@ -50,8 +50,8 @@ export default class Swap {
   };
 
   getSpotPrice = async (
-    inAsset: Asset | string,
-    outAsset: Asset | string,
+    inAsset: Asset,
+    outAsset: Asset,
     blockHash?: any
   ): Promise<number> => {
     if (!blockHash) {
@@ -76,7 +76,11 @@ export default class Swap {
         continue;
       }
       //@ts-ignore
-      const price = await this.getSpotPrice({ ztg: null }, asset, blockHash);
+      const price = await this.getSpotPrice(
+        util.AssetTypeFromString("ztg", this.api),
+        asset,
+        blockHash
+      );
       prices[asset.toString()] = Number(price.toString());
     }
 
