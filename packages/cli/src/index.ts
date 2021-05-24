@@ -55,8 +55,13 @@ program
 program
   .command("createMarket <title> <description> <oracle> <end>")
   .option(
-    "--advised",
+    "-a --advised",
     "Create Advised market instead of Permissionless market",
+    false
+  )
+  .option(
+    "-s --scalar [range...]",
+    "Create Scalar market instead of Categorical market",
     false
   )
   .option(
@@ -85,12 +90,18 @@ program
         seed: string;
         categories: string[];
         advised: boolean;
+        scalar: string[];
         timestamp: boolean;
       }
     ) =>
       catchErrorsAndExit(
         createMarket,
-        Object.assign(opts, { title, description, oracle, end })
+        Object.assign(opts, {
+          title,
+          description,
+          oracle,
+          end,
+        })
       )
   );
 

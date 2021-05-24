@@ -62,6 +62,8 @@ export default class Models {
     return Promise.all(ids.map((id) => this.fetchMarketData(id)));
   }
 
+  createNewMarket = this.createNewCategoricalMarket;
+
   /**
    * Creates a new market with the given parameters. Returns the `marketId` that can be used
    * to get the full data via `sdk.models.fetchMarket(marketId)`.
@@ -72,7 +74,7 @@ export default class Models {
    * @param end Ending block or the ending unix timestamp of the market.
    * @param creationType "Permissionless" or "Advised"
    */
-  async createNewMarket(
+  async createNewCategoricalMarket(
     signer: KeyringPairOrExtSigner,
     title: string,
     description: string,
@@ -141,6 +143,83 @@ export default class Models {
             creationType,
             categories.length
           )
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
+  }
+
+  /**
+   * Creates a new scalar market with the given parameters. Returns the `marketId` that can be used
+   * to get the full data via `sdk.models.fetchMarket(marketId)`.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param title The title of the new prediction market.
+   * @param description The description / extra information for the market.
+   * @param oracle The address that will be responsible for reporting the market.
+   * @param end Ending block or the ending unix timestamp of the market.
+   * @param creationType "Permissionless" or "Advised"
+   * @param range outcome range as number[2], used for calculating redemption value.
+   */
+  async createNewScalarMarket(
+    signer: KeyringPairOrExtSigner,
+    title: string,
+    description: string,
+    oracle: string,
+    end: MarketEnd,
+    creationType = "Advised",
+    range: number[],
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> {
+    const ipfs = initIpfs();
+
+    const { cid } = await ipfs.add({
+      content: JSON.stringify({
+        title,
+        description,
+        range,
+      }),
+    });
+
+    return new Promise(async (resolve) => {
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
+
+        if (status.isInBlock) {
+          console.log(`Transaction included at blockHash ${status.asInBlock}`);
+
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+            if (method == "MarketCreated") {
+              _resolve(data[0].toString());
+            } else if (method == "ExtrinsicFailed") {
+              console.log("Extrinsic failed");
+              _resolve("");
+            }
+
+            unsubOrWarns(_unsub);
+          });
+        }
+      };
+
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .createScalarMarket(oracle, end, cid.toString(), creationType, range)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .createScalarMarket(oracle, end, cid.toString(), creationType, range)
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)

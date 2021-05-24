@@ -1,4 +1,5 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+// import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK, { util } from "../../../sdk/src";
 
 type Options = {
   endpoint: string;
@@ -8,6 +9,7 @@ type Options = {
   end: string;
   categories?: string[];
   advised: boolean;
+  scalar: string[];
   seed: string;
   timestamp: boolean;
 };
@@ -20,6 +22,7 @@ const createMarket = async (opts: Options): Promise<void> => {
     end,
     categories,
     advised,
+    scalar,
     endpoint,
     seed,
     timestamp,
@@ -27,8 +30,9 @@ const createMarket = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
-  const signer = util.signerFromSeed(seed);
-  console.log("Sending transaction from", signer.address);
+  const marketEnd = timestamp
+    ? { timestamp: Number(end) }
+    : { block: Number(end) };
 
   if (categories && !(categories.length > 1)) {
     if (categories.length === 1) {
@@ -50,23 +54,68 @@ const createMarket = async (opts: Options): Promise<void> => {
     );
   }
 
-  const marketEnd = timestamp
-    ? { timestamp: Number(end) }
-    : { block: Number(end) };
+  if (scalar) {
+    if (scalar.length !== 2 || scalar.map(Number).some(isNaN)) {
+      if (scalar.length === 0 || !Array.isArray(scalar)) {
+        console.log(
+          "A range must be provided for a scalar market. If the eventual resolved answer falls outside of this range either the Long or Short outcome token will be redeemable for exactly 1 ZTG. If it falls within, then both will redeemable for part of 1 ZTG."
+        );
+        throw new Error("No range was provided to create scalar market.");
+      }
+      if (scalar.length === 1) {
+        if (scalar[0] === "calar") {
+          console.log(
+            "Did you use the right number of dashes (-s or --scalar) ?"
+          );
+        }
+        console.log(
+          "-s / --scalar is an optional multiparameter argument and should be passed after mandatory arguments.\n"
+        );
+      }
+      console.log(
+        scalar.length,
+        scalar,
+        scalar.map(Number),
+        scalar.map(Number).some(isNaN)
+      );
 
-  const marketId = await sdk.models.createNewMarket(
-    signer,
-    title,
-    description,
-    oracle,
-    marketEnd,
-    advised ? "Advised" : "Permissionless",
-    categories && categories.length > 1 ? categories : ["Yes", "No"]
-  );
+      throw new Error(
+        "A range specified by exactly two numbers (bottom and top) must be provided to create scalar market."
+      );
+    }
+    if (categories) {
+      console.log(
+        "Categories cannot be specified for a scalar market. The outcomes Long and Short will be used."
+      );
+    }
+  }
 
-  console.log(`Market created! Market Id: ${marketId}`);
+  const signer = util.signerFromSeed(seed);
+  console.log("Sending transaction from", signer.address);
 
-  process.exit(0);
+  const marketId = scalar
+    ? await sdk.models.createNewScalarMarket(
+        signer,
+        title,
+        description,
+        oracle,
+        marketEnd,
+        advised ? "Advised" : "Permissionless",
+        scalar.map(Number)
+      )
+    : await sdk.models.createNewCategoricalMarket(
+        signer,
+        title,
+        description,
+        oracle,
+        marketEnd,
+        advised ? "Advised" : "Permissionless",
+        categories && categories.length > 1 ? categories : ["Yes", "No"]
+      );
+
+  if (marketId) {
+    console.log(`Market created! Market Id: ${marketId}`);
+  }
 };
 
 export default createMarket;
