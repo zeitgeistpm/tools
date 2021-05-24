@@ -28,6 +28,9 @@ import viewDisputes from "./actions/viewDisputes";
 import approveMarket from "./actions/approveMarket";
 import rejectMarket from "./actions/rejectMarket";
 import poolJoinWithExactAssetAmount from "./actions/poolJoinWithExactAssetAmount";
+import poolJoinWithExactPoolAmount from "./actions/poolJoinWithExactPoolAmount";
+import poolExitWithExactAssetAmount from "./actions/poolExitWithExactAssetAmount";
+import poolExitWithExactPoolAmount from "./actions/poolExitWithExactPoolAmount";
 import deployKusamaDerby from "./actions/deployKusamaDerby";
 import indexExtrinsicsUnstable from "./actions/indexWinners";
 
@@ -294,6 +297,78 @@ program
       catchErrorsAndExit(
         poolJoinWithExactAssetAmount,
         Object.assign(opts, { poolId, assetIn, assetAmount, minPoolAmount })
+      )
+  );
+
+program
+  .command(
+    "poolJoinWithExactPoolAmount <poolId> <assetIn> <poolAmount> <maxAssetAmount>"
+  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action(
+    (
+      poolId: number,
+      assetIn: string,
+      poolAmount: string,
+      maxAssetAmount: string,
+      opts: { seed: string; endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        poolJoinWithExactAssetAmount,
+        Object.assign(opts, { poolId, assetIn, poolAmount, maxAssetAmount })
+      )
+  );
+
+program
+  .command(
+    "poolExitWithExactAssetAmount <poolId> <assetIn> <assetAmount> <maxPoolAmount>"
+  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action(
+    (
+      poolId: number,
+      assetOut: string,
+      assetAmount: string,
+      maxPoolAmount: string,
+      opts: { seed: string; endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        poolExitWithExactAssetAmount,
+        Object.assign(opts, { poolId, assetOut, assetAmount, maxPoolAmount })
+      )
+  );
+
+program
+  .command(
+    "poolExitWithExactPoolAmount <poolId> <assetIn> <poolAmount> <maxAssetAmount>"
+  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action(
+    (
+      poolId: number,
+      assetOut: string,
+      poolAmount: string,
+      maxAssetAmount: string,
+      opts: { seed: string; endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        poolExitWithExactPoolAmount,
+        Object.assign(opts, { poolId, assetOut, poolAmount, maxAssetAmount })
       )
   );
 

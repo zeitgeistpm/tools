@@ -9,7 +9,11 @@ type Options = {
 };
 
 const exitPool = async (opts: Options): Promise<void> => {
-  const { endpoint, amountIn, amountOut, poolId, seed } = opts;
+  const { endpoint, seed, poolId, amountIn, amountOut, ...bounds } = opts;
+  const trimmedBounds = {
+    poolAmount: Number(amountIn),
+    assetMin: amountOut.split(",").map(Number),
+  };
 
   const sdk = await SDK.initialize(endpoint);
 
@@ -19,8 +23,8 @@ const exitPool = async (opts: Options): Promise<void> => {
   const pool = await sdk.models.fetchPoolData(poolId);
   const res = await pool.exitPool(
     signer,
-    Number(amountIn),
-    amountOut.split(",").map(Number)
+    trimmedBounds.poolAmount,
+    trimmedBounds.assetMin
   );
   console.log(res);
 };

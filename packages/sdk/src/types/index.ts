@@ -140,7 +140,7 @@ interface PoolExitForMinAsset extends PoolJoinOrExitIncomplete {
   assetAmount?: never;
   poolMin?: never;
   assetMax?: never;
-  assetMin: number;
+  assetMin: number | number[];
   poolMax?: never;
 }
 

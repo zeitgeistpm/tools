@@ -5,6 +5,7 @@ import {
   KeyringPairOrExtSigner,
   AssetShortform,
   poolJoinOpts,
+  poolExitOpts,
   BlockHash,
 } from "../types";
 import { AssetTypeFromString, isExtSigner, unsubOrWarns } from "../util";
@@ -150,8 +151,8 @@ export default class Swap {
 
   joinPool = async (
     signer: KeyringPairOrExtSigner,
-    poolAmountOut: string,
-    maxAmountsIn: string[],
+    poolAmountOut: number,
+    maxAmountsIn: number[],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<boolean> => {
     const _callback = (
@@ -807,6 +808,21 @@ export default class Swap {
       });
     },
 
+    poolExitWithExactAssetAmount: async (
+      signer: KeyringPairOrExtSigner,
+      assetOut: Asset | AssetShortform | string,
+      assetAmount: number,
+      maxPoolAmount: number,
+      callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    ): Promise<boolean> =>
+      this.poolExitWithExactAssetAmount(
+        signer,
+        AssetTypeFromString(assetOut),
+        assetAmount,
+        maxPoolAmount,
+        callback
+      ),
+
     poolExitWithExactPoolAmount: async (
       signer: KeyringPairOrExtSigner,
       assetOut: Asset | AssetShortform | string,
@@ -821,6 +837,118 @@ export default class Swap {
         minAssetAmount,
         callback
       ),
+
+    /** Three substrate join_pool_xxx functions in one
+     *  param types are forgiving
+     */
+    exitPoolMultifunc: async (
+      signer: KeyringPairOrExtSigner,
+      opts: poolExitOpts,
+      callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    ): Promise<boolean> => {
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: boolean | PromiseLike<boolean>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
+        console.log("status:", status.toHuman());
+
+        if (status.isInBlock) {
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+            if (method == "ExtrinsicSuccess") {
+              unsubOrWarns(_unsub);
+              _resolve(true);
+            }
+            if (method == "ExtrinsicFailed") {
+              unsubOrWarns(_unsub);
+              _resolve(false);
+            }
+          });
+        }
+      };
+      /// Quick helpers for readability
+      const isLikeNum = (param) => {
+        const p = opts.bounds[param];
+        return (
+          typeof p === "number" ||
+          (Array.isArray(p) && typeof p[0] === "number")
+        );
+      };
+      const areAllUndefined = (...params) =>
+        params.every((param) => typeof opts.bounds[param] === "undefined");
+      let tx;
+
+      if (isLikeNum("poolAmount") && isLikeNum("assetMin")) {
+        // PoolExitForMinAsset, with asset optional
+        if (!areAllUndefined("assetAmount", "poolMax", "poolMin", "assetMax")) {
+          throw new Error("Too many asset and pool bounds were specified.");
+        }
+        if (
+          areAllUndefined("asset") &&
+          !Array.isArray(opts.bounds.assetMin)
+        ) {
+          opts.bounds.assetMin = [opts.bounds.assetMin];
+        }
+        tx = areAllUndefined("asset")
+          ? this.api.tx.swaps.poolExit(
+              this.poolId,
+              opts.bounds.poolAmount,
+              opts.bounds.assetMin
+            )
+          : this.api.tx.swaps.poolExitWithExactPoolAmount(
+          this.poolId,
+          opts.asset,
+          opts.bounds.poolAmount,
+          opts.bounds.assetMin
+        );
+      } else if (isLikeNum("assetAmount") && isLikeNum("poolMax")) {
+        // PoolExitForMaxPool
+        if (!areAllUndefined("poolAmount", "poolMin", "assetMax", "assetMin")) {
+          throw new Error("Too many asset and pool bounds were specified.");
+        }
+        if (!areAllUndefined("asset") && Array.isArray(opts.bounds.assetMin)) {
+          throw new Error("Too many asset maxima were specified.");
+        } else 
+        if (areAllUndefined("asset")) {
+          throw new Error("Missing parameter: asset");
+        }
+        tx = this.api.tx.swaps.poolExitWithExactAssetAmount(
+            this.poolId,
+            opts.asset,
+            opts.bounds.assetAmount,
+            opts.bounds.poolMax
+          );
+      } else {
+        console.log(opts.bounds);
+        throw new Error(`Incorrect asset and pool bounds in params to exitPool. Valid combinations are:\n
+          poolId, asset, bounds = { poolAmount, assetMin } \n
+          poolId, bounds = { poolAmount, assetMin } \n
+          poolId, bounds = { assetAmount, poolMax } \n`);
+      }
+
+      return new Promise(async (resolve) => {
+        if (isExtSigner(signer)) {
+          const unsub = await tx.signAndSend(
+            signer.address,
+            { signer: signer.signer },
+            (result) => {
+              callback
+                ? callback(result, unsub)
+                : _callback(result, resolve, unsub);
+            }
+          );
+        } else {
+          const unsub = await tx.signAndSend(signer, (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          });
+        }
+      });
+    },
 
     swapExactAmountIn: async (
       signer: KeyringPairOrExtSigner,

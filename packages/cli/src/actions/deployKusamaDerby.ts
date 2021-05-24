@@ -56,17 +56,7 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
       "80000000000",
     ]);
     const pool = await market.getPool();
-    await pool.joinPool(signer, "4000000000000", [
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-    ]);
+    await pool.joinPool(signer, 4000000000000, Array(9).fill(8000000000000));
   }
 };
 

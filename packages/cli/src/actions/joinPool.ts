@@ -29,7 +29,11 @@ const joinPool = async (opts: Options): Promise<void> => {
   /* @ts-ignore */
   const res =
     (sdkJoinPoolFunctionToUse as any) === "joinPool"
-      ? await pool.joinPool(signer, amountOut, amountIn.split(","))
+      ? await pool.joinPool(
+          signer,
+          trimmedBounds.poolAmount,
+          trimmedBounds.assetMax
+        )
       : await pool.forgiving.joinPoolMultifunc(signer, {
           bounds: trimmedBounds as any,
         });
