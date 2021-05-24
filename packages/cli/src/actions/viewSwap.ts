@@ -11,14 +11,22 @@ const viewSwap = async (opts: Options): Promise<void> => {
   const sdk = await SDK.initialize(endpoint);
 
   const market = await sdk.models.fetchMarketData(Number(marketId));
-  const swapId = await market.getPoolId();
+  const poolId = await market.getPoolId();
 
-  if (swapId != 0 && !swapId) {
-    throw new Error("Swap for this market does not exist.");
+  if (poolId != 0 && !poolId) {
+    throw new Error(`Market ${marketId} has no canonical swap pool.`);
   }
 
-  const swap = await sdk.models.fetchPoolData(swapId);
-  console.log(swap.toJSONString());
+  const pool = await sdk.models.fetchPoolData(poolId);
+  const [sharesId, poolAccountId] = await Promise.all([
+    pool.sharesId(),
+    pool.accountId(),
+  ]);
+  console.log(`Pool asset type name: ${sharesId}`);
+  console.log(
+    `poolAccountId: ${poolAccountId} - do not send funds directly to this address!`
+  );
+  console.log(pool.toJSONString());
 };
 
 export default viewSwap;

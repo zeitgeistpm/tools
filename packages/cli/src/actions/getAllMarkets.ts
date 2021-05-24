@@ -13,7 +13,9 @@ const getAllMarkets = async (opts: Options): Promise<void> => {
   // supress output of endpoint initialisation timer, which confuses |jq '.'
   const sdk = await SDK.initialize(endpoint, { logEndpointInitTime: false });
 
-  const res = await sdk.models.getAllMarkets();
+  const res = (await sdk.models.getAllMarkets()).sort(
+    (a, b) => a.marketId - b.marketId
+  );
 
   // Check -f has arguments (since otherwise filter==true)
   if (Array.isArray(filter)) {

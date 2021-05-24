@@ -392,7 +392,9 @@ export default class Models {
   }
 
   async assetSpotPricesInZtg(blockHash?: any): Promise<any> {
-    const markets = await this.getAllMarkets();
+    const markets = (await this.getAllMarkets()).sort(
+      (a, b) => a.marketId - b.marketId
+    );
     let priceData = {};
 
     for (const market of markets) {

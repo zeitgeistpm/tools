@@ -44,6 +44,8 @@ export default class Swap {
   toJSONString = (): string => {
     const swap = Object.assign({}, this);
     delete swap.api;
+    delete swap.forgiving;
+    delete swap.strict;
     return JSON.stringify(swap, null, 2);
   };
 
@@ -628,6 +630,11 @@ export default class Swap {
       }
     });
   };
+
+  /**
+   * Future library of functions in this class, which will be accessed by default the more forgiving wrappers.
+   */
+  strict = {};
 
   /**
    * Wrappers for functions in this class, which are more forgiving of type in the parameters accepted
