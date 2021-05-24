@@ -182,7 +182,7 @@ class Market {
 
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
-    weights: string[],
+    weights: number[],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> => {
     this.poolId = await this.getPoolId();
@@ -272,7 +272,7 @@ class Market {
 
   assetSpotPricesInZtg = async (
     blockHash?: any
-  ): Promise<{ [key: string]: string }> => {
+  ): Promise<{ [key: string]: number | null }> => {
     const pool = await this.getPool();
     if (!pool) {
       return null;

@@ -17,8 +17,8 @@ import { Asset, Pool, Address } from "@zeitgeistpm/types/dist/interfaces/index";
  */
 export default class Swap {
   public assets: Asset[];
-  public swapFee: string;
-  public totalWeight: string;
+  public swapFee: number;
+  public totalWeight: number;
   public weights;
   public poolId: number;
 
@@ -29,8 +29,8 @@ export default class Swap {
     const { assets, swap_fee, total_weight, weights } = details;
 
     this.assets = assets;
-    this.swapFee = swap_fee.toString();
-    this.totalWeight = total_weight.toString();
+    this.swapFee = Number(swap_fee.toString());
+    this.totalWeight = Number(total_weight.toString());
     this.weights = weights;
 
     this.poolId = poolId;
@@ -46,9 +46,10 @@ export default class Swap {
     delete swap.api;
     return JSON.stringify(swap, null, 2);
   };
+
   getSpotPrice = async (
-    inAsset: string | Asset,
-    outAsset: string | Asset,
+    inAsset: Asset | string,
+    outAsset: Asset | string,
     blockHash?: any
   ): Promise<number> => {
     if (!blockHash) {
@@ -66,7 +67,7 @@ export default class Swap {
 
   assetSpotPricesInZtg = async (
     blockHash?: BlockHash
-  ): Promise<{ [key: string]: string }> => {
+  ): Promise<{ [key: string]: number | null }> => {
     const prices = {};
     for (const asset of this.assets) {
       if (asset.isZtg) {
@@ -74,7 +75,7 @@ export default class Swap {
       }
       //@ts-ignore
       const price = await this.getSpotPrice({ ztg: null }, asset, blockHash);
-      prices[asset.toString()] = price.toString();
+      prices[asset.toString()] = Number(price.toString());
     }
 
     return prices;
@@ -132,7 +133,7 @@ export default class Swap {
   // createPool = async (
   //   signer: KeyringPairOrExtSigner,
   //   assets: string[],
-  //   weights?: string[],
+  //   weights?: number[],
   //   callback?: (result: ISubmittableResult, _unsub: () => void) => void
   // ): Promise<string> => {
   //     if (assets.length !== weights.length) {
@@ -886,10 +887,7 @@ export default class Swap {
         if (!areAllUndefined("assetAmount", "poolMax", "poolMin", "assetMax")) {
           throw new Error("Too many asset and pool bounds were specified.");
         }
-        if (
-          areAllUndefined("asset") &&
-          !Array.isArray(opts.bounds.assetMin)
-        ) {
+        if (areAllUndefined("asset") && !Array.isArray(opts.bounds.assetMin)) {
           opts.bounds.assetMin = [opts.bounds.assetMin];
         }
         tx = areAllUndefined("asset")
@@ -899,11 +897,11 @@ export default class Swap {
               opts.bounds.assetMin
             )
           : this.api.tx.swaps.poolExitWithExactPoolAmount(
-          this.poolId,
-          opts.asset,
-          opts.bounds.poolAmount,
-          opts.bounds.assetMin
-        );
+              this.poolId,
+              opts.asset,
+              opts.bounds.poolAmount,
+              opts.bounds.assetMin
+            );
       } else if (isLikeNum("assetAmount") && isLikeNum("poolMax")) {
         // PoolExitForMaxPool
         if (!areAllUndefined("poolAmount", "poolMin", "assetMax", "assetMin")) {
@@ -911,16 +909,15 @@ export default class Swap {
         }
         if (!areAllUndefined("asset") && Array.isArray(opts.bounds.assetMin)) {
           throw new Error("Too many asset maxima were specified.");
-        } else 
-        if (areAllUndefined("asset")) {
+        } else if (areAllUndefined("asset")) {
           throw new Error("Missing parameter: asset");
         }
         tx = this.api.tx.swaps.poolExitWithExactAssetAmount(
-            this.poolId,
-            opts.asset,
-            opts.bounds.assetAmount,
-            opts.bounds.poolMax
-          );
+          this.poolId,
+          opts.asset,
+          opts.bounds.assetAmount,
+          opts.bounds.poolMax
+        );
       } else {
         console.log(opts.bounds);
         throw new Error(`Incorrect asset and pool bounds in params to exitPool. Valid combinations are:\n
