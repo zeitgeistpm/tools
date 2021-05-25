@@ -41,7 +41,6 @@ export default class SDK {
       return pallet;
     });
 
-    console.log(errors);
     this.model.errors = errors;
     return errors;
   };
