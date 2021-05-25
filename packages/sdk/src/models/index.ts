@@ -26,9 +26,10 @@ type Options = {
   MAX_RPC_REQUESTS?: number;
 };
 
-export default class Models {
-  private api: ApiPromise;
+export default class Model {
   MAX_RPC_REQUESTS: number;
+  private api: ApiPromise;
+  errors: any;
 
   constructor(api: ApiPromise, opts: Options = {}) {
     this.api = api;

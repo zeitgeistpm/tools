@@ -16,7 +16,7 @@ const viewSpotPrices = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
-  const pool = await sdk.models.fetchPoolData(Number(poolId));
+  const pool = await sdk.model.fetchPoolData(Number(poolId));
 
   if (displayWeights) {
     console.log(pool.weights);

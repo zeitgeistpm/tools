@@ -12,7 +12,7 @@ const getAssetsPrices = async (opts: Options): Promise<void> => {
 
   const blockHash = block ? await sdk.api.rpc.chain.getBlockHash(block) : null;
 
-  const res = await sdk.models.assetSpotPricesInZtg(blockHash);
+  const res = await sdk.model.assetSpotPricesInZtg(blockHash);
 
   if (block) {
     console.log("Block:", block);

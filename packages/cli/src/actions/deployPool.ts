@@ -15,7 +15,7 @@ const deployPool = async (opts: Options): Promise<void> => {
   const signer = util.signerFromSeed(seed);
   console.log("Sending transaction from", signer.address);
 
-  const market = await sdk.models.fetchMarketData(marketId);
+  const market = await sdk.model.fetchMarketData(marketId);
   const { outcomeAssets } = market;
 
   let wts = [];

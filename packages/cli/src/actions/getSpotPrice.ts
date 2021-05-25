@@ -1,5 +1,4 @@
-// import SDK, { util } from "@zeitgeistpm/sdk";
-import SDK, { util } from "../../../sdk/src";
+import SDK, { util } from "@zeitgeistpm/sdk";
 
 type Options = {
   assetIn: string;
@@ -13,12 +12,12 @@ const getSpotPrice = async (opts: Options): Promise<void> => {
   const { endpoint, poolId, assetIn, assetOut, blockHash } = opts;
 
   const sdk = await SDK.initialize(endpoint);
-  const pool = await sdk.models.fetchPoolData(Number(poolId));
+  const pool = await sdk.model.fetchPoolData(Number(poolId));
 
   const accountId = await pool.accountId();
   const price = await pool.getSpotPrice(
-    util.AssetTypeFromString(assetIn, sdk.api),
-    util.AssetTypeFromString(assetOut, sdk.api),
+    util.assetTypeFromString(assetIn, sdk.api),
+    util.assetTypeFromString(assetOut, sdk.api),
     blockHash
   );
 

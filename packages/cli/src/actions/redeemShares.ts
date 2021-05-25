@@ -13,7 +13,7 @@ const redeemShares = async (opts: Options): Promise<void> => {
 
   const signer = util.signerFromSeed(seed);
 
-  const market = await sdk.models.fetchMarketData(Number(marketId));
+  const market = await sdk.model.fetchMarketData(Number(marketId));
   const res = await market.redeemShares(signer);
 
   console.log(res);

@@ -13,7 +13,7 @@ import {
   MarketDispute,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
-import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
+import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
 /**

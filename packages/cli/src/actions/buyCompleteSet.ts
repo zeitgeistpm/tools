@@ -17,7 +17,7 @@ const buyCompleteSet = async (opts: Options): Promise<void> => {
     `Buy complete set of ${amount} market ${marketId} outcomes for ${signer.address} on network ${endpoint}`
   );
 
-  const market = await sdk.models.fetchMarketData(Number(marketId));
+  const market = await sdk.model.fetchMarketData(Number(marketId));
   const res = await market.buyCompleteSet(signer, Number(amount));
 
   if (res) {

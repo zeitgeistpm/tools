@@ -13,7 +13,7 @@ const countMarkets = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
-  const res = await sdk.models.getMarketCount();
+  const res = await sdk.model.getMarketCount();
 
   console.log(res);
 };

@@ -10,14 +10,14 @@ const viewSwap = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
-  const market = await sdk.models.fetchMarketData(Number(marketId));
+  const market = await sdk.model.fetchMarketData(Number(marketId));
   const poolId = await market.getPoolId();
 
   if (poolId != 0 && !poolId) {
     throw new Error(`Market ${marketId} has no canonical swap pool.`);
   }
 
-  const pool = await sdk.models.fetchPoolData(poolId);
+  const pool = await sdk.model.fetchPoolData(poolId);
   const [sharesId, poolAccountId] = await Promise.all([
     pool.sharesId(),
     pool.accountId(),

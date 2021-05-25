@@ -18,7 +18,7 @@ const transfer = async (opts: Options): Promise<void> => {
 
   //   const signer = util.signerFromSeed(seed);
 
-  //   const res = await sdk.models.shares.shareTransfer(
+  //   const res = await sdk.model.shares.shareTransfer(
   //     signer,
   //     Number(marketId),
   //     Number(sharesIndex),

@@ -6,7 +6,7 @@ import {
   unsubOrWarns,
   isValidAddress,
 } from "./polkadot";
-import { KeyringPairOrExtSigner, ExtSigner, AssetShortform } from "../types";
+import { KeyringPairOrExtSigner, ExtSigner, assetShortform } from "../types";
 import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
 export { initApi, initIpfs, signerFromSeed, unsubOrWarns, isValidAddress };
@@ -43,7 +43,7 @@ export const isAsset = (asset) =>
   "isScalarOutcome" in asset;
 
 export const assetTypeFromString = (
-  stringAsset: string | AssetShortform | Asset,
+  stringAsset: string | assetShortform | Asset,
   api?: ApiPromise
 ): Asset => {
   if (isAsset(stringAsset)) {
@@ -60,9 +60,9 @@ export const assetTypeFromString = (
 };
 
 const assetShortformFromString = (
-  stringAsset: string | AssetShortform | Asset,
+  stringAsset: string | assetShortform | Asset,
   api?: ApiPromise
-): Asset | AssetShortform => {
+): Asset | assetShortform => {
   if (isAsset(stringAsset)) {
     // @ts-ignore
     return stringAsset;
@@ -85,7 +85,7 @@ const assetShortformFromString = (
     }
   }
 
-  // asset= [x,y] | [x,'Long'|'Short'] | AssetShortform
+  // asset= [x,y] | [x,'Long'|'Short'] | assetShortform
   const asset =
     typeof stringAsset === "string"
       ? tolerantJsonParse(stringAsset)
@@ -112,7 +112,7 @@ const assetShortformFromString = (
     return { categoricalOutcome: asset.map(Number) };
   }
 
-  // input was valid AssetShortform
+  // input was valid assetShortform
   if (typeof asset === "object" && !Array.isArray(asset)) {
     if (asset.ztg === null) {
       return { ztg: null };

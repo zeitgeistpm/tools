@@ -3,7 +3,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import {
   KeyringPairOrExtSigner,
-  AssetShortform,
+  assetShortform,
   poolJoinOpts,
   poolExitOpts,
   BlockHash,
@@ -645,8 +645,8 @@ export default class Swap {
    */
   forgiving = {
     getSpotPrice: async (
-      inAsset: Asset | AssetShortform | string,
-      outAsset: Asset | AssetShortform | string,
+      inAsset: Asset | assetShortform | string,
+      outAsset: Asset | assetShortform | string,
       blockHash?: string
     ): Promise<number> =>
       this.getSpotPrice(
@@ -656,8 +656,8 @@ export default class Swap {
       ),
 
     fetchPoolSpotPricesFromBlockNumbers: async (
-      inAsset: Asset | AssetShortform | string,
-      outAsset: Asset | AssetShortform | string,
+      inAsset: Asset | assetShortform | string,
+      outAsset: Asset | assetShortform | string,
       blockNumbers: number[]
     ): Promise<any> =>
       this.fetchPoolSpotPricesFromBlockNumbers(
@@ -667,8 +667,8 @@ export default class Swap {
       ),
 
     fetchPoolSpotPrices: async (
-      inAsset: Asset | AssetShortform | string,
-      outAsset: Asset | AssetShortform | string,
+      inAsset: Asset | assetShortform | string,
+      outAsset: Asset | assetShortform | string,
       blockHashes: string[]
     ): Promise<any> =>
       this.fetchPoolSpotPrices(
@@ -679,7 +679,7 @@ export default class Swap {
 
     poolJoinWithExactAssetAmount: async (
       signer: KeyringPairOrExtSigner,
-      assetIn: Asset | AssetShortform | string,
+      assetIn: Asset | assetShortform | string,
       assetAmount: number,
       minPoolAmount: number,
       callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -694,7 +694,7 @@ export default class Swap {
 
     poolJoinWithExactPoolAmount: async (
       signer: KeyringPairOrExtSigner,
-      assetIn: Asset | AssetShortform | string,
+      assetIn: Asset | assetShortform | string,
       PoolAmount: number,
       maxAssetAmount: number,
       callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -822,7 +822,7 @@ export default class Swap {
 
     poolExitWithExactAssetAmount: async (
       signer: KeyringPairOrExtSigner,
-      assetOut: Asset | AssetShortform | string,
+      assetOut: Asset | assetShortform | string,
       assetAmount: number,
       maxPoolAmount: number,
       callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -837,7 +837,7 @@ export default class Swap {
 
     poolExitWithExactPoolAmount: async (
       signer: KeyringPairOrExtSigner,
-      assetOut: Asset | AssetShortform | string,
+      assetOut: Asset | assetShortform | string,
       PoolAmount: number,
       minAssetAmount: number,
       callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -960,9 +960,9 @@ export default class Swap {
 
     swapExactAmountIn: async (
       signer: KeyringPairOrExtSigner,
-      assetIn: Asset | AssetShortform | string,
+      assetIn: Asset | assetShortform | string,
       assetAmountIn: number,
-      assetOut: Asset | AssetShortform | string,
+      assetOut: Asset | assetShortform | string,
       minAmountOut: number,
       maxPrice: number,
       callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -979,9 +979,9 @@ export default class Swap {
 
     swapExactAmountOut: async (
       signer: KeyringPairOrExtSigner,
-      assetIn: Asset | AssetShortform | string,
+      assetIn: Asset | assetShortform | string,
       maxAmountIn: number,
-      assetOut: Asset | AssetShortform | string,
+      assetOut: Asset | assetShortform | string,
       assetAmountOut: number,
       maxPrice: number,
       callback?: (result: ISubmittableResult, _unsub: () => void) => void

@@ -17,7 +17,7 @@ const poolExitWithExactAssetAmount = async (opts: Options): Promise<void> => {
   const signer = util.signerFromSeed(seed);
   console.log("Sending transaction from", signer.address);
 
-  const pool = await sdk.models.fetchPoolData(poolId);
+  const pool = await sdk.model.fetchPoolData(poolId);
 
   const res = await pool.poolExitWithExactAssetAmount(
     signer,

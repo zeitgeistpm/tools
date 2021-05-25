@@ -17,7 +17,7 @@ const viewMarket = async (opts: Options): Promise<void> => {
     address = address || util.signerFromSeed(seed).address;
   }
 
-  const market = await sdk.models.fetchMarketData(Number(marketId));
+  const market = await sdk.model.fetchMarketData(Number(marketId));
   const poolId = market.getPoolId();
   console.log(market.toJSONString());
   console.log(`Pool Id: `, await poolId);

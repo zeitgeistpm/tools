@@ -17,7 +17,7 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
   // first deploy new markets
   const marketIds = [];
   for (let i = 0; i < 3; i++) {
-    const marketId = await sdk.models.createNewMarket(
+    const marketId = await sdk.model.createNewMarket(
       signer,
       `kusama-derby-test-${i}`,
       "test descriptions",
@@ -42,7 +42,7 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
   console.log(marketIds);
 
   for (const marketId of marketIds) {
-    const market = await sdk.models.fetchMarketData(marketId);
+    const market = await sdk.model.fetchMarketData(marketId);
     await market.buyCompleteSet(signer, "5000000000000" as any);
     await market.deploySwapPool(
       signer,

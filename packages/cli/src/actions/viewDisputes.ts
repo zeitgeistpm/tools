@@ -10,7 +10,7 @@ const viewDisputes = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
-  const disputes = await sdk.models.fetchDisputes(Number(marketId));
+  const disputes = await sdk.model.fetchDisputes(Number(marketId));
 
   console.log(disputes);
 };

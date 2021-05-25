@@ -64,7 +64,7 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   const outcomeAssets =
     marketId === undefined
       ? []
-      : sdk.models.fetchMarketData(Number(marketId)).then((marketData) => {
+      : sdk.model.fetchMarketData(Number(marketId)).then((marketData) => {
           if (marketData.report === null) {
             throw new Error(
               `Market ${marketId} exists, with marketStatus ${marketData.marketStatus} but is not reported.`
@@ -92,7 +92,7 @@ const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   console.log("blockHash received at ", Date.now());
   console.log("blockHash", blockHash.toString());
 
-  const res = await sdk.models.indexTransferRecipients(
+  const res = await sdk.model.indexTransferRecipients(
     startBlock || 0,
     endBlock,
     arbitrarySet

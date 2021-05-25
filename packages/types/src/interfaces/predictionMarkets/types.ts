@@ -29,7 +29,7 @@ export interface MarketCreation extends Enum {
 export interface MarketDispute extends Struct {
   readonly at: BlockNumber;
   readonly by: AccountId;
-  readonly outcome: OutcOutcomeReportome;
+  readonly outcome: OutcomeReport;
 }
 
 /** @name MarketEnd */

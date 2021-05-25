@@ -28,12 +28,12 @@ const swapExactAmountIn = async (opts: Options): Promise<void> => {
   const signer = util.signerFromSeed(seed);
   console.log("Sending transaction from", signer.address);
 
-  const pool = await sdk.models.fetchPoolData(poolId);
+  const pool = await sdk.model.fetchPoolData(poolId);
   const res = await pool.swapExactAmountIn(
     signer,
-    util.AssetTypeFromString(assetIn),
+    util.assetTypeFromString(assetIn),
     Number(assetAmountIn),
-    util.AssetTypeFromString(assetOut),
+    util.assetTypeFromString(assetOut),
     Number(minAmountOut),
     Number(maxPrice)
   );

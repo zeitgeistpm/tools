@@ -9,7 +9,7 @@ const getAllMarketIds = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint);
 
-  const res = await sdk.models.getAllMarketIds();
+  const res = await sdk.model.getAllMarketIds();
 
   console.log(res);
 };

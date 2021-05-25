@@ -45,7 +45,7 @@ const getShareBalances = async (opts: Options): Promise<void> => {
   if (marketId) {
     console.log("Fetching outcome assets for market", marketId);
 
-    const market = await sdk.models.fetchMarketData(Number(marketId));
+    const market = await sdk.model.fetchMarketData(Number(marketId));
     const poolId = await market.getPoolId();
 
     market.outcomeAssets.forEach((marketAsset) => {
@@ -63,7 +63,7 @@ const getShareBalances = async (opts: Options): Promise<void> => {
         ? await sdk.api.query.system.account(address).then((res) => res.data)
         : await sdk.api.query.tokens.accounts(
             address,
-            util.AssetTypeFromString(asset)
+            util.assetTypeFromString(asset)
           );
 
     console.log(

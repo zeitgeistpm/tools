@@ -3,7 +3,7 @@ import { Signer } from "@polkadot/types/types";
 import {
   Market,
   MarketType,
-  Outcome,
+  OutcomeReport,
 } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
 import { Asset, Address } from "@zeitgeistpm/types/dist/interfaces/index";
 
@@ -25,7 +25,7 @@ type categoricalOutcomeIndex = [number, number];
 
 type scalarOutcomeIndex = [number, "Long" | "Short"];
 
-export type AssetShortform =
+export type assetShortform =
   | CategoricalOutcome
   | ScalarOutcome
   | {
@@ -93,7 +93,7 @@ export type FilteredMarketResponse = {
 export type Report = {
   at: number;
   by: string;
-  outcome: Outcome;
+  outcome: OutcomeReport;
 };
 
 export type MarketEnd = { block: number } | { timestamp: number };
@@ -103,11 +103,11 @@ export type MarketCreation = "Permissioned" | "Advised";
 export type MarketDispute = {
   at: number;
   by: string;
-  outcome: Outcome;
+  outcome: OutcomeReport;
 };
 
 export type PoolResponse = {
-  assets: string[] | AssetShortform[];
+  assets: string[] | assetShortform[];
   swap_fee: number;
   total_weight: number;
   weights: any; // { string => number } TODO how to do repr this in TS?
@@ -159,7 +159,7 @@ export type poolExitBounds = PoolExitForMinAsset | PoolExitForMaxPool;
 
 export type PoolId = number;
 
-export type AssetForgiving = Asset | AssetShortform | string;
+export type AssetForgiving = Asset | assetShortform | string;
 
 export type poolJoinOpts = {
   asset?: AssetForgiving;

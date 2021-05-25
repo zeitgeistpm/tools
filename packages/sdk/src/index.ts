@@ -1,14 +1,14 @@
 import { ApiPromise } from "@polkadot/api";
-import Models from "./models";
+import Model from "./models";
 import { initApi } from "./util";
 
 export * as consts from "./consts";
-export * as models from "./models";
+export * as model from "./models";
 export * as types from "./types";
 export * as util from "./util";
 export default class SDK {
   public api: ApiPromise;
-  public models: Models;
+  public model: Model;
 
   static async initialize(
     endpoint = "wss://bp-rpc.zeitgeist.pm",
@@ -20,8 +20,31 @@ export default class SDK {
       console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
     }
 
-    return new SDK(api);
+    const sdk = new SDK(api);
+    await sdk.populateErrors();
+    return sdk;
   }
+
+  populateErrors = async (): Promise<any> => {
+    const metadata = await this.api.rpc.state.getMetadata();
+    const inner = metadata.get("metadata");
+    // @ts-ignore
+    const errors = inner.toJSON().v12.modules.map((module) => {
+      const { name, errors, index } = module;
+      const pallet = errors.length
+        ? errors.map((error, errorIndex) => ({
+            name: error.name,
+            documentation: error.documentation,
+          }))
+        : [];
+      pallet.name = name;
+      return pallet;
+    });
+
+    console.log(errors);
+    this.model.errors = errors;
+    return errors;
+  };
 
   static mock(mockedAPI): SDK {
     return new SDK(mockedAPI as any);
@@ -29,6 +52,6 @@ export default class SDK {
 
   constructor(api: ApiPromise) {
     this.api = api;
-    this.models = new Models(this.api);
+    this.model = new Model(this.api);
   }
 }

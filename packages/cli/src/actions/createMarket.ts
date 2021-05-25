@@ -93,7 +93,7 @@ const createMarket = async (opts: Options): Promise<void> => {
   console.log("Sending transaction from", signer.address);
 
   const marketId = scalar
-    ? await sdk.models.createNewScalarMarket(
+    ? await sdk.model.createNewScalarMarket(
         signer,
         title,
         description,
@@ -102,7 +102,7 @@ const createMarket = async (opts: Options): Promise<void> => {
         advised ? "Advised" : "Permissionless",
         scalar.map(Number)
       )
-    : await sdk.models.createNewCategoricalMarket(
+    : await sdk.model.createNewCategoricalMarket(
         signer,
         title,
         description,
