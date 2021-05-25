@@ -77,7 +77,7 @@ export default class Swap {
       }
       //@ts-ignore
       const price = await this.getSpotPrice(
-        util.AssetTypeFromString("ztg", this.api),
+        AssetTypeFromString("ztg", this.api),
         asset,
         blockHash
       );
