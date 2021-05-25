@@ -42,7 +42,7 @@ export const isAsset = (asset) =>
   !Array.isArray(asset) &&
   "isScalarOutcome" in asset;
 
-export const AssetTypeFromString = (
+export const assetTypeFromString = (
   stringAsset: string | AssetShortform | Asset,
   api?: ApiPromise
 ): Asset => {
@@ -56,10 +56,10 @@ export const AssetTypeFromString = (
       "SDK must be initialised and an `api` passed in order to crate a reference type"
     );
   }
-  return api.createType("Asset", AssetShortformFromString(stringAsset));
+  return api.createType("Asset", assetShortformFromString(stringAsset));
 };
 
-const AssetShortformFromString = (
+const assetShortformFromString = (
   stringAsset: string | AssetShortform | Asset,
   api?: ApiPromise
 ): Asset | AssetShortform => {
@@ -69,7 +69,7 @@ const AssetShortformFromString = (
   }
 
   if (api && api.createType) {
-    return AssetTypeFromString(stringAsset, api);
+    return assetTypeFromString(stringAsset, api);
   }
 
   // asset= ztg

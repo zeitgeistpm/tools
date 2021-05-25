@@ -7,7 +7,7 @@ import {
   poolJoinOpts,
   BlockHash,
 } from "../types";
-import { AssetTypeFromString, isExtSigner, unsubOrWarns } from "../util";
+import { assetTypeFromString, isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool, Address } from "@zeitgeistpm/types/dist/interfaces/index";
 
 /**
@@ -536,9 +536,9 @@ export default class Swap {
 
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
-      AssetTypeFromString(assetIn),
+      assetTypeFromString(assetIn),
       assetAmountIn,
-      AssetTypeFromString(assetOut),
+      assetTypeFromString(assetOut),
       minAmountOut,
       maxPrice
     );
@@ -599,9 +599,9 @@ export default class Swap {
 
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
-      AssetTypeFromString(assetIn),
+      assetTypeFromString(assetIn),
       maxAmountIn,
-      AssetTypeFromString(assetOut),
+      assetTypeFromString(assetOut),
       assetAmountOut,
       maxPrice
     );
@@ -637,8 +637,8 @@ export default class Swap {
       blockHash?: string
     ): Promise<number> =>
       this.getSpotPrice(
-        AssetTypeFromString(inAsset),
-        AssetTypeFromString(outAsset),
+        assetTypeFromString(inAsset),
+        assetTypeFromString(outAsset),
         blockHash
       ),
 
@@ -648,8 +648,8 @@ export default class Swap {
       blockNumbers: number[]
     ): Promise<any> =>
       this.fetchPoolSpotPricesFromBlockNumbers(
-        AssetTypeFromString(inAsset),
-        AssetTypeFromString(outAsset),
+        assetTypeFromString(inAsset),
+        assetTypeFromString(outAsset),
         blockNumbers
       ),
 
@@ -659,8 +659,8 @@ export default class Swap {
       blockHashes: string[]
     ): Promise<any> =>
       this.fetchPoolSpotPrices(
-        AssetTypeFromString(inAsset),
-        AssetTypeFromString(outAsset),
+        assetTypeFromString(inAsset),
+        assetTypeFromString(outAsset),
         blockHashes
       ),
 
@@ -673,7 +673,7 @@ export default class Swap {
     ): Promise<boolean> =>
       this.poolJoinWithExactAssetAmount(
         signer,
-        AssetTypeFromString(assetIn),
+        assetTypeFromString(assetIn),
         assetAmount,
         minPoolAmount,
         callback
@@ -688,7 +688,7 @@ export default class Swap {
     ): Promise<boolean> =>
       this.poolJoinWithExactPoolAmount(
         signer,
-        AssetTypeFromString(assetIn),
+        assetTypeFromString(assetIn),
         PoolAmount,
         maxAssetAmount,
         callback
@@ -816,7 +816,7 @@ export default class Swap {
     ): Promise<boolean> =>
       this.poolExitWithExactPoolAmount(
         signer,
-        AssetTypeFromString(assetOut),
+        assetTypeFromString(assetOut),
         PoolAmount,
         minAssetAmount,
         callback
@@ -833,9 +833,9 @@ export default class Swap {
     ): Promise<boolean> =>
       this.swapExactAmountIn(
         signer,
-        AssetTypeFromString(assetIn),
+        assetTypeFromString(assetIn),
         assetAmountIn,
-        AssetTypeFromString(assetOut),
+        assetTypeFromString(assetOut),
         minAmountOut,
         maxPrice,
         callback
@@ -852,9 +852,9 @@ export default class Swap {
     ): Promise<boolean> =>
       this.swapExactAmountOut(
         signer,
-        AssetTypeFromString(assetIn),
+        assetTypeFromString(assetIn),
         maxAmountIn,
-        AssetTypeFromString(assetOut),
+        assetTypeFromString(assetOut),
         assetAmountOut,
         maxPrice,
         callback
