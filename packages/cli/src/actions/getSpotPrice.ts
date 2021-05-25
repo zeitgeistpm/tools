@@ -17,8 +17,8 @@ const getSpotPrice = async (opts: Options): Promise<void> => {
 
   const accountId = await pool.accountId();
   const price = await pool.getSpotPrice(
-    util.AssetTypeFromString(assetIn, sdk.api),
-    util.AssetTypeFromString(assetOut, sdk.api),
+    util.assetTypeFromString(assetIn, sdk.api),
+    util.assetTypeFromString(assetOut, sdk.api),
     blockHash
   );
 
