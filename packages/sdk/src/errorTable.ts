@@ -26,10 +26,12 @@ export default class ErrorTable {
       if (!errors.length) {
         continue;
       }
-      errors.map((error, errorIndex) => {
-        const { name: errorName, documentation } = error;
-        errorTable[index][errorIndex] = { errorName, documentation };
-      });
+      (errors as Array<{ name: string; documentation: string }>).forEach(
+        (error, errorIndex) => {
+          const { name: errorName, documentation } = error;
+          errorTable[index][errorIndex] = { errorName, documentation };
+        }
+      );
     }
 
     return errorTable;
