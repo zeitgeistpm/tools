@@ -60,9 +60,9 @@ export default {
       market_type: "MarketType",
       market_status: "MarketStatus",
       report: "Option<Report>",
-      resolved_outcome: "Option<Outcome>",
+      resolved_outcome: "Option<OutcomeReport>",
     },
-    Outcome: {
+    OutcomeReport: {
       _enum: {
         Categorical: "u16",
         Scalar: "u128",
@@ -71,12 +71,12 @@ export default {
     Report: {
       at: "BlockNumber",
       by: "AccountId",
-      outcome: "Outcome",
+      outcome: "OutcomeReport",
     },
     MarketDispute: {
       at: "BlockNumber",
       by: "AccountId",
-      outcome: "Outcome",
+      outcome: "OutcomeReport",
     },
   },
 };
