@@ -3,7 +3,7 @@ import { Signer } from "@polkadot/types/types";
 import {
   Market,
   MarketType,
-  Outcome,
+  OutcomeReport,
 } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
 import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
@@ -91,7 +91,7 @@ export type FilteredMarketResponse = {
 export type Report = {
   at: number;
   by: string;
-  outcome: Outcome;
+  outcome: OutcomeReport;
 };
 
 export type MarketEnd = { block: number } | { timestamp: number };
@@ -101,7 +101,7 @@ export type MarketCreation = "Permissioned" | "Advised";
 export type MarketDispute = {
   at: number;
   by: string;
-  outcome: Outcome;
+  outcome: OutcomeReport;
 };
 
 export type PoolResponse = {
