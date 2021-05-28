@@ -16,7 +16,7 @@ export interface Market extends Struct {
   readonly market_type: MarketType;
   readonly market_status: MarketStatus;
   readonly report: Option<Report>;
-  readonly resolved_outcome: Option<Outcome>;
+  readonly resolved_outcome: Option<OutcomeReport>;
 }
 
 /** @name MarketCreation */
@@ -29,7 +29,7 @@ export interface MarketCreation extends Enum {
 export interface MarketDispute extends Struct {
   readonly at: BlockNumber;
   readonly by: AccountId;
-  readonly outcome: Outcome;
+  readonly outcome: OutcomeReport;
 }
 
 /** @name MarketEnd */
@@ -62,8 +62,8 @@ export interface MarketType extends Enum {
   readonly asScalar: ITuple<[u128, u128]>;
 }
 
-/** @name Outcome */
-export interface Outcome extends Enum {
+/** @name OutcomeReport */
+export interface OutcomeReport extends Enum {
   readonly isCategorical: boolean;
   readonly asCategorical: u16;
   readonly isScalar: boolean;
@@ -74,7 +74,7 @@ export interface Outcome extends Enum {
 export interface Report extends Struct {
   readonly at: BlockNumber;
   readonly by: AccountId;
-  readonly outcome: Outcome;
+  readonly outcome: OutcomeReport;
 }
 
 export type PHANTOM_PREDICTIONMARKETS = 'predictionMarkets';

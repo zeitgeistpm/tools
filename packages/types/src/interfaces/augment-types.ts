@@ -57,7 +57,7 @@ import type { VestingInfo } from '@polkadot/types/interfaces/vesting';
 import type { AccountId32Junction, AccountIndex64Junction, AccountKey20Junction, AssetInstance, DoubleEncodedCall, Junction, MultiAsset, MultiAssetAbstractFungible, MultiAssetAbstractNonFungible, MultiAssetConcreteFungible, MultiAssetConcreteNonFungible, MultiLocation, NetworkId, VersionedMultiAsset, VersionedMultiLocation, VersionedXcm, Xcm, XcmAssetEffects, XcmError, XcmHrmpChannelAccepted, XcmHrmpChannelClosing, XcmHrmpNewChannelOpenRequest, XcmOrder, XcmOrderBuyExecution, XcmOrderDepositAsset, XcmOrderDepositReserveAsset, XcmOrderExchangeAsset, XcmOrderInitiateReserveWithdraw, XcmOrderInitiateTeleport, XcmOrderQueryHolding, XcmOriginKind, XcmOutcome, XcmQueryResponse, XcmRelayedFrom, XcmReserveAssetDeposit, XcmResponse, XcmTeleportAsset, XcmTransact, XcmTransferAsset, XcmTransferReserveAsset, XcmWithdrawAsset } from '@polkadot/types/interfaces/xcm';
 import type { Amount, AmountOf, Asset, CategoryIndex, CurrencyId, CurrencyIdOf, Lookup, ScalarPosition, SerdeWrapper } from '@zeitgeistpm/types/interfaces/index';
 import type { Order, OrderSide } from '@zeitgeistpm/types/interfaces/orderbook';
-import type { Market, MarketCreation, MarketDispute, MarketEnd, MarketId, MarketStatus, MarketType, Outcome, Report } from '@zeitgeistpm/types/interfaces/predictionMarkets';
+import type { Market, MarketCreation, MarketDispute, MarketEnd, MarketId, MarketStatus, MarketType, OutcomeReport, Report } from '@zeitgeistpm/types/interfaces/predictionMarkets';
 import type { CommonPoolEventParams, Pool, PoolAssetEvent, PoolAssetsEvent, SwapEvent } from '@zeitgeistpm/types/interfaces/swaps';
 
 declare module '@polkadot/types/types/registry' {
@@ -626,7 +626,7 @@ declare module '@polkadot/types/types/registry' {
     'Option<Origin>': Option<Origin>;
     'Option<OriginCaller>': Option<OriginCaller>;
     'Option<OutboundHrmpMessage>': Option<OutboundHrmpMessage>;
-    'Option<Outcome>': Option<Outcome>;
+    'Option<OutcomeReport>': Option<OutcomeReport>;
     'Option<Owner>': Option<Owner>;
     'Option<PalletId>': Option<PalletId>;
     'Option<PalletsOrigin>': Option<PalletsOrigin>;
@@ -1436,7 +1436,7 @@ declare module '@polkadot/types/types/registry' {
     'Vec<Origin>': Vec<Origin>;
     'Vec<OriginCaller>': Vec<OriginCaller>;
     'Vec<OutboundHrmpMessage>': Vec<OutboundHrmpMessage>;
-    'Vec<Outcome>': Vec<Outcome>;
+    'Vec<OutcomeReport>': Vec<OutcomeReport>;
     'Vec<Owner>': Vec<Owner>;
     'Vec<PalletId>': Vec<PalletId>;
     'Vec<PalletsOrigin>': Vec<PalletsOrigin>;
@@ -2246,7 +2246,7 @@ declare module '@polkadot/types/types/registry' {
     Origin: Origin;
     OriginCaller: OriginCaller;
     OutboundHrmpMessage: OutboundHrmpMessage;
-    Outcome: Outcome;
+    OutcomeReport: OutcomeReport;
     Owner: Owner;
     PalletId: PalletId;
     PalletsOrigin: PalletsOrigin;
