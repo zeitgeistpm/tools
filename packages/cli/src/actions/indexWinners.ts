@@ -33,14 +33,8 @@ const spotPrice = {
 const indexExtrinsicsUnstable = async (opts: Options): Promise<void> => {
   console.log("options:", opts);
 
-  const {
-    marketId,
-    startBlock,
-    endBlock,
-    outFile,
-    displayHashes,
-    endpoint,
-  } = opts;
+  const { marketId, startBlock, endBlock, outFile, displayHashes, endpoint } =
+    opts;
 
   if (outFile) {
     fs.promises
