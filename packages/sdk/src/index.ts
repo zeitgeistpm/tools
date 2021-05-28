@@ -1,4 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
+
+import ErrorTable from "./errorTable";
 import Models from "./models";
 import { initApi } from "./util";
 
@@ -6,8 +8,10 @@ export * as consts from "./consts";
 export * as models from "./models";
 export * as types from "./types";
 export * as util from "./util";
+
 export default class SDK {
   public api: ApiPromise;
+  public errorTable: ErrorTable;
   public models: Models;
 
   static async initialize(
@@ -20,11 +24,15 @@ export default class SDK {
       console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
     }
 
-    return new SDK(api);
+    const sdk = new SDK(api);
+    const eTable = await ErrorTable.populate(api);
+    sdk.errorTable = eTable;
+
+    return sdk;
   }
 
-  static mock(mockedAPI): SDK {
-    return new SDK(mockedAPI as any);
+  static mock(mockedAPI: any): SDK {
+    return new SDK(mockedAPI);
   }
 
   constructor(api: ApiPromise) {
