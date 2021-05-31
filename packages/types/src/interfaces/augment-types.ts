@@ -58,10 +58,10 @@ import type { ClassDetails, ClassId, ClassMetadata, DepositBalance, DepositBalan
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces/utility';
 import type { VestingInfo } from '@polkadot/types/interfaces/vesting';
 import type { AccountId32Junction, AccountIndex64Junction, AccountKey20Junction, AssetInstance, BodyId, BodyPart, BodyPartAtLeastProportion, BodyPartFraction, BodyPartMoreThanProportion, DoubleEncodedCall, InboundStatus, Junction, MultiAsset, MultiAssetAbstractFungible, MultiAssetAbstractNonFungible, MultiAssetConcreteFungible, MultiAssetConcreteNonFungible, MultiLocation, NetworkId, OutboundStatus, Outcome, PluralityJunction, QueueConfigData, VersionedMultiAsset, VersionedMultiLocation, VersionedXcm, Xcm, XcmAssetEffects, XcmError, XcmHrmpChannelAccepted, XcmHrmpChannelClosing, XcmHrmpNewChannelOpenRequest, XcmOrder, XcmOrderBuyExecution, XcmOrderDepositAsset, XcmOrderDepositReserveAsset, XcmOrderExchangeAsset, XcmOrderInitiateReserveWithdraw, XcmOrderInitiateTeleport, XcmOrderQueryHolding, XcmOriginKind, XcmQueryResponse, XcmRelayedFrom, XcmReserveAssetDeposit, XcmResponse, XcmTeleportAsset, XcmTransact, XcmTransferAsset, XcmTransferReserveAsset, XcmWithdrawAsset, XcmpMessageFormat } from '@polkadot/types/interfaces/xcm';
-import type { Amount, AmountOf, Asset, CategoryIndex, CurrencyId, CurrencyIdOf, Lookup, ScalarPosition, SerdeWrapper } from '@zeitgeistpm/types/interfaces/index';
+import type { Amount, AmountOf, Asset, CategoryIndex, CurrencyId, CurrencyIdOf, Lookup, MultiHash, ScalarPosition, SerdeWrapper } from '@zeitgeistpm/types/interfaces/index';
 import type { Order, OrderSide } from '@zeitgeistpm/types/interfaces/orderbook';
 import type { Market, MarketCreation, MarketDispute, MarketEnd, MarketId, MarketStatus, MarketType, OutcomeReport, Report } from '@zeitgeistpm/types/interfaces/predictionMarkets';
-import type { CommonPoolEventParams, Pool, PoolAssetEvent, PoolAssetsEvent, SwapEvent } from '@zeitgeistpm/types/interfaces/swaps';
+import type { CommonPoolEventParams, Pool, PoolAssetEvent, PoolAssetsEvent, PoolId, SwapEvent } from '@zeitgeistpm/types/interfaces/swaps';
 
 declare module '@polkadot/types/types/registry' {
   export interface InterfaceTypes {
@@ -116,6 +116,7 @@ declare module '@polkadot/types/types/registry' {
     'Compact<Perquintill>': Compact<Perquintill>;
     'Compact<PerU16>': Compact<PerU16>;
     'Compact<Points>': Compact<Points>;
+    'Compact<PoolId>': Compact<PoolId>;
     'Compact<Priority>': Compact<Priority>;
     'Compact<PropIndex>': Compact<PropIndex>;
     'Compact<ProposalIndex>': Compact<ProposalIndex>;
@@ -657,6 +658,7 @@ declare module '@polkadot/types/types/registry' {
     'Option<MultiAssetConcreteFungible>': Option<MultiAssetConcreteFungible>;
     'Option<MultiAssetConcreteNonFungible>': Option<MultiAssetConcreteNonFungible>;
     'Option<MultiDisputeStatementSet>': Option<MultiDisputeStatementSet>;
+    'Option<MultiHash>': Option<MultiHash>;
     'Option<MultiLocation>': Option<MultiLocation>;
     'Option<Multiplier>': Option<Multiplier>;
     'Option<Multisig>': Option<Multisig>;
@@ -751,6 +753,7 @@ declare module '@polkadot/types/types/registry' {
     'Option<Pool>': Option<Pool>;
     'Option<PoolAssetEvent>': Option<PoolAssetEvent>;
     'Option<PoolAssetsEvent>': Option<PoolAssetsEvent>;
+    'Option<PoolId>': Option<PoolId>;
     'Option<Precommits>': Option<Precommits>;
     'Option<PrefabWasmModule>': Option<PrefabWasmModule>;
     'Option<PrefixedStorageKey>': Option<PrefixedStorageKey>;
@@ -1550,6 +1553,7 @@ declare module '@polkadot/types/types/registry' {
     'Vec<MultiAssetConcreteFungible>': Vec<MultiAssetConcreteFungible>;
     'Vec<MultiAssetConcreteNonFungible>': Vec<MultiAssetConcreteNonFungible>;
     'Vec<MultiDisputeStatementSet>': Vec<MultiDisputeStatementSet>;
+    'Vec<MultiHash>': Vec<MultiHash>;
     'Vec<MultiLocation>': Vec<MultiLocation>;
     'Vec<Multiplier>': Vec<Multiplier>;
     'Vec<Multisig>': Vec<Multisig>;
@@ -1644,6 +1648,7 @@ declare module '@polkadot/types/types/registry' {
     'Vec<Pool>': Vec<Pool>;
     'Vec<PoolAssetEvent>': Vec<PoolAssetEvent>;
     'Vec<PoolAssetsEvent>': Vec<PoolAssetsEvent>;
+    'Vec<PoolId>': Vec<PoolId>;
     'Vec<Precommits>': Vec<Precommits>;
     'Vec<PrefabWasmModule>': Vec<PrefabWasmModule>;
     'Vec<PrefixedStorageKey>': Vec<PrefixedStorageKey>;
@@ -2443,6 +2448,7 @@ declare module '@polkadot/types/types/registry' {
     MultiAssetConcreteFungible: MultiAssetConcreteFungible;
     MultiAssetConcreteNonFungible: MultiAssetConcreteNonFungible;
     MultiDisputeStatementSet: MultiDisputeStatementSet;
+    MultiHash: MultiHash;
     MultiLocation: MultiLocation;
     Multiplier: Multiplier;
     Multisig: Multisig;
@@ -2537,6 +2543,7 @@ declare module '@polkadot/types/types/registry' {
     Pool: Pool;
     PoolAssetEvent: PoolAssetEvent;
     PoolAssetsEvent: PoolAssetsEvent;
+    PoolId: PoolId;
     Precommits: Precommits;
     PrefabWasmModule: PrefabWasmModule;
     PrefixedStorageKey: PrefixedStorageKey;

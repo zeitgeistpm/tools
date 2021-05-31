@@ -173,8 +173,6 @@ export default class Models {
     }
 
     const extendedMarket = marketJson;
-
-    //@ts-ignore
     const { metadata } = marketJson;
 
     // Default to no metadata, but actually parse it below if it exists.
