@@ -33,6 +33,11 @@ export const index = {
     CurrencyId: "Asset",
     Index: "u64",
     Lookup: "MultiAddress",
+    MultiHash: {
+      _enum: {
+        Sha3_384: "[u8; 50]",
+      },
+    },
     ScalarPosition: {
       _enum: ["Long", "Short"],
     },

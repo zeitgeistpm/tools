@@ -44,7 +44,19 @@ export type ScalarOutcome = {
 };
 
 // The market type as returned by the API call to `predictionMarkets.markets`.
-export type MarketResponse = Market;
+export type MarketResponse = {
+  creator: string;
+  creation: MarketCreation;
+  creator_fee: number;
+  oracle: string;
+  end: MarketEnd;
+  metadata: string;
+  market_type: MarketType;
+  market_status: string;
+  report: Report | null;
+  categories: string[] | null;
+  resolved_outcome: number | null;
+};
 
 // The extended market data from which a market may be created.
 export type ExtendedMarketResponse = {
