@@ -24,9 +24,8 @@ export default class SDK {
       console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
     }
 
-    const sdk = new SDK(api);
     const eTable = await ErrorTable.populate(api);
-    sdk.errorTable = eTable;
+    const sdk = new SDK(api, eTable);
 
     return sdk;
   }
@@ -35,8 +34,9 @@ export default class SDK {
     return new SDK(mockedAPI);
   }
 
-  constructor(api: ApiPromise) {
+  constructor(api: ApiPromise, errorTable?: ErrorTable) {
     this.api = api;
-    this.models = new Models(this.api);
+    this.errorTable = errorTable;
+    this.models = new Models(this.api, errorTable);
   }
 }

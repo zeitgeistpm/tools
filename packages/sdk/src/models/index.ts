@@ -1,8 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { hexToNumber, hexToString } from "@polkadot/util";
-import all from "it-all";
-import { concat, toString } from "uint8arrays";
+import { hexToNumber, u8aToHex } from "@polkadot/util";
 import { unsubOrWarns } from "../util";
 import { Pool } from "@zeitgeistpm/types/dist/interfaces/swaps";
 import { Option } from "@polkadot/types";
@@ -15,10 +13,12 @@ import {
   KeyringPairOrExtSigner,
   PoolId,
 } from "../types";
-import { initIpfs, changeEndianness, isExtSigner } from "../util";
+import { changeEndianness, isExtSigner } from "../util";
 
 import Market from "./market";
 import Swap from "./swaps";
+import ErrorTable from "../errorTable";
+import IPFS from "../storage/ipfs";
 
 export { Market, Swap };
 
@@ -28,10 +28,12 @@ type Options = {
 
 export default class Models {
   private api: ApiPromise;
+  private errorTable: ErrorTable;
   MAX_RPC_REQUESTS: number;
 
-  constructor(api: ApiPromise, opts: Options = {}) {
+  constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options = {}) {
     this.api = api;
+    this.errorTable = errorTable;
     this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
   }
 
@@ -82,15 +84,17 @@ export default class Models {
     categories = ["Yes", "No"],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
-    const ipfs = initIpfs();
+    const ipfs = new IPFS();
 
-    const { cid } = await ipfs.add({
-      content: JSON.stringify({
+    const cid = await ipfs.add(
+      JSON.stringify({
         title,
         description,
         categories,
-      }),
-    });
+      })
+    );
+
+    const multihash = { Sha3_384: cid.multihash };
 
     return new Promise(async (resolve) => {
       const _callback = (
@@ -109,7 +113,12 @@ export default class Models {
             if (method == "MarketCreated") {
               _resolve(data[0].toString());
             } else if (method == "ExtrinsicFailed") {
-              console.log("Extrinsic failed");
+              const { index, error } = data.toJSON()[0].module;
+              const { errorName, documentation } = this.errorTable.getEntry(
+                index,
+                error
+              );
+              console.log(`${errorName}: ${documentation}`);
               _resolve("");
             }
 
@@ -123,7 +132,7 @@ export default class Models {
           .createCategoricalMarket(
             oracle,
             end,
-            cid.toString(),
+            multihash,
             creationType,
             categories.length
           )
@@ -137,7 +146,7 @@ export default class Models {
           .createCategoricalMarket(
             oracle,
             end,
-            cid.toString(),
+            multihash,
             creationType,
             categories.length
           )
@@ -155,22 +164,16 @@ export default class Models {
    * @param marketId The unique identifier for the market you want to fetch.
    */
   async fetchMarketData(marketId: MarketId): Promise<Market> {
-    const ipfs = initIpfs();
-
     const marketRaw = await this.api.query.predictionMarkets.markets(marketId);
 
-    // TODO: type (#???)
-    const marketJson = marketRaw.toJSON() as any as MarketResponse;
+    const marketJson = marketRaw.toJSON() as never as MarketResponse;
 
     if (!marketJson) {
       throw new Error(`Market with market id ${marketId} does not exist.`);
     }
 
     const extendedMarket = marketJson;
-
-    //@ts-ignore
     const { metadata } = marketJson;
-    const metadataString = hexToString(metadata.toString());
 
     // Default to no metadata, but actually parse it below if it exists.
     let data = {
@@ -181,8 +184,9 @@ export default class Models {
 
     try {
       // Metadata exists, so parse it.
-      if (metadataString) {
-        const raw = toString(concat(await all(ipfs.cat(metadataString))));
+      if (metadata) {
+        const ipfs = new IPFS();
+        const raw = await ipfs.read(metadata);
 
         try {
           // new version
@@ -238,12 +242,12 @@ export default class Models {
     Object.assign(extendedMarket, {
       ...data,
       marketId,
-      metadataString,
+      metadataString: metadata,
       outcomeAssets,
     });
 
     const extendedMarketResponse = new Market(
-      extendedMarket as any as ExtendedMarketResponse,
+      extendedMarket as never as ExtendedMarketResponse,
       this.api
     );
 
