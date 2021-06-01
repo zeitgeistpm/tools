@@ -94,7 +94,7 @@ export default class Models {
       })
     );
 
-    const multihash = { Sha3_384: u8aToHex(cid.multihash) };
+    const multihash = { Sha3_384: cid.multihash };
 
     return new Promise(async (resolve) => {
       const _callback = (

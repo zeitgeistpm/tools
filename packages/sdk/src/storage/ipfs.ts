@@ -1,4 +1,4 @@
-import { hexToString } from "@polkadot/util";
+import { hexToString, u8aToString } from "@polkadot/util";
 import CID from "cids";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
@@ -16,35 +16,22 @@ export default class IPFS {
     return cid;
   }
 
-  async read(what: string): Promise<string> {
+  /**
+   * Reads data from a given partial CID.
+   * @param partialCid A partial CID without the encoding prefix.
+   * @returns A promise that resolves to the data at the CID.
+   */
+  async read(partialCid: string): Promise<string> {
     // Old way - backwards compatibility is fun
-    if (what.slice(2, 6) !== "1530") {
-      const str = hexToString(what);
+    if (partialCid.slice(2, 6) !== "1530") {
+      const str = hexToString(partialCid);
       return toString(concat(await all(this.client.cat(str))));
     }
 
     // New way
-    const cid = new CID("f0155" + what.slice(2));
-    const encoded = cid.toString("base32");
-    const data = await all(this.client.cat(encoded));
+    const cid = new CID("f0155" + partialCid.slice(2));
+    const data = await all(this.client.cat(cid));
 
     return data.toString();
   }
 }
-
-/// The Ghetto Test Suite ^TM
-// const Tests = async () => {
-//   const ipfs = new IPFS();
-//   const cid = await ipfs.add("some");
-//   console.log(u8aToHex(cid.multihash));
-//   const c = "0x" + cid.toString("base16").slice(5);
-//   console.log("CID", c);
-//   const res = await ipfs.read(c);
-//   console.log("res", res);
-// };
-
-// try {
-//   Tests();
-// } catch (e) {
-//   console.error(e);
-// }
