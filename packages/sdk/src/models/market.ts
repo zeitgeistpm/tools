@@ -11,12 +11,11 @@ import {
   MarketEnd,
   Report,
   MarketDispute,
-  marketTypeForHuman,
-  OutcomeAsset,
-  PoolResponse,
+  AssetId,
 } from "../types";
-import { NativeShareId } from "../consts";
 import { isExtSigner, unsubOrWarns } from "../util";
+import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
+import { Option } from "@polkadot/types";
 
 /**
  * The Market class initializes all the market data.
@@ -37,13 +36,13 @@ class Market {
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
-  public marketType: marketTypeForHuman;
+  public marketType: AssetId;
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
   public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
-  public categories: number | null;
+  public categories: string[] | null;
   /** The resolved outcome for the market. */
   public resolvedOutcome: number | null;
   /** The title of the market. */
@@ -53,7 +52,7 @@ class Market {
   /** The metadata string. */
   public metadataString: string;
   /** The share identifiers */
-  public outcomeAssets: OutcomeAsset[];
+  public outcomeAssets: Asset[];
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
@@ -84,7 +83,7 @@ class Market {
     this.oracle = oracle;
     this.end = end;
     this.metadata = metadata;
-    this.marketType = market_type;
+    this.marketType = market_type as any;
     this.marketStatus = market_status;
     this.report = report;
     this.categories = categories;
@@ -104,29 +103,31 @@ class Market {
     return JSON.stringify(market, null, 2);
   }
 
-  toFilteredJSONString(filter? : string[] | null): string {
+  toFilteredJSONString(filter?: string[] | null): string {
     const market = Object.assign({}, this);
     delete market.api;
-    if (!filter)
-      return JSON.stringify(market, null, 2)
-    else
-      return JSON.stringify(Market.filterMarketData(market, filter), null, 2)
+    if (!filter) {
+      return JSON.stringify(market, null, 2);
+    } else {
+      return JSON.stringify(Market.filterMarketData(market, filter), null, 2);
+    }
   }
 
   static filterMarketData(
-    market: ExtendedMarketResponse | MarketResponse | Market, 
-    filter? : string[] | null
+    market: ExtendedMarketResponse | MarketResponse | Market,
+    filter?: string[] | null
   ): FilteredMarketResponse {
-    if (!filter)
+    if (!filter) {
       return market as any;
+    }
 
-    const alwaysInclude=["marketId"];
-    
+    const alwaysInclude = ["marketId"];
+
     const res = {};
     filter
       .concat(alwaysInclude)
-      .filter(key=> Object.keys(market).includes(key))
-      .forEach(key=> res[key]= market[key]) ;    
+      .filter((key) => Object.keys(market).includes(key))
+      .forEach((key) => (res[key] = market[key]));
     return res;
   }
 
@@ -148,7 +149,7 @@ class Market {
     ).toHuman() as number;
   };
 
-  getPool = async (): Promise<Swap> => {
+  getPool = async (): Promise<Swap | null> => {
     const poolId = await this.getPoolId();
     if (poolId == null) {
       return null;
@@ -158,11 +159,12 @@ class Market {
       return null;
     }
 
-    const poolResponse = (
-      await this.api.query.swaps.pools(poolId)
-    ).toJSON() as PoolResponse;
+    const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
-    return new Swap(poolId, poolResponse, this.api);
+    if (pool.isSome) {
+      return new Swap(poolId, pool.unwrap(), this.api);
+    }
+    return null;
   };
 
   getDisputes = async (): Promise<MarketDispute[]> => {
@@ -193,14 +195,14 @@ class Market {
         events.forEach(({ phase, event: { data, method, section } }) => {
           console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
 
-          if (method == "PoolCreated") {
+          if (method == "PoolCreate") {
+            unsubOrWarns(_unsub);
             _resolve(data[0].toString());
           }
           if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
             _resolve("");
           }
-
-          unsubOrWarns(_unsub);
         });
       }
     };
@@ -208,20 +210,39 @@ class Market {
     return new Promise(async (resolve) => {
       // TODO: // sanity check: weights.length should equal outcomes.length+1 (for ZTG)
       // TODO: // weights should each be >= runtime's MinWeight (currently 1e10)
-      console.log("Relative weights: ", weights);
-      console.log(`If market ${this.marketId} has a different number of outcomes than ${weights.length-1}, you might get error {6,13}.\n`);
+      console.log(
+        "Relative weights: ",
+        weights
+          .map(Number)
+          .map((x) => x / 1e10)
+          .map((x) => `${x}X1e10`)
+      );
+      console.log(
+        `If market ${this.marketId} has a different number of outcomes than ${
+          weights.length - 1
+        }, you might get error {6,13}.\n`
+      );
+
       if (this.outcomeAssets) {
-        if (weights.length+1 !== this.outcomeAssets.length) {
-          console.log("Weights length mismatch. Expect an error {6,13}: ProvidedValuesLenMustEqualAssetsLen.");
-          if (weights.length === this.outcomeAssets.length)
-            console.log("Hint: don't forget to include the weight of ZTG as the last weight!");
+        if (weights.length !== this.outcomeAssets.length + 1) {
+          console.log(
+            "Weights length mismatch. Expect an error {6,13}: ProvidedValuesLenMustEqualAssetsLen."
+          );
+          if (weights.length === this.outcomeAssets.length) {
+            console.log(
+              "Hint: don't forget to include the weight of ZTG as the last weight!"
+            );
+          }
         }
       } else {
-        console.log("Market object appears to be a bare MarketResponse, not an ExtendedMarket");
-        console.log("This should not happen unless you are running old code for bug testing.");        
+        console.log(
+          "Market object appears to be a bare MarketResponse, not an ExtendedMarket"
+        );
+        console.log(
+          "This should not happen unless you are running old code for bug testing."
+        );
       }
-      
-      
+
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
           .deploySwapPoolForMarket(this.marketId, weights)
@@ -240,43 +261,46 @@ class Market {
           );
       }
     });
-
   };
 
-  async getAssetsPrices(blockNumber: any): Promise<any> {
-    const assetPrices = {};
-    const blockHash = await this.api.rpc.chain.getBlockHash(blockNumber);
+  async assetSpotPricesInZtg(
+    blockHash?: any
+  ): Promise<{ [key: string]: string }> {
     const pool = await this.getPool();
-
-    if (pool != null) {
-      const outAsset = NativeShareId;
-      for (const inAsset of pool.assets) {
-        if (inAsset != outAsset) {
-          try {
-            const price = await pool.getSpotPrice(inAsset, outAsset, blockHash);
-            assetPrices[inAsset] = price.amount.toString();
-          } catch (error) {}
-        }
-      }
+    if (!pool) {
+      return null;
+      // throw new Error(
+      //   `No swap pool is deployed for market with id: ${this.marketId}`
+      // );
     }
-    return assetPrices;
+
+    return pool.assetSpotPricesInZtg(blockHash);
   }
 
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> {
+  ): Promise<string> {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _resolve: (value: string | PromiseLike<string>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "BoughtCompleteSet") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+        });
       }
     };
 
@@ -305,17 +329,26 @@ class Market {
     signer: KeyringPairOrExtSigner,
     amount: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> {
+  ): Promise<string> {
     const _callback = (
       result: ISubmittableResult,
-      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _resolve: (value: string | PromiseLike<string>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "SoldCompleteSet") {
+            _resolve(data[0].toString());
+          }
+          if (method == "ExtrinsicFailed") {
+            _resolve("");
+          }
+        });
       }
     };
 
@@ -449,13 +482,23 @@ class Market {
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
       _unsub: () => void
     ) => {
-      const { status } = result;
+      const { events, status } = result;
+      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        _resolve(true);
-        unsubOrWarns(_unsub);
-      }
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
 
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
+      }
     };
 
     return new Promise(async (resolve) => {
@@ -508,25 +551,25 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
-      const call = await this.api.tx.predictionMarkets
-        .approveMarket(this.marketId);
+      const call = await this.api.tx.predictionMarkets.approveMarket(
+        this.marketId
+      );
 
       const sudoTx = await this.api.tx.sudo.sudo(call);
-        
+
       if (isExtSigner(signer)) {
-        const unsub = await sudoTx
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await sudoTx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await sudoTx
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await sudoTx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -560,25 +603,25 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
-      const call = await this.api.tx.predictionMarkets
-        .rejectMarket(this.marketId);
+      const call = await this.api.tx.predictionMarkets.rejectMarket(
+        this.marketId
+      );
 
       const sudoTx = await this.api.tx.sudo.sudo(call);
 
       if (isExtSigner(signer)) {
-        const unsub = await sudoTx
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await sudoTx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await sudoTx
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await sudoTx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -631,7 +674,6 @@ class Market {
       }
     });
   }
-  
 }
 
 export default Market;

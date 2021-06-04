@@ -12,11 +12,11 @@ type Options = {
 // "joinPool" | "joinPoolMultifunc | ""
 const sdkJoinPoolFunctionToUse = "joinPoolMultifunc";
 
-const joinPool =  async (opts: Options): Promise<void> => {
+const joinPool = async (opts: Options): Promise<void> => {
   const { endpoint, seed, poolId, amountIn, amountOut, ...bounds } = opts;
   const trimmedBounds = {
     poolAmount: Number(amountOut),
-    assetMax: amountIn.split(",").map(Number)
+    assetMax: amountIn.split(",").map(Number),
   };
 
   const sdk = await SDK.initialize(endpoint);
@@ -26,15 +26,13 @@ const joinPool =  async (opts: Options): Promise<void> => {
 
   const pool = await sdk.models.fetchPoolData(poolId);
 
-  //@ts-ignore
-  const res = sdkJoinPoolFunctionToUse === "joinPool"
-   ? await pool.joinPool(signer, amountOut, amountIn.split(","))
-   : await pool.joinPoolMultifunc(
-      signer, 
-      { 
-        bounds: trimmedBounds
-      } 
-    );
+  /* @ts-ignore */
+  const res =
+    (sdkJoinPoolFunctionToUse as any) === "joinPool"
+      ? await pool.joinPool(signer, amountOut, amountIn.split(","))
+      : await pool.joinPoolMultifunc(signer, {
+          bounds: trimmedBounds as any,
+        });
   console.log(res);
 };
 

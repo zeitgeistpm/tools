@@ -11,9 +11,8 @@ const viewDisputes = async (opts: Options): Promise<void> => {
   const sdk = await SDK.initialize(endpoint);
 
   const disputes = await sdk.models.fetchDisputes(Number(marketId));
-  
+
   console.log(disputes);
-  
 };
 
 export default viewDisputes;

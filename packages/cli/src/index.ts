@@ -1,6 +1,7 @@
 import program from "commander";
 
 import buyCompleteSet from "./actions/buyCompleteSet";
+import getBlockHashes from "./actions/blockHashes";
 import createMarket from "./actions/createMarket";
 import cancelPendingMarket from "./actions/cancelPendingMarket";
 import disputeMarket from "./actions/disputeMarket";
@@ -14,8 +15,9 @@ import viewMarket from "./actions/viewMarket";
 import viewSwap from "./actions/viewSwap";
 import sellCompleteSet from "./actions/sellCompleteSet";
 import getShareBalance from "./actions/getShareBalance";
+import getShareBalances from "./actions/getShareBalances";
 import getSpotPrice from "./actions/getSpotPrice";
-import wrapNativeCurrency from "./actions/wrapNativeCurrency";
+import viewSpotPrices from "./actions/viewPoolSpotPrices";
 import transfer from "./actions/transfer";
 import redeemShares from "./actions/redeemShares";
 import getAssetsPrices from "./actions/getAssetsPrices";
@@ -25,6 +27,9 @@ import getAllMarkets from "./actions/getAllMarkets";
 import viewDisputes from "./actions/viewDisputes";
 import approveMarket from "./actions/approveMarket";
 import rejectMarket from "./actions/rejectMarket";
+import poolJoinWithExactAssetAmount from "./actions/poolJoinWithExactAssetAmount";
+import deployKusamaDerby from "./actions/deployKusamaDerby";
+import indexExtrinsicsUnstable from "./actions/indexWinners";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -38,24 +43,36 @@ const catchErrorsAndExit = async (fn: any, opts: any) => {
 };
 
 program
+  .command("deployKusamaDerby")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .action((opts: any) => catchErrorsAndExit(deployKusamaDerby, opts));
+
+program
   .command("createMarket <title> <description> <oracle> <end>")
   .option(
-    "--no-advised",
-    "Create Permissionless market instead of Advised market"
+    "--advised",
+    "Create Advised market instead of Permissionless market",
+    false
   )
   .option(
     "-c --categories [categories...]",
-    'specify at least two categories'
+    "A space-separated list of categories for the market"
   )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--timestamp",
+    "Interpret the end value as a unix timestamp instead of a block number",
+    false
   )
   .action(
     (
@@ -63,7 +80,13 @@ program
       description: string,
       oracle: string,
       end: string,
-      opts: { endpoint: string; seed: string, categories: string[], advised: boolean }
+      opts: {
+        endpoint: string;
+        seed: string;
+        categories: string[];
+        advised: boolean;
+        timestamp: boolean;
+      }
     ) =>
       catchErrorsAndExit(
         createMarket,
@@ -72,19 +95,32 @@ program
   );
 
 program
+  .command("blockHashes")
+  .option("-b, --blocks [blocks...]", "the blocks to retrieve hashes of")
+  .option("--link", "Include a block explorer link", true)
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action((opts: { blocks: number[]; link: boolean; endpoint: string }) =>
+    catchErrorsAndExit(getBlockHashes, Object.assign(opts))
+  );
+
+program
   .command("viewMarket <marketId>")
   .option(
     "--address <string>",
-    "An address on which to report ownership of shares.",
+    "An address on which to report ownership of assets."
   )
   .option(
     "--seed <string>",
-    "A seed from which to calculate an address on which to report ownership of shares. Default Alice:",
+    "A seed from which to calculate an address on which to report ownership of assets",
     "//Alice"
   )
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, opts: any) =>
@@ -93,14 +129,10 @@ program
 
 program
   .command("cancelMarket <marketId>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, opts: any) =>
@@ -111,7 +143,7 @@ program
   .command("viewSwap <marketId>")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, opts: any) =>
@@ -120,14 +152,10 @@ program
 
 program
   .command("buyCompleteSet <marketId> <amount>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action(
@@ -144,14 +172,10 @@ program
 
 program
   .command("sellCompleteSet <marketId> <amount>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, amount: number, opts: { seed: string }) =>
@@ -163,14 +187,10 @@ program
 
 program
   .command("report <marketId> <outcome>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, outcome: number, opts: { seed: string }) =>
@@ -179,14 +199,10 @@ program
 
 program
   .command("dispute <marketId> <outcome>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, outcome: number, opts: { seed: string }) =>
@@ -198,14 +214,10 @@ program
 
 program
   .command("redeem <marketId>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((marketId: number, opts: { seed: string }) =>
@@ -214,15 +226,16 @@ program
 
 program
   .command("deployPool <marketId>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--weights <weights>",
+    "A comma-separated list of lengths for each asset",
+    ""
   )
   .action((marketId: number, opts: { endpoint: string; seed: string }) =>
     catchErrorsAndExit(deployPool, Object.assign(opts, { marketId }))
@@ -230,14 +243,10 @@ program
 
 program
   .command("joinPool <poolId> <amountOut> <amountIn>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action(
@@ -254,15 +263,35 @@ program
   );
 
 program
-  .command("exitPool <poolId> <amountIn> <amountOut>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
+  .command(
+    "poolJoinWithExactAssetAmount <poolId> <assetIn> <assetAmount> <minPoolAmount>"
   )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action(
+    (
+      poolId: number,
+      assetIn: string,
+      assetAmount: string,
+      minPoolAmount: string,
+      opts: { seed: string; endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        poolJoinWithExactAssetAmount,
+        Object.assign(opts, { poolId, assetIn, assetAmount, minPoolAmount })
+      )
+  );
+
+program
+  .command("exitPool <poolId> <amountIn> <amountOut>")
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action(
@@ -282,14 +311,10 @@ program
   .command(
     "swapExactAmountIn <poolId> <assetIn> <assetAmountIn> <assetOut> <minAmountOut> <maxPrice>"
   )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action(
@@ -319,14 +344,10 @@ program
   .command(
     "swapExactAmountOut <poolId> <assetIn> <maxAmountIn> <assetOut> <assetAmountOut> <maxPrice>"
   )
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action(
@@ -353,21 +374,36 @@ program
   );
 
 program
-  .command("shareBalance <marketId> <shareIndex> <account>")
+  .command("getBalance <addressOrSeed>, <asset>")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((marketId: number, shareIndex: number, account: string) =>
-    catchErrorsAndExit(getShareBalance, { marketId, shareIndex, account })
+  .action((addressOrSeed = "//Alice", asset, opts: { endpoint: string }) =>
+    catchErrorsAndExit(
+      getShareBalance,
+      Object.assign(opts, { addressOrSeed, asset })
+    )
+  );
+
+program
+  .command("getBalances <addressOrSeed>")
+  .option("-m --marketId <number>")
+  .option("--endpoint <string>", "The endpoint URL of the API connection")
+  .action(
+    (addressOrSeed = "//Alice", opts: { marketId: number; endpoint: string }) =>
+      catchErrorsAndExit(
+        getShareBalances,
+        Object.assign(opts, { addressOrSeed })
+      )
   );
 
 program
   .command("getSpotPrice <poolId> <assetIn> <assetOut>")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action(
@@ -384,42 +420,47 @@ program
   );
 
 program
-  .command("wrapNativeCurrency <amount>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .command("viewSpotPrices <poolId> <assetIn> <assetOut> [blocks...]")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((amount: string, opts: { endpoint: string; seed: string }) =>
-    catchErrorsAndExit(wrapNativeCurrency, Object.assign(opts, { amount }))
+  .action(
+    (
+      poolId: string,
+      assetIn: string,
+      assetOut: string,
+      blocks: string,
+      opts: { endpoint: string }
+    ) =>
+      catchErrorsAndExit(
+        viewSpotPrices,
+        Object.assign(opts, { poolId, assetIn, assetOut, blocks })
+      )
   );
 
 program
-  .command("getAssetsPrices <blockNumber>")
+  .command("getAssetsPrices")
+  .option(
+    "-b --block <number>",
+    "The block number at which to get historic prices"
+  )
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((blockNumber: string, opts: { endpoint: string }) =>
-    catchErrorsAndExit(getAssetsPrices, Object.assign(opts, { blockNumber }))
+  .action((opts: { block: number; endpoint: string }) =>
+    catchErrorsAndExit(getAssetsPrices, opts)
   );
 
 program
   .command("transfer <marketId> <sharesIndex> <to> <amount>")
-  .option(
-    "--seed <string>",
-    "The signer's seed. Default Alice:",
-    "//Alice"
-  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   // TODO: check if these params really should be string!
@@ -441,51 +482,46 @@ program
   .command("countMarkets")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((opts: { endpoint: string }) =>
     catchErrorsAndExit(countMarkets, Object.assign(opts))
   );
 
-
 program
   .command("getAllMarketIds")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .action((opts: { endpoint: string }) =>
     catchErrorsAndExit(getAllMarketIds, Object.assign(opts))
   );
 
-
 program
   .command("getAllMarkets")
-  .option(
-    "-f, --filter [fields...]",
-    'only output specified fields'
-  )
+  .option("-f, --filter [fields...]", "only output specified fields")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((opts: { endpoint: string, filter: string[] }) =>
+  .action((opts: { endpoint: string; filter: string[] }) =>
     catchErrorsAndExit(getAllMarkets, Object.assign(opts))
   );
 
-
-program  .command("approveMarket <marketId>")
+program
+  .command("approveMarket <marketId>")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
   .option(
     "--seed <string>",
-    "The signer's seed. Must be an ApprovalOrigin. Default Alice:",
+    "The signer's seed. Must be an ApprovalOrigin",
     "//Alice"
   )
   .action((marketId: number, opts: any) =>
@@ -496,12 +532,12 @@ program
   .command("rejectMarket <marketId>")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
-  )  
+  )
   .option(
     "--seed <string>",
-    "The signer's seed. Must be an ApprovalOrigin. Default Alice:",
+    "The signer's seed. Must be an ApprovalOrigin",
     "//Alice"
   )
   .action((marketId: number, opts: any) =>
@@ -512,12 +548,27 @@ program
   .command("viewDisputes <marketId>")
   .option(
     "--endpoint <string>",
-    "The endpoint to connect the API to.",
+    "The endpoint URL of the API connection",
     "wss://bp-rpc.zeitgeist.pm"
   )
-  .action((marketId: number,
-      opts: { endpoint: string}) =>
+  .action((marketId: number, opts: { endpoint: string }) =>
     catchErrorsAndExit(viewDisputes, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("indexWinners")
+  .option("-m --marketId <number>")
+  .option("-s --startBlock <number>")
+  .option("-e --endBlock <number>")
+  .option("-o --outFile <string>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .action(
+    (opts: { marketId; startBlock; endBlock; outFile; endpoint: string }) =>
+      catchErrorsAndExit(indexExtrinsicsUnstable, opts)
   );
 
 program.parse(process.argv);

@@ -1,21 +1,28 @@
-import SDK from "@zeitgeistpm/sdk";
+import SDK, { util } from "@zeitgeistpm/sdk";
 
 type Options = {
   assetIn: string;
   assetOut: string;
   endpoint: string;
   poolId: string;
+  blockHash?: string;
 };
 
 const getSpotPrice = async (opts: Options): Promise<void> => {
-  const { endpoint, poolId, assetIn, assetOut } = opts;
+  const { endpoint, poolId, assetIn, assetOut, blockHash } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
-  //@ts-ignore
-  const price = await sdk.api.rpc.swaps.getSpotPrice(poolId, assetIn, assetOut);
+  const AssetIn = sdk.api.createType("Asset", util.AssetIdFromString(assetIn));
+  const AssetOut = sdk.api.createType(
+    "Asset",
+    util.AssetIdFromString(assetOut)
+  );
 
-  console.log(price.amount.toString());
+  const pool = await sdk.models.fetchPoolData(Number(poolId));
+  const price = await pool.getSpotPrice(AssetIn, AssetOut, blockHash);
+
+  console.log(`${price}`);
 };
 
 export default getSpotPrice;

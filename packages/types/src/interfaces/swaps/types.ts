@@ -33,6 +33,9 @@ export interface PoolAssetsEvent extends Struct {
   readonly transferred: Vec<Balance>;
 }
 
+/** @name PoolId */
+export interface PoolId extends u128 {}
+
 /** @name SwapEvent */
 export interface SwapEvent extends Struct {
   readonly asset_amount_in: Balance;

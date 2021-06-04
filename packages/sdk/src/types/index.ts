@@ -1,7 +1,11 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
-//@ts-ignore
-import { Market, MarketType, Outcome } from "@zeitgeistpm/types/interfaces/predictionMarkets";
+import {
+  Market,
+  MarketType,
+  OutcomeReport,
+} from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
+import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
 // Just a market identifier.
 export type MarketId = number;
@@ -11,39 +15,48 @@ export type CategoricalMarket = {
 };
 
 export type ScalarMarket = {
-  lowerBound: number,
-  higherBound: number,
+  lowerBound: number;
+  higherBound: number;
 };
 
-export type OutcomeIndex = [
-  number, number | string
-];
+export type OutcomeIndex = [number, number | string];
 
 type categoricalOutcomeIndex = [number, number];
 
-type scalarOutcomeIndex = [number, "Long" | "Short" ];
+type scalarOutcomeIndex = [number, "Long" | "Short"];
 
-export type marketTypeForHuman = 
-    CategoricalOutcome
+export type AssetId =
+  | CategoricalOutcome
   | ScalarOutcome
   | {
-    ztg: null;
-  } | {
-    poolShare: number;
-  };
+      ztg: null;
+    }
+  | {
+      poolShare: number;
+    };
 
 export type CategoricalOutcome = {
- categoricalOutcome : categoricalOutcomeIndex;
-}
-
-export type ScalarOutcome = {
-  scalarOutcome: scalarOutcomeIndex;  
+  categoricalOutcome: categoricalOutcomeIndex;
 };
 
-export type OutcomeAsset = CategoricalOutcome | ScalarOutcome;
+export type ScalarOutcome = {
+  scalarOutcome: scalarOutcomeIndex;
+};
 
 // The market type as returned by the API call to `predictionMarkets.markets`.
-export type MarketResponse = Market;
+export type MarketResponse = {
+  creator: string;
+  creation: MarketCreation;
+  creator_fee: number;
+  oracle: string;
+  end: MarketEnd;
+  metadata: string;
+  market_type: MarketType;
+  market_status: string;
+  report: Report | null;
+  categories: string[] | null;
+  resolved_outcome: number | null;
+};
 
 // The extended market data from which a market may be created.
 export type ExtendedMarketResponse = {
@@ -56,14 +69,14 @@ export type ExtendedMarketResponse = {
   market_type: MarketType;
   market_status: string;
   report: Report | null;
-  categories: number | null;
+  categories: string[] | null;
   resolved_outcome: number | null;
   // new ones
   marketId: number;
   title: string;
   description: string;
   metadataString: string;
-  outcomeAssets: OutcomeAsset[];
+  outcomeAssets: Asset[];
 };
 
 // The extended market data from which a market may be created.
@@ -84,13 +97,13 @@ export type FilteredMarketResponse = {
   title?: string;
   description?: string;
   metadataString?: string;
-  outcomeAssets?: OutcomeAsset[];
+  outcomeAssets?: Asset[];
 };
 
 export type Report = {
   at: number;
   by: string;
-  outcome: Outcome;
+  outcome: OutcomeReport;
 };
 
 export type MarketEnd = { block: number } | { timestamp: number };
@@ -100,19 +113,18 @@ export type MarketCreation = "Permissioned" | "Advised";
 export type MarketDispute = {
   at: number;
   by: string;
-  outcome: Outcome;
+  outcome: OutcomeReport;
 };
 
 export type PoolResponse = {
-  assets: string[];
+  assets: string[] | AssetId[];
   swap_fee: number;
   total_weight: number;
   weights: any; // { string => number } TODO how to do repr this in TS?
 };
 
-
 interface PoolJoinOrExitIncomplete {
-  // amount: number;
+  amount: number;
 }
 
 interface PoolJoinForMaxAsset extends PoolJoinOrExitIncomplete {
@@ -157,17 +169,17 @@ export type poolExitBounds = PoolExitForMinAsset | PoolExitForMaxPool;
 
 export type PoolId = number;
 
-export type AssetId = string;
+export type AssetIdStringForTempCompatibility = string;
 
 export type poolJoinOpts = {
-  asset? : AssetId;
+  asset?: AssetIdStringForTempCompatibility;
   bounds: poolJoinBounds;
-}
+};
 
 export type poolExitOpts = {
-  asset? : AssetId;
+  asset?: AssetIdStringForTempCompatibility;
   bounds: poolExitBounds;
-}
+};
 
 export type ExtSigner = { address: string; signer: Signer };
 

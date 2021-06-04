@@ -21,6 +21,7 @@ export default {
       cpep: "CommonPoolEventParams<AccountId>",
       transferred: "Balance",
     },
+    PoolId: "u128",
     SwapEvent: {
       asset_amount_in: "Balance",
       asset_amount_out: "Balance",

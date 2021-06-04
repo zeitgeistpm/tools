@@ -1,32 +1,40 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { hexToNumber, hexToString } from "@polkadot/util";
-import all from "it-all";
-import { concat, toString } from "uint8arrays";
+import { hexToNumber, u8aToHex } from "@polkadot/util";
 import { unsubOrWarns } from "../util";
+import { Pool } from "@zeitgeistpm/types/dist/interfaces/swaps";
+import { Option } from "@polkadot/types";
 
 import {
   MarketEnd,
   MarketId,
   MarketResponse,
   ExtendedMarketResponse,
-  PoolResponse,
   KeyringPairOrExtSigner,
   PoolId,
 } from "../types";
-import { initIpfs, changeEndianness, isExtSigner } from "../util";
+import { changeEndianness, isExtSigner } from "../util";
 
 import Market from "./market";
 import Swap from "./swaps";
+import ErrorTable from "../errorTable";
+import IPFS from "../storage/ipfs";
 
 export { Market, Swap };
 
+type Options = {
+  MAX_RPC_REQUESTS?: number;
+};
+
 export default class Models {
-
   private api: ApiPromise;
+  private errorTable: ErrorTable;
+  MAX_RPC_REQUESTS: number;
 
-  constructor(api: ApiPromise) {
+  constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options = {}) {
     this.api = api;
+    this.errorTable = errorTable;
+    this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
   }
 
   /**
@@ -76,15 +84,17 @@ export default class Models {
     categories = ["Yes", "No"],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
-    const ipfs = initIpfs();
+    const ipfs = new IPFS();
 
-    const { cid } = await ipfs.add({
-      content: JSON.stringify({
+    const cid = await ipfs.add(
+      JSON.stringify({
         title,
         description,
         categories,
-      }),
-    });
+      })
+    );
+
+    const multihash = { Sha3_384: cid.multihash };
 
     return new Promise(async (resolve) => {
       const _callback = (
@@ -103,7 +113,12 @@ export default class Models {
             if (method == "MarketCreated") {
               _resolve(data[0].toString());
             } else if (method == "ExtrinsicFailed") {
-              console.log("Extrinsic failed");
+              const { index, error } = data.toJSON()[0].module;
+              const { errorName, documentation } = this.errorTable.getEntry(
+                index,
+                error
+              );
+              console.log(`${errorName}: ${documentation}`);
               _resolve("");
             }
 
@@ -114,7 +129,13 @@ export default class Models {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(oracle, end, cid.toString(), creationType, categories.length)
+          .createCategoricalMarket(
+            oracle,
+            end,
+            multihash,
+            creationType,
+            categories.length
+          )
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -122,7 +143,13 @@ export default class Models {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(oracle, end, cid.toString(), creationType, categories.length)
+          .createCategoricalMarket(
+            oracle,
+            end,
+            multihash,
+            creationType,
+            categories.length
+          )
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)
@@ -136,27 +163,17 @@ export default class Models {
    * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
    * @param marketId The unique identifier for the market you want to fetch.
    */
-  async fetchMarketData(
-    marketId: MarketId,
-  ): Promise<Market> {
-    const ipfs = initIpfs();
+  async fetchMarketData(marketId: MarketId): Promise<Market> {
+    const marketRaw = await this.api.query.predictionMarkets.markets(marketId);
 
-
-    const marketRaw =
-      await this.api.query.predictionMarkets.markets(marketId);
-
-    // TODO: type (#???)
-    const marketJson = marketRaw.toJSON() as MarketResponse;
+    const marketJson = marketRaw.toJSON() as never as MarketResponse;
 
     if (!marketJson) {
       throw new Error(`Market with market id ${marketId} does not exist.`);
     }
 
     const extendedMarket = marketJson;
-
-    //@ts-ignore
     const { metadata } = marketJson;
-    const metadataString = hexToString(metadata.toString());
 
     // Default to no metadata, but actually parse it below if it exists.
     let data = {
@@ -167,8 +184,9 @@ export default class Models {
 
     try {
       // Metadata exists, so parse it.
-      if (metadataString) {
-        const raw = toString(concat(await all(ipfs.cat(metadataString))));
+      if (metadata) {
+        const ipfs = new IPFS();
+        const raw = await ipfs.read(metadata);
 
         try {
           // new version
@@ -194,28 +212,32 @@ export default class Models {
           data = extract(raw);
         }
       }
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
 
     //@ts-ignore
     const market = marketRaw.unwrap();
 
     //@ts-ignore
-    const outcomeAssets = market.market_type.isCategorical 
-      //@ts-ignore
-      ? [...Array(market.market_type.asCategorical.toNumber()).keys()].map((catIdx) => {
+    const outcomeAssets = market.market_type.isCategorical
+      ? //@ts-ignore
+        [...Array(market.market_type.asCategorical.toNumber()).keys()].map(
+          (catIdx) => {
+            //@ts-ignore
+            return this.api.createType("Asset", {
+              categoricalOutcome: [marketId, catIdx],
+            });
+          }
+        )
+      : ["Long", "Short"].map((pos) => {
+          //@ts-ignore
+          const position = this.api.createType("ScalarPosition", pos);
           //@ts-ignore
           return this.api.createType("Asset", {
-            categoricalOutcome: [ marketId, catIdx ]
+            scalarOutcome: [marketId, position.toString()],
           });
-        })
-      : ["Long", "Short"].map((pos) => {
-        //@ts-ignore
-        const position = this.api.createType("ScalarPosition", pos);
-        //@ts-ignore
-        return this.api.createType("Asset", {
-          scalarOutcome: [ marketId, position.toString() ]
         });
-      });
   
     extendedMarket.report = market.report.isSome ? market.report.value : null;
     extendedMarket.resolved_outcome = market.resolved_outcome.isSome
@@ -225,11 +247,14 @@ export default class Models {
     Object.assign(extendedMarket, {
       ...data,
       marketId,
-      metadataString,
+      metadataString: metadata,
       outcomeAssets,
     });
 
-    const extendedMarketResponse = new Market(extendedMarket as any, this.api);
+    const extendedMarketResponse = new Market(
+      extendedMarket as never as ExtendedMarketResponse,
+      this.api
+    );
 
     return extendedMarketResponse;
   }
@@ -243,8 +268,11 @@ export default class Models {
     const count = (
       await this.api.query.predictionMarkets.marketCount()
     ).toJSON();
-    if (typeof count !== 'number')
-      throw new Error('Expected a number to return from api.query.predictionMarkets.marketCount (even if variable remains unset)');
+    if (typeof count !== "number") {
+      throw new Error(
+        "Expected a number to return from api.query.predictionMarkets.marketCount (even if variable remains unset)"
+      );
+    }
     return count;
   }
 
@@ -254,13 +282,16 @@ export default class Models {
    * but all registered disputes will still be returned even if, eg, resolved.
    * To check if disputes are active, use viewMarket and check market_status for "Disputed"
    */
-  async fetchDisputes(marketId: MarketId): Promise<any> {    
+  async fetchDisputes(marketId: MarketId): Promise<any> {
     const res = (
       await this.api.query.predictionMarkets.disputes(marketId)
-    ).toJSON() ;
+    ).toJSON();
 
-    if (!Array.isArray(res))
-      throw new Error(`fetchDisputes expected response an array but got ${typeof res}.`);
+    if (!Array.isArray(res)) {
+      throw new Error(
+        `fetchDisputes expected response an array but got ${typeof res}.`
+      );
+    }
 
     if (!res.length) {
       const market = (
@@ -270,28 +301,181 @@ export default class Models {
         throw new Error(`Market with market id ${marketId} does not exist.`);
       }
       //@ts-ignore
-      if (!market.report)
-        throw new Error(`Market with market id ${marketId} has not been reported and therefore has not been disputed.`);
+      if (!market.report) {
+        throw new Error(
+          `Market with market id ${marketId} has not been reported and therefore has not been disputed.`
+        );
       }
+    }
 
     return res;
   }
 
-  async fetchPoolData(poolId: PoolId): Promise<Swap> {
-    const poolResponse = (
-      await this.api.query.swaps.pools(poolId)
-    ).toJSON() as PoolResponse;
+  async fetchPoolData(poolId: PoolId): Promise<Swap | null> {
+    const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
-    return new Swap(poolId, poolResponse, this.api);
+    if (pool.isSome) {
+      return new Swap(poolId, pool.unwrap(), this.api);
+    } else {
+      return null;
+    }
   }
 
-  async getAssetsPrices(blockNumber: any): Promise<any> {
+  async assetSpotPricesInZtg(blockHash?: any): Promise<any> {
     const markets = await this.getAllMarkets();
     let priceData = {};
+
     for (const market of markets) {
-      const assetPrices = await market.getAssetsPrices(blockNumber);
+      const assetPrices = await market.assetSpotPricesInZtg(blockHash);
       priceData = { ...priceData, ...assetPrices };
     }
     return priceData;
+  }
+
+  async getBlockData(blockHash?: any): Promise<any> {
+    console.log(blockHash.toString());
+
+    const data = await this.api.rpc.chain.getBlock(blockHash);
+    console.log(data);
+    return data;
+  }
+
+  async indexTransferRecipients(
+    startBlock = 0,
+    endBlock?: number,
+    arbitrarySet?: number[],
+    filter?: any
+  ): Promise<any[]> {
+    const index = {};
+    const head = this.api.rpc.chain.getHeader();
+    console.log([...Array(endBlock)]);
+
+    let outstandingRequests = 0;
+    let extrinsics = [];
+
+    const range = [
+      ...Array(
+        Number(endBlock) || (await (await head).number.toNumber())
+      ).keys(),
+    ].slice(startBlock || 0);
+    if (arbitrarySet) {
+      console.log(arbitrarySet);
+    } else {
+      console.log(`${startBlock} to ${endBlock}`);
+      console.log(range);
+    }
+
+    const chunkSize = (arbitrarySet || range).length;
+    console.log(`...makes ${chunkSize} blocks`);
+
+    let timer = Date.now();
+
+    if (chunkSize > this.MAX_RPC_REQUESTS) {
+      const chunks = [];
+      const whole = arbitrarySet ? [...arbitrarySet] : range;
+
+      console.log(
+        `Blocks exceed MAX_RPC_REQUESTS (${this.MAX_RPC_REQUESTS}). Chunking at: ${timer}`
+      );
+
+      while (whole.length) {
+        chunks.push(whole.splice(0, this.MAX_RPC_REQUESTS));
+      }
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      const chunkedExtrinsics: any[] = chunks.map((_) => new Promise(() => {}));
+
+      const outerTrigger = chunks.reduce(async (trigger, chunk, idx) => {
+        await trigger;
+        console.log(
+          `Chunk ${idx}: ${idx * this.MAX_RPC_REQUESTS}-${
+            (idx + 1) * this.MAX_RPC_REQUESTS - 1
+          }:`
+        );
+
+        chunkedExtrinsics[idx] = await this.indexTransferRecipients(
+          0,
+          0,
+          chunk,
+          filter
+        );
+        console.log(`Chunk ${idx}: extrinsics fetched at: ${Date.now()}`);
+
+        return await chunkedExtrinsics[idx];
+      }, chunks[0]);
+
+      // Native Array.flat requires TS lib: "es2019" || "es2019.array" which conflict with ipfs-core-types
+      const arrayFlat1 = (arr) => arr.reduce((a, b) => a.concat(b), []);
+
+      await outerTrigger;
+
+      console.log(`All extrinsics fetched at ${Date.now}`);
+
+      const result = Promise.all(arrayFlat1(chunkedExtrinsics));
+      return await result;
+    }
+
+    console.log("beginning retrieval at:", Date.now());
+
+    try {
+      const blockHashes = await Promise.all(
+        (arbitrarySet || range).map((block, idx) => {
+          outstandingRequests++;
+          if (Date.now() - timer > 30000) {
+            console.log(`Progress: ${idx}/${chunkSize}`);
+            timer = Date.now();
+          }
+          return this.api.rpc.chain.getBlockHash(block);
+        })
+      );
+
+      outstandingRequests = 0;
+      timer = Date.now();
+      const blocks = Promise.all(
+        blockHashes.map((hash, idx) => {
+          outstandingRequests++;
+          if (Date.now() - timer > 30000) {
+            console.log(`Progress: ${idx}`);
+            timer = Date.now();
+          }
+
+          try {
+            return this.api.rpc.chain
+              .getBlock(hash)
+              .then((block) => block.block);
+          } catch (e) {
+            console.log("Oops at:", Date.now());
+            console.log(hash);
+
+            console.log("Requests outstanding:", outstandingRequests);
+          }
+        })
+      );
+      console.log(
+        (arbitrarySet || range)[0],
+        "-",
+        (arbitrarySet || range)[chunkSize - 1],
+        ","
+      );
+      console.log(" chunk sent at:", Date.now());
+
+      await blocks;
+      outstandingRequests = 0;
+      console.log("retrieved but not logged at:", Date.now());
+
+      extrinsics = (await blocks).map((block) => block.extrinsics);
+    } catch (e) {
+      console.log("Oops at:", Date.now());
+      console.log("Requests outstanding:", outstandingRequests);
+      throw e;
+    }
+
+    (arbitrarySet || range).forEach((blockNum, idx) => {
+      //@ts-ignore
+      extrinsics[idx].blockNum = blockNum;
+    });
+
+    console.log("Requests outstanding:", outstandingRequests);
+
+    return extrinsics;
   }
 }
