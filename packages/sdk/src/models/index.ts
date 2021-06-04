@@ -239,9 +239,7 @@ export default class Models {
           });
         });
 
-    extendedMarket.report = market.report.isSome
-      ? market.report.value
-      : null;
+    extendedMarket.report = market.report.isSome ? market.report.value : null;
     extendedMarket.resolved_outcome = market.resolved_outcome.isSome
       ? market.resolved_outcome.value.toNumber()
       : null;
