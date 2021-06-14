@@ -13,6 +13,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   rules: {
+    "security/detect-object-injection": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     curly: 2,
     "prettier/prettier": [
