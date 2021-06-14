@@ -19,7 +19,9 @@
     "prettier": "^2.3.0",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.3.2"
+    "typedoc": "^0.20.36",
+    "typedoc-plugin-markdown": "^3.9.0",
+    "typescript": "4.2"
   },
   "scripts": {
     "hooks-init": "husky install",
@@ -33,6 +35,7 @@
     "sdk:lint": "tsc --noEmit && eslint 'packages/sdk/src/**/*.ts'",
     "sdk:lint-quiet": "tsc --noEmit && eslint 'packages/sdk/src/**/*.ts' --quiet",
     "sdk:lint-fix": "tsc --noEmit && eslint 'packages/sdk/src/**/*.ts' --fix",
+    "sdk:makeDocs": "npx typedoc packages/sdk/src/index.ts",
     "type-defs:lint": "tsc --noEmit ; eslint packages/type-defs/src/**/*.ts",
     "type-defs:lint-fix": "tsc --noEmit ; eslint packages/type-defs/src/**/*.ts --fix",
     "types:getMetadata": "ts-node packages/types/scripts/getMetadata.ts",
