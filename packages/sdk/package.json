@@ -14,8 +14,8 @@
     "start": "ts-node src/index start",
     "test": "jest"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Zeitgeist PM <contact@zeitgeist.pm>",
+  "license": "GPL-3.0",
   "dependencies": {
     "@polkadot/api": "^4.4.1",
     "@polkadot/keyring": "^6.0.5",

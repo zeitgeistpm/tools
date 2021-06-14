@@ -4,7 +4,6 @@ import ErrorTable from "./errorTable";
 import Models from "./models";
 import { initApi } from "./util";
 
-export * as consts from "./consts";
 export * as models from "./models";
 export * as types from "./types";
 export * as util from "./util";
@@ -30,7 +29,7 @@ export default class SDK {
     return sdk;
   }
 
-  static mock(mockedAPI: any): SDK {
+  static mock(mockedAPI: ApiPromise): SDK {
     return new SDK(mockedAPI);
   }
 
