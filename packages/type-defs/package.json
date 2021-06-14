@@ -10,7 +10,7 @@
     "rebuild": "rm -rf dist; yarn dist",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
-  "author": "Zeitgeist PM <contact@zeitgeist.pm>",
-  "license": "GPL-3.0",
+  "author": "",
+  "license": "ISC",
   "gitHead": "f65183993419e36276711f4634c57536ffad93a1"
 }
