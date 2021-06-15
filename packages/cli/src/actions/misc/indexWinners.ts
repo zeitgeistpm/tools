@@ -1,6 +1,5 @@
 import fs from "fs";
-import SDK, { util } from "@zeitgeistpm/sdk";
-import { hexToBn, isHex } from "@polkadot/util";
+import SDK from "@zeitgeistpm/sdk";
 
 type Options = {
   marketId?: number;
