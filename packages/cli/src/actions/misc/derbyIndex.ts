@@ -102,8 +102,8 @@ const derbyIndex = async () => {
 
   await getAllBalances();
 
-  for (const entry of Store.entries()) {
-    console.log(entry);
+  for (const entry of Array.from(Store)) {
+    fs.appendFileSync("derbyIndex.output", `${entry[0]},${entry[1]}\n`);
   }
 };
 
