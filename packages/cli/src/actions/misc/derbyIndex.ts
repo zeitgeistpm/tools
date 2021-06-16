@@ -7,7 +7,7 @@ import { encodeAddress } from "@polkadot/util-crypto";
  * Rewards are determined by the following participations:
  * 1) Getting a token from the faucet - 0.1 points
  * 2) Placing a trade on the markets - 1 points
- * 3) Predicting the correct winner - 5 points
+ * 3) Predicting the correct winner - 5 points (TODO)
  * 4) Ending balance - MIN(10, bal * 0.01) points
  */
 
@@ -87,13 +87,9 @@ const derbyIndex = async () => {
     const allKeys = await sdk.api.query.system.account.keys();
     const balances = await Promise.all(
       allKeys.map(async (key) => {
-        // console.log(key.toString());
         const pubkey = key.toString().slice(-64);
-        console.log(pubkey);
         const address = encodeAddress("0x" + pubkey);
-        console.log(address.toString());
         const data = await sdk.api.query.system.account(address);
-        // console.log(data.nonce.toString());
         return [address.toString(), data.data.free.toString()];
       })
     );
@@ -105,6 +101,10 @@ const derbyIndex = async () => {
   };
 
   await getAllBalances();
+
+  for (const entry of Store.entries()) {
+    console.log(entry);
+  }
 };
 
 try {
