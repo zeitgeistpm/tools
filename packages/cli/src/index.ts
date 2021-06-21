@@ -3,6 +3,7 @@ import program from "commander";
 import buyCompleteSet from "./actions/buyCompleteSet";
 import getBlockHashes from "./actions/blockHashes";
 import createMarket from "./actions/createMarket";
+import createScalarMarket from "./actions/createScalarMarket";
 import cancelPendingMarket from "./actions/cancelPendingMarket";
 import disputeMarket from "./actions/disputeMarket";
 import reportMarket from "./actions/reportMarket";
@@ -90,6 +91,53 @@ program
     ) =>
       catchErrorsAndExit(
         createMarket,
+        Object.assign(opts, { title, description, oracle, end })
+      )
+  );
+
+program
+  .command("createScalarMarket <title> <description> <oracle> <end>")
+  .option(
+    "--advised",
+    "Create Advised market instead of Permissionless market",
+    false
+  )
+  .option(
+    "-lb --lowerBound <lowerBound>",
+    "A lower bound for scalar market range"
+  )
+  .option(
+    "-ub --higherBound <higherBound>",
+    "A upper bound for scalar market range"
+  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bp-rpc.zeitgeist.pm"
+  )
+  .option(
+    "--timestamp",
+    "Interpret the end value as a unix timestamp instead of a block number",
+    false
+  )
+  .action(
+    (
+      title: string,
+      description: string,
+      oracle: string,
+      end: string,
+      opts: {
+        endpoint: string;
+        seed: string;
+        lowerBound: number;
+        higherBound: number;
+        advised: boolean;
+        timestamp: boolean;
+      }
+    ) =>
+      catchErrorsAndExit(
+        createScalarMarket,
         Object.assign(opts, { title, description, oracle, end })
       )
   );
