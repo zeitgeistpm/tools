@@ -8,19 +8,19 @@
   ],
   "name": "tools",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.25.0",
-    "@typescript-eslint/parser": "^4.25.0",
-    "eslint": "^7.27.0",
+    "@typescript-eslint/eslint-plugin": "^4.28.0",
+    "@typescript-eslint/parser": "^4.28.0",
+    "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-security": "^1.4.0",
     "husky": "^6.0.0",
     "lerna": "^4.0.0",
-    "prettier": "^2.3.0",
+    "prettier": "^2.3.1",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "^3.9.0",
-    "typedoc": "^0.20.36",
-    "typescript": "4.2"
+    "typedoc": "^0.21.0",
+    "typescript": "4.3.4"
   },
   "scripts": {
     "hooks-init": "husky install",

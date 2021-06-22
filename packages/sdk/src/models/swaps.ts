@@ -3,8 +3,11 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { KeyringPairOrExtSigner, AssetId, poolJoinOpts } from "../types";
 import { AssetIdFromString, isExtSigner, unsubOrWarns } from "../util";
-import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces/index";
-// import { util } from "..";
+import {
+  Asset,
+  Pool,
+  PoolStatus,
+} from "@zeitgeistpm/types/dist/interfaces/index";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
@@ -12,6 +15,7 @@ import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces/index";
  */
 export default class Swap {
   public assets: Asset[];
+  public status: string;
   public swapFee: string;
   public totalWeight: string;
   public weights;
@@ -21,9 +25,10 @@ export default class Swap {
   private api: ApiPromise;
 
   constructor(poolId: number, details: Pool, api: ApiPromise) {
-    const { assets, swap_fee, total_weight, weights } = details;
+    const { assets, pool_status, swap_fee, total_weight, weights } = details;
 
     this.assets = assets;
+    this.status = pool_status.toString();
     this.swapFee = swap_fee.toString();
     this.totalWeight = total_weight.toString();
     this.weights = weights;

@@ -18,8 +18,9 @@ export default class ErrorTable {
     const metadata = await api.rpc.state.getMetadata();
     const inner = metadata.get("metadata");
     const errorTable = {};
+
     //@ts-ignore
-    for (const module of inner.toJSON().v12.modules) {
+    for (const module of inner.toJSON().v13.modules) {
       const { errors, index } = module;
       errorTable[index] = {};
       // skip any that don't have errors
