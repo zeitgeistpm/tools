@@ -160,6 +160,89 @@ export default class Models {
   }
 
   /**
+   * Creates a new market with the given parameters. Returns the `marketId` that can be used
+   * to get the full data via `sdk.models.fetchMarket(marketId)`.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param title The title of the new prediction market.
+   * @param description The description / extra information for the market.
+   * @param oracle The address that will be responsible for reporting the market.
+   * @param end Ending block or the ending unix timestamp of the market.
+   * @param creationType "Permissionless" or "Advised"
+   */
+  async createScalarMarket(
+    signer: KeyringPairOrExtSigner,
+    title: string,
+    description: string,
+    oracle: string,
+    end: MarketEnd,
+    creationType = "Advised",
+    bounds = [0, 100],
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> {
+    const ipfs = new IPFS();
+
+    const cid = await ipfs.add(
+      JSON.stringify({
+        title,
+        description,
+        bounds,
+      })
+    );
+
+    const multihash = { Sha3_384: cid.multihash };
+
+    return new Promise(async (resolve) => {
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
+
+        if (status.isInBlock) {
+          console.log(`Transaction included at blockHash ${status.asInBlock}`);
+
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+            
+            if (method == "MarketCreated") {
+              _resolve(data[0].toString());
+            } else if (method == "ExtrinsicFailed") {
+              const { index, error } = data.toJSON()[0].module;
+              const { errorName, documentation } = this.errorTable.getEntry(
+                index,
+                error
+              );
+              console.log(`${errorName}: ${documentation}`);
+              _resolve("");
+            }
+
+            unsubOrWarns(_unsub);
+          });
+        }
+      };
+
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .createScalarMarket(oracle, end, multihash, creationType, bounds)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .createScalarMarket(oracle, end, multihash, creationType, bounds)
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
+  }
+
+  /**
    * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
    * @param marketId The unique identifier for the market you want to fetch.
    */
