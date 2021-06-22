@@ -3,6 +3,7 @@ export default {
   types: {
     Pool: {
       assets: "Vec<Asset>",
+      pool_status: "PoolStatus",
       swap_fee: "Balance",
       total_weight: "u128",
       weights: "BTreeMap<Asset, u128>",
@@ -22,6 +23,12 @@ export default {
       transferred: "Balance",
     },
     PoolId: "u128",
+    PoolStatus: {
+      _enum: {
+        Active: null,
+        Stale: null,
+      },
+    },
     SwapEvent: {
       asset_amount_in: "Balance",
       asset_amount_out: "Balance",

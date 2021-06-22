@@ -1,7 +1,7 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { BTreeMap, Struct, Vec, u128 } from '@polkadot/types';
+import type { BTreeMap, Enum, Struct, Vec, u128 } from '@polkadot/types';
 import type { AccountId, Balance } from '@polkadot/types/interfaces/runtime';
 import type { Asset } from '@zeitgeistpm/types/interfaces/index';
 
@@ -14,6 +14,7 @@ export interface CommonPoolEventParams extends Struct {
 /** @name Pool */
 export interface Pool extends Struct {
   readonly assets: Vec<Asset>;
+  readonly pool_status: PoolStatus;
   readonly swap_fee: Balance;
   readonly total_weight: u128;
   readonly weights: BTreeMap<Asset, u128>;
@@ -35,6 +36,12 @@ export interface PoolAssetsEvent extends Struct {
 
 /** @name PoolId */
 export interface PoolId extends u128 {}
+
+/** @name PoolStatus */
+export interface PoolStatus extends Enum {
+  readonly isActive: boolean;
+  readonly isStale: boolean;
+}
 
 /** @name SwapEvent */
 export interface SwapEvent extends Struct {
