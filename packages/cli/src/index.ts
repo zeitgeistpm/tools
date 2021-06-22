@@ -4,11 +4,11 @@ import indexExtrinsicsUnstable from "./actions/misc/indexWinners";
 
 import approveMarket from "./actions/approveMarket";
 import getBlockHashes from "./actions/blockHashes";
-import createMarket from "./actions/createMarket";
-import createScalarMarket from "./actions/createScalarMarket";
 import buyCompleteSet from "./actions/buyCompleteSet";
+import createScalarMarket from "./actions/createScalarMarket";
 import cancelPendingMarket from "./actions/cancelPendingMarket";
 import countMarkets from "./actions/countMarkets";
+import createMarket from "./actions/createMarket";
 import deployKusamaDerby from "./actions/deployKusamaDerby";
 import deployPool from "./actions/deployPool";
 import disputeMarket from "./actions/disputeMarket";
@@ -104,12 +104,8 @@ program
     false
   )
   .option(
-    "-lb --lowerBound <lowerBound>",
-    "A lower bound for scalar market range"
-  )
-  .option(
-    "-ub --higherBound <higherBound>",
-    "A upper bound for scalar market range"
+    "-b --bounds [bounds...]",
+    "A space-separated lower and higher bound for the market"
   )
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
@@ -131,8 +127,7 @@ program
       opts: {
         endpoint: string;
         seed: string;
-        lowerBound: number;
-        higherBound: number;
+        bounds: number[];
         advised: boolean;
         timestamp: boolean;
       }

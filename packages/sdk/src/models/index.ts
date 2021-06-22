@@ -176,8 +176,7 @@ export default class Models {
     oracle: string,
     end: MarketEnd,
     creationType = "Advised",
-    lowerBound = 0,
-    higherBound = 100,
+    bounds = [0, 100],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = new IPFS();
@@ -186,8 +185,7 @@ export default class Models {
       JSON.stringify({
         title,
         description,
-        lowerBound,
-        higherBound,
+        bounds,
       })
     );
 
@@ -206,7 +204,7 @@ export default class Models {
 
           events.forEach(({ phase, event: { data, method, section } }) => {
             console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-
+            
             if (method == "MarketCreated") {
               _resolve(data[0].toString());
             } else if (method == "ExtrinsicFailed") {
@@ -226,14 +224,7 @@ export default class Models {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .createScalarMarket(
-            oracle,
-            end,
-            multihash,
-            creationType,
-            lowerBound,
-            higherBound
-          )
+          .createScalarMarket(oracle, end, multihash, creationType, bounds)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -241,14 +232,7 @@ export default class Models {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .createScalarMarket(
-            oracle,
-            end,
-            multihash,
-            creationType,
-            lowerBound,
-            higherBound
-          )
+          .createScalarMarket(oracle, end, multihash, creationType, bounds)
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)

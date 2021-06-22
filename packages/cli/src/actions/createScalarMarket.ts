@@ -6,8 +6,7 @@ type Options = {
   description: string;
   oracle: string;
   end: string;
-  lowerBound?: number;
-  higherBound?: number;
+  bounds?: number[];
   advised: boolean;
   seed: string;
   timestamp: boolean;
@@ -19,8 +18,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     description,
     oracle,
     end,
-    lowerBound,
-    higherBound,
+    bounds,
     advised,
     endpoint,
     seed,
@@ -32,7 +30,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
   const signer = util.signerFromSeed(seed);
   console.log("Sending transaction from", signer.address);
 
-  if ((lowerBound && !higherBound) || (!lowerBound && higherBound)) {
+  if (bounds.length !== 2) {
     throw new Error(
       "If specifying bounds, both lower and higher must be specified."
     );
@@ -49,8 +47,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     oracle,
     marketEnd,
     advised ? "Advised" : "Permissionless",
-    lowerBound ? lowerBound : 0,
-    higherBound ? higherBound : 100
+    bounds ? bounds : [0, 100]
   );
 
   console.log(`Market created! Market Id: ${marketId}`);
