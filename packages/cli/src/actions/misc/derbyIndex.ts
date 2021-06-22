@@ -114,7 +114,7 @@ const derbyIndex = async () => {
     }
   };
 
-  // await getAllBalances();
+  await getAllBalances();
   await readExtrinsicsHistory();
 
   for (const entry of Array.from(Store)) {
