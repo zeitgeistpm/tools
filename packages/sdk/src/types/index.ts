@@ -1,7 +1,6 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
 import {
-  Market,
   MarketType,
   OutcomeReport,
 } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
