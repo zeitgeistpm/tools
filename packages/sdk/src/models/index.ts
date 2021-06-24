@@ -1,6 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { hexToNumber, u8aToHex } from "@polkadot/util";
+import { hexToNumber } from "@polkadot/util";
 import { unsubOrWarns } from "../util";
 import { Pool } from "@zeitgeistpm/types/dist/interfaces/swaps";
 import { Option } from "@polkadot/types";
@@ -204,7 +204,7 @@ export default class Models {
 
           events.forEach(({ phase, event: { data, method, section } }) => {
             console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-            
+
             if (method == "MarketCreated") {
               _resolve(data[0].toString());
             } else if (method == "ExtrinsicFailed") {

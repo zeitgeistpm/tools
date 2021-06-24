@@ -32,6 +32,6 @@ export default class IPFS {
     const cid = new CID("f0155" + partialCid.slice(2));
     const data = await all(this.client.cat(cid));
 
-    return data.toString();
+    return u8aToString(data[0] as Buffer);
   }
 }
