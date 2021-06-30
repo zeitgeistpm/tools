@@ -172,7 +172,6 @@ class Market {
 
     if (poolId == null) {
       return null;
-      
     }
 
     const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
