@@ -113,6 +113,11 @@ class Market {
     }
   }
 
+  /**
+   * Populate only selected attributes from the market data defined using filter.
+   * @param market The market data.
+   * @param filters The only attributes you want to fetch from the market data.
+   */
   static filterMarketData(
     market: ExtendedMarketResponse | MarketResponse | Market,
     filter?: string[] | null
@@ -131,6 +136,9 @@ class Market {
     return res;
   }
 
+  /**
+   * Get timestamp at the end of the block (MarketEnd)
+   */
   async getEndTimestamp(): Promise<number> {
     if ("timestamp" in this.end) {
       return this.end.timestamp;
@@ -143,12 +151,19 @@ class Market {
     return now + diffInMs;
   }
 
+  /**
+   * Get pool id to be used for fetching data using `sdk.models.market.getPool()`.
+   * Returns null if no swap pool is available for the market
+   */
   getPoolId = async (): Promise<number | null> => {
     return (
       await this.api.query.predictionMarkets.marketToSwapPool(this.marketId)
     ).toHuman() as number;
   };
 
+  /**
+   * Recreate swap pool for this market using data fetched with `poolId`.
+   */
   getPool = async (): Promise<Swap | null> => {
     const poolId = await this.getPoolId();
     if (poolId == null) {
@@ -157,6 +172,7 @@ class Market {
 
     if (poolId == null) {
       return null;
+      
     }
 
     const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
@@ -167,12 +183,21 @@ class Market {
     return null;
   };
 
+  /**
+   * Fetch disputes for this market using unique identifier `marketId`.
+   */
   getDisputes = async (): Promise<MarketDispute[]> => {
     return (
       await this.api.query.predictionMarkets.disputes(this.marketId)
     ).toJSON() as any[];
   };
 
+  /**
+   * Creates swap pool for this market via `api.tx.predictionMarkets.deploySwapPoolForMarket(marketId, weights)`.
+   * Throws error if swap pool already exists for the market
+   * @param signer The actual signer provider to sign the transaction.
+   * @param weights List of lengths for each asset.
+   */
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
     weights: string[],
@@ -263,6 +288,11 @@ class Market {
     });
   };
 
+  /**
+   * Fetch spot prices of all assets in this market
+   * Can be used to find prices at a particular block using unique identifier.
+   * @param blockHash The unique identifier for the block to fetch asset spot prices.
+   */
   async assetSpotPricesInZtg(
     blockHash?: any
   ): Promise<{ [key: string]: string }> {
@@ -277,6 +307,12 @@ class Market {
     return pool.assetSpotPricesInZtg(blockHash);
   }
 
+  /**
+   * Buys a complete set of outcome shares for the market.
+   * Note: This is the only way to create new shares.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param amount The amount of each share.
+   */
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
@@ -325,6 +361,11 @@ class Market {
     });
   }
 
+  /**
+   * Sells/Destroys a complete set of outcome shares for the market.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param amount The amount of each share.
+   */
   async sellCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
@@ -373,6 +414,11 @@ class Market {
     });
   }
 
+  /**
+   * Reports an outcome for the market.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param outcome The outcome of the market
+   */
   async reportOutcome(
     signer: KeyringPairOrExtSigner,
     outcome: number,
@@ -423,6 +469,11 @@ class Market {
     });
   }
 
+  /**
+   * Submits a disputed outcome for the market.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param outcome The outcome of the market
+   */
   async dispute(
     signer: KeyringPairOrExtSigner,
     outcome: number,
@@ -473,6 +524,11 @@ class Market {
     });
   }
 
+  /**
+   * Redeems the winning shares for the market.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param outcome The outcome of the market
+   */
   async redeemShares(
     signer: KeyringPairOrExtSigner,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -522,6 +578,10 @@ class Market {
     });
   }
 
+  /**
+   * Approves the `Proposed` market that is waiting for approval from the advisory committee.
+   * @param signer The actual signer provider to sign the transaction.
+   */
   async approve(
     signer: KeyringPairOrExtSigner,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -574,6 +634,10 @@ class Market {
     });
   }
 
+  /**
+   * Rejects the `Proposed` market that is waiting for approval from the advisory committee.
+   * @param signer The actual signer provider to sign the transaction.
+   */
   async reject(
     signer: KeyringPairOrExtSigner,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -626,6 +690,10 @@ class Market {
     });
   }
 
+  /**
+   * Allows the proposer of the market that is currently in a `Proposed` state to cancel the market proposal.
+   * @param signer The actual signer provider to sign the transaction.
+   */
   async cancelAdvised(
     signer: KeyringPairOrExtSigner,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
