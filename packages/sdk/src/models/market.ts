@@ -97,16 +97,24 @@ class Market {
     this.api = api;
   }
 
+  /**
+   * Converts market object into string.
+   */
   toJSONString(): string {
     const market = Object.assign({}, this);
     delete market.api;
     return JSON.stringify(market, null, 2);
   }
 
+  /**
+   * Converts market object into string with filters.
+   * @param filter The only attributes you want to fetch from the market data.
+   */
   toFilteredJSONString(filter?: string[] | null): string {
     const market = Object.assign({}, this);
     delete market.api;
     if (!filter) {
+      // Acts like toJSONString() in absence of filter.
       return JSON.stringify(market, null, 2);
     } else {
       return JSON.stringify(Market.filterMarketData(market, filter), null, 2);
@@ -116,16 +124,18 @@ class Market {
   /**
    * Populate only selected attributes from the market data defined using filter.
    * @param market The market data.
-   * @param filters The only attributes you want to fetch from the market data.
+   * @param filter The only attributes you want to populate from this market.
    */
   static filterMarketData(
     market: ExtendedMarketResponse | MarketResponse | Market,
     filter?: string[] | null
   ): FilteredMarketResponse {
     if (!filter) {
+      // Sends back the received market data in absence of filter.
       return market as any;
     }
 
+    // Populates `marketId` by default.
     const alwaysInclude = ["marketId"];
 
     const res = {};
@@ -193,9 +203,9 @@ class Market {
 
   /**
    * Creates swap pool for this market via `api.tx.predictionMarkets.deploySwapPoolForMarket(marketId, weights)`.
-   * Throws error if swap pool already exists for the market
    * @param signer The actual signer provider to sign the transaction.
    * @param weights List of lengths for each asset.
+   * @throws Error if swap pool already exists for the market.
    */
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
