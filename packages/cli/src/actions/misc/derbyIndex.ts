@@ -38,7 +38,7 @@ const addPoints = (address: string, points: number): boolean => {
  * based on how they participated.
  */
 const derbyIndex = async () => {
-  const sdk = await SDK.initialize("wss://bp-rpc.zeitgeist.pm");
+  const sdk = await SDK.initialize("ws://localhost:9944");
 
   const readExtrinsicsHistory = async () => {
     const currentHeader = await sdk.api.rpc.chain.getHeader();
@@ -83,7 +83,6 @@ const derbyIndex = async () => {
           if (section === "predictionMarkets") {
             if (exMethod === "redeemShares") {
               const marketId = Number(args[0].toString());
-              console.log("marketId", marketId);
               if (DERBY_MARKETS.indexOf(marketId) !== -1) {
                 addPoints(signer.toString(), 5);
               }
