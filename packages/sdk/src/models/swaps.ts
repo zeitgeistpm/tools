@@ -14,11 +14,17 @@ import {
  * providing liquidity to pools and swapping assets.
  */
 export default class Swap {
+  /** The share identifiers */
   public assets: Asset[];
+  /** The status of the swap. */
   public status: string;
+  /** The fee applied to each swap. */
   public swapFee: string;
+  /** The sum of `weights` */
   public totalWeight: string;
+  /** The list of lengths for each asset. */
   public weights;
+  /** The unique identifier for this pool. */
   public poolId: number;
 
   /** Internally hold a reference to the API that created it. */
@@ -154,6 +160,12 @@ export default class Swap {
   //     });
   // };
 
+  /**
+   * Joins a given set of assets provided by signer to the pool.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param poolAmountOut The amount of LP shares for this pool that should be minted to the provider.
+   * @param maxAmountsIn List of asset upper bounds. The values are maximum limit for the assets.
+   */
   joinPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,
@@ -210,6 +222,13 @@ export default class Swap {
     });
   };
 
+  /**
+   * Transfer the exact amount of assets from signer to the pool.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param assetIn Asset entering the pool.
+   * @param assetAmount Asset amount that is entering the pool.
+   * @param minPoolAmount The calculated amount for the pool must be equal or greater than the given value.
+   */
   poolJoinWithExactAssetAmount = async (
     signer: KeyringPairOrExtSigner,
     assetIn: any,
@@ -271,6 +290,10 @@ export default class Swap {
   };
 
   /** Three substrate join_pool_xxx functions in one
+   * @param signer The actual signer provider to sign the transaction.
+   * @param opts To be provided with `asset`, `bounds.assetAmount`, `bounds.poolMin` for MinPool
+   * and with `asset`, `bounds.poolAmount`, `bounds.AssetMin` for MaxAsset
+   * and with `bounds.poolAmount`, `bounds.AssetMin` for `sdk.models.swaps.joinPool`.
    */
   joinPoolMultifunc = async (
     signer: KeyringPairOrExtSigner,
@@ -381,6 +404,12 @@ export default class Swap {
     });
   };
 
+  /**
+   * Retrieves a given set of assets from pool to the signer.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param poolAmountIn The amount of LP shares of this pool being burned based on the retrieved assets.
+   * @param minAmountsOut List of asset lower bounds. The values are minimum limit for the assets.
+   */
   exitPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountIn: string,
@@ -438,6 +467,15 @@ export default class Swap {
     });
   };
 
+  /**
+   * Swaps a given `assetAmountIn` of the `assetIn/assetOut` pair to pool.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param assetIn Asset entering the pool.
+   * @param assetAmountIn Amount that will be transferred from the provider to the pool.
+   * @param assetOut Asset leaving the pool.
+   * @param minAmountOut Minimum asset amount that can leave the pool.
+   * @param maxPrice Market price must be equal or less than the provided value.
+   */
   swapExactAmountIn = async (
     signer: KeyringPairOrExtSigner,
     assetIn: string,
@@ -501,6 +539,15 @@ export default class Swap {
     });
   };
 
+  /**
+   * Swaps a given `assetAmountOut` of the `assetIn/assetOut` pair to pool.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param assetIn Asset entering the pool.
+   * @param maxAmountIn Maximum asset amount that can enter the pool.
+   * @param assetOut Asset leaving the pool.
+   * @param assetAmountOut Amount that will be transferred from the pool to the provider.
+   * @param maxPrice Market price must be equal or less than the provided value.
+   */
   swapExactAmountOut = async (
     signer: KeyringPairOrExtSigner,
     assetIn: string,

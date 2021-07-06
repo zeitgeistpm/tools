@@ -40,6 +40,7 @@ export default class Models {
   /**
    * Gets all the market ids that exist in storage.
    * Warning: This could take a while to finish.
+   * @returns The `marketId` of all markets.
    */
   async getAllMarketIds(): Promise<number[]> {
     const keys =
@@ -57,6 +58,7 @@ export default class Models {
   /**
    * Gets all markets that exist in storage.
    * Warning: this could take a while to finish.
+   * @returns The market data using their corresponding `marketId`.
    */
   async getAllMarkets(): Promise<Market[]> {
     const ids = await this.getAllMarketIds();
@@ -65,14 +67,15 @@ export default class Models {
   }
 
   /**
-   * Creates a new market with the given parameters. Returns the `marketId` that can be used
-   * to get the full data via `sdk.models.fetchMarket(marketId)`.
+   * Creates a new categorical market with the given parameters.
    * @param signer The actual signer provider to sign the transaction.
    * @param title The title of the new prediction market.
    * @param description The description / extra information for the market.
    * @param oracle The address that will be responsible for reporting the market.
    * @param end Ending block or the ending unix timestamp of the market.
    * @param creationType "Permissionless" or "Advised"
+   * @param categories Just a array of options, can be just binary with yes or no.
+   * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
   async createNewMarket(
     signer: KeyringPairOrExtSigner,
@@ -160,14 +163,15 @@ export default class Models {
   }
 
   /**
-   * Creates a new market with the given parameters. Returns the `marketId` that can be used
-   * to get the full data via `sdk.models.fetchMarket(marketId)`.
+   * Creates a new scalar market with the given parameters.
    * @param signer The actual signer provider to sign the transaction.
    * @param title The title of the new prediction market.
    * @param description The description / extra information for the market.
    * @param oracle The address that will be responsible for reporting the market.
    * @param end Ending block or the ending unix timestamp of the market.
    * @param creationType "Permissionless" or "Advised"
+   * @param bounds The array having lower and higher bound values denoting range set.
+   * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
   async createScalarMarket(
     signer: KeyringPairOrExtSigner,
@@ -343,9 +347,9 @@ export default class Models {
   }
 
   /**
-   * Fetches market_count variable from Zeitgeist chain
-   * This acts as a count of all markets which have been created, but includes those which have
-   * been cancelled, and all other statuses
+   * This acts as a count of all markets which have been created,
+   * but includes those which have been cancelled, and all other statuses.
+   * @returns The `market_count` from Zeitgeist chain.
    */
   async getMarketCount(): Promise<number | null> {
     const count = (
@@ -360,10 +364,11 @@ export default class Models {
   }
 
   /**
-   * Gets an array of disputes for a given marketId.
-   * Should throw errors where market status is such that no disputes can have been registered.
+   * Should throw errors where market status is such that no disputes can have been registered,
    * but all registered disputes will still be returned even if, eg, resolved.
-   * To check if disputes are active, use viewMarket and check market_status for "Disputed"
+   * To check if disputes are active, use `viewMarket` and check market_status for "Disputed"
+   * @param marketId The unique identifier for the market you want to fetch disputes.
+   * @returns The array of disputes for a given market.
    */
   async fetchDisputes(marketId: MarketId): Promise<any> {
     const res = (
@@ -394,6 +399,10 @@ export default class Models {
     return res;
   }
 
+  /**
+   * @param poolId The unique identifier for the pool you want to fetch data.
+   * @returns `Swap` for the given `poolId`.
+   */
   async fetchPoolData(poolId: PoolId): Promise<Swap | null> {
     const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
@@ -404,6 +413,11 @@ export default class Models {
     }
   }
 
+  /**
+   * Can be used to find prices at a particular block using unique identifier.
+   * @param blockHash The unique identifier for the block to fetch asset spot prices.
+   * @returns Spot prices of all assets in all markets at Zeitgeist.
+   */
   async assetSpotPricesInZtg(blockHash?: any): Promise<any> {
     const markets = await this.getAllMarkets();
     let priceData = {};
@@ -415,6 +429,10 @@ export default class Models {
     return priceData;
   }
 
+  /**
+   * @param blockHash The unique identifier for the block to fetch data.
+   * @returns The data stored in a particular block.
+   */
   async getBlockData(blockHash?: any): Promise<any> {
     console.log(blockHash.toString());
 
