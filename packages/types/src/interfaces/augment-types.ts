@@ -2424,6 +2424,7 @@ declare module '@polkadot/types/types/registry' {
     MarketDispute: MarketDispute;
     MarketEnd: MarketEnd;
     MarketId: MarketId;
+    MarketIdOf: MarketId;
     MarketStatus: MarketStatus;
     MarketType: MarketType;
     MaybeRandomness: MaybeRandomness;

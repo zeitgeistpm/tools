@@ -183,3 +183,5 @@ export type poolExitOpts = {
 export type ExtSigner = { address: string; signer: Signer };
 
 export type KeyringPairOrExtSigner = KeyringPair | ExtSigner;
+
+export type MarketIdOf = MarketId;
