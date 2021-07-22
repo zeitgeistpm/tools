@@ -33,6 +33,7 @@ export const index = {
     CurrencyId: "Asset",
     Index: "u64",
     Lookup: "MultiAddress",
+    MarketIdOf: "u128",
     MultiHash: {
       _enum: {
         Sha3_384: "[u8; 50]",

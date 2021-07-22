@@ -58,7 +58,7 @@ import type { ClassDetails, ClassId, ClassMetadata, DepositBalance, DepositBalan
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces/utility';
 import type { VestingInfo } from '@polkadot/types/interfaces/vesting';
 import type { AccountId32Junction, AccountIndex64Junction, AccountKey20Junction, AssetInstance, BodyId, BodyPart, BodyPartAtLeastProportion, BodyPartFraction, BodyPartMoreThanProportion, DoubleEncodedCall, InboundStatus, Junction, MultiAsset, MultiAssetAbstractFungible, MultiAssetAbstractNonFungible, MultiAssetConcreteFungible, MultiAssetConcreteNonFungible, MultiLocation, NetworkId, OutboundStatus, Outcome, PluralityJunction, QueueConfigData, VersionedMultiAsset, VersionedMultiLocation, VersionedXcm, Xcm, XcmAssetEffects, XcmError, XcmHrmpChannelAccepted, XcmHrmpChannelClosing, XcmHrmpNewChannelOpenRequest, XcmOrder, XcmOrderBuyExecution, XcmOrderDepositAsset, XcmOrderDepositReserveAsset, XcmOrderExchangeAsset, XcmOrderInitiateReserveWithdraw, XcmOrderInitiateTeleport, XcmOrderQueryHolding, XcmOrigin, XcmOriginKind, XcmQueryResponse, XcmRelayedFrom, XcmReserveAssetDeposit, XcmResponse, XcmTeleportAsset, XcmTransact, XcmTransferAsset, XcmTransferReserveAsset, XcmWithdrawAsset, XcmpMessageFormat } from '@polkadot/types/interfaces/xcm';
-import type { Amount, AmountOf, Asset, CategoryIndex, CurrencyId, CurrencyIdOf, Lookup, MultiHash, ScalarPosition, SerdeWrapper } from '@zeitgeistpm/types/interfaces/index';
+import type { Amount, AmountOf, Asset, CategoryIndex, CurrencyId, CurrencyIdOf, Lookup, MarketIdOf, MultiHash, ScalarPosition, SerdeWrapper } from '@zeitgeistpm/types/interfaces/index';
 import type { Order, OrderSide } from '@zeitgeistpm/types/interfaces/orderbook';
 import type { Market, MarketCreation, MarketDispute, MarketEnd, MarketId, MarketStatus, MarketType, OutcomeReport, Report } from '@zeitgeistpm/types/interfaces/predictionMarkets';
 import type { CommonPoolEventParams, Pool, PoolAssetEvent, PoolAssetsEvent, PoolId, PoolStatus, SwapEvent } from '@zeitgeistpm/types/interfaces/swaps';
@@ -101,6 +101,7 @@ declare module '@polkadot/types/types/registry' {
     'Compact<LeasePeriod>': Compact<LeasePeriod>;
     'Compact<LeasePeriodOf>': Compact<LeasePeriodOf>;
     'Compact<MarketId>': Compact<MarketId>;
+    'Compact<MarketIdOf>': Compact<MarketIdOf>;
     'Compact<MemberCount>': Compact<MemberCount>;
     'Compact<Moment>': Compact<Moment>;
     'Compact<MomentOf>': Compact<MomentOf>;
@@ -616,6 +617,7 @@ declare module '@polkadot/types/types/registry' {
     'Option<MarketDispute>': Option<MarketDispute>;
     'Option<MarketEnd>': Option<MarketEnd>;
     'Option<MarketId>': Option<MarketId>;
+    'Option<MarketIdOf>': Option<MarketIdOf>;
     'Option<MarketStatus>': Option<MarketStatus>;
     'Option<MarketType>': Option<MarketType>;
     'Option<MaybeRandomness>': Option<MaybeRandomness>;
@@ -1520,6 +1522,7 @@ declare module '@polkadot/types/types/registry' {
     'Vec<MarketDispute>': Vec<MarketDispute>;
     'Vec<MarketEnd>': Vec<MarketEnd>;
     'Vec<MarketId>': Vec<MarketId>;
+    'Vec<MarketIdOf>': Vec<MarketIdOf>;
     'Vec<MarketStatus>': Vec<MarketStatus>;
     'Vec<MarketType>': Vec<MarketType>;
     'Vec<MaybeRandomness>': Vec<MaybeRandomness>;
@@ -2424,7 +2427,7 @@ declare module '@polkadot/types/types/registry' {
     MarketDispute: MarketDispute;
     MarketEnd: MarketEnd;
     MarketId: MarketId;
-    MarketIdOf: MarketId;
+    MarketIdOf: MarketIdOf;
     MarketStatus: MarketStatus;
     MarketType: MarketType;
     MaybeRandomness: MaybeRandomness;

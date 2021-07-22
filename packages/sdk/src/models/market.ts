@@ -167,7 +167,7 @@ class Market {
    */
   getPoolId = async (): Promise<number | null> => {
     return (
-      await this.api.query.predictionMarkets.marketToSwapPool(this.marketId)
+      await this.api.query.marketCommons.marketPool(this.marketId)
     ).toHuman() as number;
   };
 
@@ -197,7 +197,7 @@ class Market {
    */
   getDisputes = async (): Promise<MarketDispute[]> => {
     return (
-      await this.api.query.predictionMarkets.disputes(this.marketId)
+      await this.api.query.simpleDisputes.disputes(this.marketId)
     ).toJSON() as any[];
   };
 

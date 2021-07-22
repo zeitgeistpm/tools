@@ -45,6 +45,9 @@ export interface Index extends u64 {}
 /** @name Lookup */
 export interface Lookup extends MultiAddress {}
 
+/** @name MarketIdOf */
+export interface MarketIdOf extends u128 {}
+
 /** @name MultiHash */
 export interface MultiHash extends Enum {
   readonly isSha3384: boolean;

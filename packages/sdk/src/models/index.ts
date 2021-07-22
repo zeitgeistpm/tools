@@ -45,8 +45,8 @@ export default class Models {
   async getAllMarketIds(): Promise<number[]> {
     const keys =
       this.api["config"] !== "mock"
-        ? await this.api.query.predictionMarkets.markets.keys()
-        : await this.api.query.predictionMarkets.marketIds.keys();
+        ? await this.api.query.marketCommons.markets.keys()
+        : await this.api.query.marketCommons.marketIds.keys();
 
     return keys.map((key) => {
       const idStr = "0x" + changeEndianness(key.toString().slice(-32));
@@ -251,7 +251,7 @@ export default class Models {
    * @param marketId The unique identifier for the market you want to fetch.
    */
   async fetchMarketData(marketId: MarketId): Promise<Market> {
-    const marketRaw = await this.api.query.predictionMarkets.markets(marketId);
+    const marketRaw = await this.api.query.marketCommons.markets(marketId);
 
     const marketJson = marketRaw.toJSON() as never as MarketResponse;
 
@@ -352,12 +352,10 @@ export default class Models {
    * @returns The `market_count` from Zeitgeist chain.
    */
   async getMarketCount(): Promise<number | null> {
-    const count = (
-      await this.api.query.predictionMarkets.marketCount()
-    ).toJSON();
+    const count = (await this.api.query.marketCommons.marketCount()).toJSON();
     if (typeof count !== "number") {
       throw new Error(
-        "Expected a number to return from api.query.predictionMarkets.marketCount (even if variable remains unset)"
+        "Expected a number to return from api.query.marketCommons.marketCount (even if variable remains unset)"
       );
     }
     return count;
@@ -372,7 +370,7 @@ export default class Models {
    */
   async fetchDisputes(marketId: MarketId): Promise<any> {
     const res = (
-      await this.api.query.predictionMarkets.disputes(marketId)
+      await this.api.query.simpleDisputes.disputes(marketId)
     ).toJSON();
 
     if (!Array.isArray(res)) {
@@ -383,7 +381,7 @@ export default class Models {
 
     if (!res.length) {
       const market = (
-        await this.api.query.predictionMarkets.markets(marketId)
+        await this.api.query.marketCommons.markets(marketId)
       ).toJSON();
       if (!market) {
         throw new Error(`Market with market id ${marketId} does not exist.`);
