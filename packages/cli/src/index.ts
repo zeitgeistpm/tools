@@ -1,7 +1,5 @@
 import program from "commander";
 
-import indexExtrinsicsUnstable from "./actions/misc/indexWinners";
-
 import approveMarket from "./actions/approveMarket";
 import getBlockHashes from "./actions/blockHashes";
 import buyCompleteSet from "./actions/buyCompleteSet";
