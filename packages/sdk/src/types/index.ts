@@ -81,7 +81,6 @@ export type MarketResponse = {
   market_type: MarketType;
   market_status: string;
   report: Report | null;
-  categories: string[] | null;
   resolved_outcome: number | null;
 };
 
