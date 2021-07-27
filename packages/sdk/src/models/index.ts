@@ -259,9 +259,7 @@ export default class Models {
 
     // Default to no metadata, but actually parse it below if it exists.
     let metadata = {
-      description: "No metadata",
       slug: "No metadata",
-      categories: [],
     } as Partial<DecodedMarketMetadata>;
 
     try {
@@ -279,21 +277,16 @@ export default class Models {
     //@ts-ignore
     const market = marketRaw.unwrap();
 
-    //@ts-ignore
-    const outcomeAssets = market.market_type.isCategorical
-      ? //@ts-ignore
-        [...Array(market.market_type.asCategorical.toNumber()).keys()].map(
+    basicMarketData.outcomeAssets = market.market_type.isCategorical
+      ? [...Array(market.market_type.asCategorical.toNumber()).keys()].map(
           (catIdx) => {
-            //@ts-ignore
             return this.api.createType("Asset", {
               categoricalOutcome: [marketId, catIdx],
             });
           }
         )
       : ["Long", "Short"].map((pos) => {
-          //@ts-ignore
           const position = this.api.createType("ScalarPosition", pos);
-          //@ts-ignore
           return this.api.createType("Asset", {
             scalarOutcome: [marketId, position.toString()],
           });

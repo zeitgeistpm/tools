@@ -51,8 +51,6 @@ class Market {
   public description: string;
   /** The market question. */
   public question: string;
-  /** The metadata string. */
-  public metadataString: string;
   /** The share identifiers */
   public outcomeAssets: Asset[];
   /** Market tags */
@@ -84,6 +82,7 @@ class Market {
       market_status: this.marketStatus,
       report: this.report,
       resolved_outcome: this.resolvedOutcome,
+      outcomeAssets: this.outcomeAssets,
     } = market);
 
     ({
