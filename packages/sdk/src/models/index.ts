@@ -9,9 +9,9 @@ import {
   MarketEnd,
   MarketId,
   MarketResponse,
-  ExtendedMarketResponse,
   KeyringPairOrExtSigner,
   PoolId,
+  DecodedMarketMetadata,
 } from "../types";
 import { changeEndianness, isExtSigner } from "../util";
 
@@ -69,31 +69,26 @@ export default class Models {
   /**
    * Creates a new categorical market with the given parameters.
    * @param signer The actual signer provider to sign the transaction.
-   * @param title The title of the new prediction market.
-   * @param description The description / extra information for the market.
    * @param oracle The address that will be responsible for reporting the market.
    * @param end Ending block or the ending unix timestamp of the market.
    * @param creationType "Permissionless" or "Advised"
-   * @param categories Just a array of options, can be just binary with yes or no.
+   * @param metadata Market metadata
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
   async createNewMarket(
     signer: KeyringPairOrExtSigner,
-    title: string,
-    description: string,
     oracle: string,
     end: MarketEnd,
     creationType = "Advised",
-    categories = ["Yes", "No"],
+    metadata: DecodedMarketMetadata,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = new IPFS();
+    const categories = metadata.categories;
 
     const cid = await ipfs.add(
       JSON.stringify({
-        title,
-        description,
-        categories,
+        ...metadata,
       })
     );
 
@@ -259,45 +254,21 @@ export default class Models {
       throw new Error(`Market with market id ${marketId} does not exist.`);
     }
 
-    const extendedMarket = marketJson;
-    const { metadata } = marketJson;
+    const basicMarketData: MarketResponse = { ...marketJson };
+    const { metadata: metadataString } = basicMarketData;
 
     // Default to no metadata, but actually parse it below if it exists.
-    let data = {
-      description: "No metadata",
-      title: "No metadata",
-      categories: ["No metadata"],
-    };
+    let metadata = {
+      slug: "No metadata",
+    } as Partial<DecodedMarketMetadata>;
 
     try {
-      // Metadata exists, so parse it.
-      if (metadata) {
+      if (metadataString) {
         const ipfs = new IPFS();
-        const raw = await ipfs.read(metadata);
+        const raw = await ipfs.read(metadataString);
 
-        try {
-          // new version
-          const parsed = JSON.parse(raw) as {
-            title: string;
-            description: string;
-            categories: string[];
-          };
-          data = parsed;
-        } catch {
-          const extract = (data: string) => {
-            const titlePattern = "title:";
-            const infoPattern = "::info:";
-            return {
-              description: data.slice(
-                data.indexOf(infoPattern) + infoPattern.length
-              ),
-              title: data.slice(titlePattern.length, data.indexOf(infoPattern)),
-              categories: ["Invalid", "Yes", "No"],
-            };
-          };
-
-          data = extract(raw);
-        }
+        const parsed = JSON.parse(raw) as DecodedMarketMetadata;
+        metadata = parsed;
       }
     } catch (err) {
       console.error(err);
@@ -306,44 +277,36 @@ export default class Models {
     //@ts-ignore
     const market = marketRaw.unwrap();
 
-    //@ts-ignore
-    const outcomeAssets = market.market_type.isCategorical
-      ? //@ts-ignore
-        [...Array(market.market_type.asCategorical.toNumber()).keys()].map(
+    basicMarketData.outcomeAssets = market.market_type.isCategorical
+      ? [...Array(market.market_type.asCategorical.toNumber()).keys()].map(
           (catIdx) => {
-            //@ts-ignore
             return this.api.createType("Asset", {
               categoricalOutcome: [marketId, catIdx],
             });
           }
         )
       : ["Long", "Short"].map((pos) => {
-          //@ts-ignore
           const position = this.api.createType("ScalarPosition", pos);
-          //@ts-ignore
           return this.api.createType("Asset", {
             scalarOutcome: [marketId, position.toString()],
           });
         });
 
-    extendedMarket.report = market.report.isSome ? market.report.value : null;
-    extendedMarket.resolved_outcome = market.resolved_outcome.isSome
+    basicMarketData.report = market.report.isSome ? market.report.value : null;
+    basicMarketData.resolved_outcome = market.resolved_outcome.isSome
       ? market.resolved_outcome.value.toNumber()
       : null;
 
-    Object.assign(extendedMarket, {
-      ...data,
-      marketId,
-      metadataString: metadata,
-      outcomeAssets,
-    });
+    if (marketId === 72) {
+      console.log(basicMarketData);
+    }
 
-    const extendedMarketResponse = new Market(
-      extendedMarket as never as ExtendedMarketResponse,
+    return new Market(
+      marketId,
+      basicMarketData,
+      metadata as DecodedMarketMetadata,
       this.api
     );
-
-    return extendedMarketResponse;
   }
 
   /**

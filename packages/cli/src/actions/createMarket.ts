@@ -1,12 +1,17 @@
 import SDK, { util } from "@zeitgeistpm/sdk";
+import {
+  CategoryMetadata,
+  DecodedMarketMetadata,
+} from "@zeitgeistpm/sdk/dist/types";
 
 type Options = {
   endpoint: string;
-  title: string;
+  slug: string;
   description: string;
   oracle: string;
   end: string;
   categories?: string[];
+  question: string;
   advised: boolean;
   seed: string;
   timestamp: boolean;
@@ -14,7 +19,7 @@ type Options = {
 
 const createMarket = async (opts: Options): Promise<void> => {
   const {
-    title,
+    slug,
     description,
     oracle,
     end,
@@ -22,6 +27,7 @@ const createMarket = async (opts: Options): Promise<void> => {
     advised,
     endpoint,
     seed,
+    question,
     timestamp,
   } = opts;
 
@@ -50,18 +56,33 @@ const createMarket = async (opts: Options): Promise<void> => {
     );
   }
 
+  const categoriesMeta: CategoryMetadata[] =
+    categories != null
+      ? categories.map((cat) => {
+          return { name: cat, ticker: cat.slice(0, 5) };
+        })
+      : [
+          { name: "Yes", ticker: "YES" },
+          { name: "No", ticker: "NO" },
+        ];
+
+  const metadata: DecodedMarketMetadata = {
+    description,
+    slug,
+    question,
+    categories: categoriesMeta,
+  };
+
   const marketEnd = timestamp
     ? { timestamp: Number(end) }
     : { block: Number(end) };
 
   const marketId = await sdk.models.createNewMarket(
     signer,
-    title,
-    description,
     oracle,
     marketEnd,
     advised ? "Advised" : "Permissionless",
-    categories && categories.length > 1 ? categories : ["Yes", "No"]
+    metadata
   );
 
   console.log(`Market created! Market Id: ${marketId}`);

@@ -19,21 +19,24 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
   for (let i = 0; i < 3; i++) {
     const marketId = await sdk.models.createNewMarket(
       signer,
-      `kusama-derby-test-${i}`,
-      "test descriptions",
       "5D2L4ghyiYE8p2z7VNJo9JYwRuc8uzPWtMBqdVyvjRcsnw4P",
       { timestamp: 1620504000000 },
       "Permissionless",
-      [
-        "karura",
-        "moonriver",
-        "phala",
-        "robonomics",
-        "kilt",
-        "equilibrium",
-        "hydradx",
-        "shiden",
-      ]
+      {
+        categories: [
+          { name: "karura" },
+          { name: "moonriver" },
+          { name: "phala" },
+          { name: "robonomics" },
+          { name: "kilt" },
+          { name: "equilibirium" },
+          { name: "hydradx" },
+          { name: "shiden" },
+        ],
+        slug: `kusama-derby-test-${i}`,
+        description: "test description",
+        question: "who will win?",
+      }
     );
 
     marketIds.push(marketId);

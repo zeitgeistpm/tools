@@ -53,7 +53,7 @@ program
   .action((opts: any) => catchErrorsAndExit(deployKusamaDerby, opts));
 
 program
-  .command("createMarket <title> <description> <oracle> <end>")
+  .command("createMarket <slug> <description> <oracle> <end> <question>")
   .option(
     "--advised",
     "Create Advised market instead of Permissionless market",
@@ -61,7 +61,7 @@ program
   )
   .option(
     "-c --categories [categories...]",
-    "A space-separated list of categories for the market"
+    "A space-separated strings for names of categories for the market"
   )
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
@@ -76,10 +76,11 @@ program
   )
   .action(
     (
-      title: string,
+      slug: string,
       description: string,
       oracle: string,
       end: string,
+      question: string,
       opts: {
         endpoint: string;
         seed: string;
@@ -90,7 +91,7 @@ program
     ) =>
       catchErrorsAndExit(
         createMarket,
-        Object.assign(opts, { title, description, oracle, end })
+        Object.assign(opts, { slug, description, oracle, end, question })
       )
   );
 

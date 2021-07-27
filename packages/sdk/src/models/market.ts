@@ -12,6 +12,8 @@ import {
   Report,
   MarketDispute,
   AssetId,
+  DecodedMarketMetadata,
+  CategoryMetadata,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
@@ -21,8 +23,8 @@ import { Option } from "@polkadot/types";
  * The Market class initializes all the market data.
  */
 class Market {
-  /** The unique identifier for this market. */
-  public marketId: number;
+  /** The short name for the market, ex. 'TEAM 1 v.s TEAM 2'. */
+  public slug: string;
   /** The creator of the market. */
   public creator: string;
   /** The creation type of the market. Can be `Permissionless` or `Advised`. */
@@ -42,57 +44,56 @@ class Market {
   /** The reported outcome of the market. Null if the market was not reported yet. */
   public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
-  public categories: string[] | null;
+  public categories: CategoryMetadata[] | null;
   /** The resolved outcome for the market. */
   public resolvedOutcome: number | null;
-  /** The title of the market. */
-  public title: string;
   /** The description of the market. */
   public description: string;
-  /** The metadata string. */
-  public metadataString: string;
+  /** The market question. */
+  public question: string;
   /** The share identifiers */
   public outcomeAssets: Asset[];
+  /** Market tags */
+  public tags: string[];
+
+  public confidential_id?: string;
+
+  /** The image for the market. */
+  img?: string;
 
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
 
-  constructor(market: ExtendedMarketResponse, api: ApiPromise) {
-    const {
-      creator,
-      creation,
-      creator_fee,
-      oracle,
-      end,
-      metadata,
-      market_type,
-      market_status,
-      report,
-      categories,
-      resolved_outcome,
-      marketId,
-      title,
-      description,
-      metadataString,
-      outcomeAssets,
-    } = market;
+  constructor(
+    /** The unique identifier for this market. */
+    public marketId: number,
+    market: MarketResponse,
+    decodedMetadata: DecodedMarketMetadata,
+    api: ApiPromise
+  ) {
+    ({
+      creator: this.creator,
+      creation: this.creation,
+      creator_fee: this.creatorFee,
+      oracle: this.oracle,
+      end: this.end,
+      metadata: this.metadata,
+      market_type: this.marketType as any,
+      market_status: this.marketStatus,
+      report: this.report,
+      resolved_outcome: this.resolvedOutcome,
+      outcomeAssets: this.outcomeAssets,
+    } = market);
 
-    this.creator = creator;
-    this.creation = creation as MarketCreation;
-    this.creatorFee = creator_fee;
-    this.oracle = oracle;
-    this.end = end;
-    this.metadata = metadata;
-    this.marketType = market_type as any;
-    this.marketStatus = market_status;
-    this.report = report;
-    this.categories = categories;
-    this.resolvedOutcome = resolved_outcome;
-    this.marketId = marketId;
-    this.title = title;
-    this.description = description;
-    this.metadataString = metadataString;
-    this.outcomeAssets = outcomeAssets;
+    ({
+      slug: this.slug,
+      question: this.question,
+      description: this.description,
+      categories: this.categories,
+      tags: this.tags,
+      confidential_id: this.confidential_id,
+      img: this.img,
+    } = decodedMetadata);
 
     this.api = api;
   }
