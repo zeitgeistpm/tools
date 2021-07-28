@@ -297,10 +297,6 @@ export default class Models {
       ? market.resolved_outcome.value.toNumber()
       : null;
 
-    if (marketId === 72) {
-      console.log(basicMarketData);
-    }
-
     return new Market(
       marketId,
       basicMarketData,
