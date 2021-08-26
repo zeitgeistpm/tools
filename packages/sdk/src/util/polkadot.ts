@@ -116,7 +116,7 @@ export const initApi = (
             },
             {
               name: "blocks",
-              type: "Vec<Hash>",
+              type: "Vec<BlockNumber>",
             },
           ],
           type: "Vec<SerdeWrapper>",
