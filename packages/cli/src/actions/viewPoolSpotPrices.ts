@@ -22,9 +22,9 @@ const viewSpotPrices = async (opts: Options): Promise<void> => {
     console.log(pool.weights);
   }
 
-  const prices = await pool.fetchPoolSpotPricesFromBlockNumbers(
-    util.AssetIdFromString(assetIn),
-    util.AssetIdFromString(assetOut),
+  const prices = await pool.fetchPoolSpotPrices(
+    assetIn,
+    assetOut,
     blocksAsNumArray
   );
 

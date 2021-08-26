@@ -87,37 +87,18 @@ export default class Swap {
     return prices;
   }
 
-  public async fetchPoolSpotPricesFromBlockNumbers(
+  public async fetchPoolSpotPrices(
     inAsset: string | AssetId,
     outAsset: string | AssetId,
     blockNumbers: number[]
   ): Promise<any> {
-    const timer = Date.now();
-    const blockHashes = await Promise.all(
-      blockNumbers.map((block) =>
-        this.api.rpc.chain.getBlockHash(block).then((hash) => hash.toString())
-      )
-    );
-
-    return this.fetchPoolSpotPrices(
-      AssetIdFromString(inAsset),
-      AssetIdFromString(outAsset),
-      blockHashes
-    );
-  }
-
-  public async fetchPoolSpotPrices(
-    inAsset: string | AssetId,
-    outAsset: string | AssetId,
-    blockHashes: string[]
-  ): Promise<any> {
-    if (blockHashes) {
+    if (blockNumbers) {
       //@ts-ignore
       return this.api.rpc.swaps.getSpotPrices(
         this.poolId,
         AssetIdFromString(inAsset),
         AssetIdFromString(outAsset),
-        blockHashes
+        blockNumbers
       );
     }
   }
