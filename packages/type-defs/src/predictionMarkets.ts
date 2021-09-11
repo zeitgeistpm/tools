@@ -26,10 +26,10 @@ export default {
     MarketCreation: {
       _enum: ["Permissionless", "Advised"],
     },
-    MarketEnd: {
+    MarketPeriod: {
       _enum: {
-        Block: "BlockNumber",
-        Timestamp: "u64",
+        Block: "Range<BlockNumber>",
+        Timestamp: "Range<Moment>",
       },
     },
     MarketId: "u128",
@@ -55,12 +55,13 @@ export default {
       creation: "MarketCreation",
       creator_fee: "u8",
       oracle: "AccountId",
-      end: "MarketEnd",
+      period: "MarketPeriod",
       metadata: "Vec<u8>",
       market_type: "MarketType",
-      market_status: "MarketStatus",
+      status: "MarketStatus",
       report: "Option<Report>",
       resolved_outcome: "Option<OutcomeReport>",
+      mdm: "MarketDisputeMechanism",
     },
     OutcomeReport: {
       _enum: {
@@ -77,6 +78,13 @@ export default {
       at: "BlockNumber",
       by: "AccountId",
       outcome: "OutcomeReport",
+    },
+    MarketDisputeMechanism: {
+      _enum: {
+        Authorized: "BlockNumber",
+        Court: null,
+        SimpleDisputes: null,
+      },
     },
   },
 };

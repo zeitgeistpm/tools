@@ -58,9 +58,9 @@ import type { ClassDetails, ClassId, ClassMetadata, DepositBalance, DepositBalan
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces/utility';
 import type { VestingInfo } from '@polkadot/types/interfaces/vesting';
 import type { AccountId32Junction, AccountIndex64Junction, AccountKey20Junction, AssetInstance, BodyId, BodyPart, BodyPartAtLeastProportion, BodyPartFraction, BodyPartMoreThanProportion, DoubleEncodedCall, InboundStatus, Junction, MultiAsset, MultiAssetAbstractFungible, MultiAssetAbstractNonFungible, MultiAssetConcreteFungible, MultiAssetConcreteNonFungible, MultiLocation, NetworkId, OutboundStatus, Outcome, PluralityJunction, QueueConfigData, VersionedMultiAsset, VersionedMultiLocation, VersionedXcm, Xcm, XcmAssetEffects, XcmError, XcmHrmpChannelAccepted, XcmHrmpChannelClosing, XcmHrmpNewChannelOpenRequest, XcmOrder, XcmOrderBuyExecution, XcmOrderDepositAsset, XcmOrderDepositReserveAsset, XcmOrderExchangeAsset, XcmOrderInitiateReserveWithdraw, XcmOrderInitiateTeleport, XcmOrderQueryHolding, XcmOrigin, XcmOriginKind, XcmQueryResponse, XcmRelayedFrom, XcmReserveAssetDeposit, XcmResponse, XcmTeleportAsset, XcmTransact, XcmTransferAsset, XcmTransferReserveAsset, XcmWithdrawAsset, XcmpMessageFormat } from '@polkadot/types/interfaces/xcm';
-import type { Amount, AmountOf, Asset, CategoryIndex, CurrencyId, CurrencyIdOf, Lookup, MarketIdOf, MultiHash, ScalarPosition, SerdeWrapper } from '@zeitgeistpm/types/interfaces/index';
+import type { Amount, AmountOf, Asset, CategoryIndex, CurrencyId, CurrencyIdOf, Lookup, MarketIdOf, MaxUsize, MultiHash, ScalarPosition, SerdeWrapper } from '@zeitgeistpm/types/interfaces/index';
 import type { Order, OrderSide } from '@zeitgeistpm/types/interfaces/orderbook';
-import type { Market, MarketCreation, MarketDispute, MarketEnd, MarketId, MarketStatus, MarketType, OutcomeReport, Report } from '@zeitgeistpm/types/interfaces/predictionMarkets';
+import type { Market, MarketCreation, MarketDispute, MarketDisputeMechanism, MarketId, MarketPeriod, MarketStatus, MarketType, OutcomeReport, Report } from '@zeitgeistpm/types/interfaces/predictionMarkets';
 import type { CommonPoolEventParams, Pool, PoolAssetEvent, PoolAssetsEvent, PoolId, PoolStatus, SwapEvent } from '@zeitgeistpm/types/interfaces/swaps';
 
 declare module '@polkadot/types/types/registry' {
@@ -102,6 +102,7 @@ declare module '@polkadot/types/types/registry' {
     'Compact<LeasePeriodOf>': Compact<LeasePeriodOf>;
     'Compact<MarketId>': Compact<MarketId>;
     'Compact<MarketIdOf>': Compact<MarketIdOf>;
+    'Compact<MaxUsize>': Compact<MaxUsize>;
     'Compact<MemberCount>': Compact<MemberCount>;
     'Compact<Moment>': Compact<Moment>;
     'Compact<MomentOf>': Compact<MomentOf>;
@@ -615,11 +616,13 @@ declare module '@polkadot/types/types/registry' {
     'Option<Market>': Option<Market>;
     'Option<MarketCreation>': Option<MarketCreation>;
     'Option<MarketDispute>': Option<MarketDispute>;
-    'Option<MarketEnd>': Option<MarketEnd>;
+    'Option<MarketDisputeMechanism>': Option<MarketDisputeMechanism>;
     'Option<MarketId>': Option<MarketId>;
     'Option<MarketIdOf>': Option<MarketIdOf>;
+    'Option<MarketPeriod>': Option<MarketPeriod>;
     'Option<MarketStatus>': Option<MarketStatus>;
     'Option<MarketType>': Option<MarketType>;
+    'Option<MaxUsize>': Option<MaxUsize>;
     'Option<MaybeRandomness>': Option<MaybeRandomness>;
     'Option<MaybeVrf>': Option<MaybeVrf>;
     'Option<MemberCount>': Option<MemberCount>;
@@ -1520,11 +1523,13 @@ declare module '@polkadot/types/types/registry' {
     'Vec<Market>': Vec<Market>;
     'Vec<MarketCreation>': Vec<MarketCreation>;
     'Vec<MarketDispute>': Vec<MarketDispute>;
-    'Vec<MarketEnd>': Vec<MarketEnd>;
+    'Vec<MarketDisputeMechanism>': Vec<MarketDisputeMechanism>;
     'Vec<MarketId>': Vec<MarketId>;
     'Vec<MarketIdOf>': Vec<MarketIdOf>;
+    'Vec<MarketPeriod>': Vec<MarketPeriod>;
     'Vec<MarketStatus>': Vec<MarketStatus>;
     'Vec<MarketType>': Vec<MarketType>;
+    'Vec<MaxUsize>': Vec<MaxUsize>;
     'Vec<MaybeRandomness>': Vec<MaybeRandomness>;
     'Vec<MaybeVrf>': Vec<MaybeVrf>;
     'Vec<MemberCount>': Vec<MemberCount>;
@@ -2425,11 +2430,13 @@ declare module '@polkadot/types/types/registry' {
     Market: Market;
     MarketCreation: MarketCreation;
     MarketDispute: MarketDispute;
-    MarketEnd: MarketEnd;
+    MarketDisputeMechanism: MarketDisputeMechanism;
     MarketId: MarketId;
     MarketIdOf: MarketIdOf;
+    MarketPeriod: MarketPeriod;
     MarketStatus: MarketStatus;
     MarketType: MarketType;
+    MaxUsize: MaxUsize;
     MaybeRandomness: MaybeRandomness;
     MaybeVrf: MaybeVrf;
     MemberCount: MemberCount;
