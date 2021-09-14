@@ -1,7 +1,7 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { Bytes, Enum, Option, Struct, u128, u16, u64, u8 } from '@polkadot/types';
+import type { Bytes, Enum, Option, Struct, u128, u16, u8 } from '@polkadot/types';
 import type { ITuple } from '@polkadot/types/types';
 import type { AccountId, BlockNumber } from '@polkadot/types/interfaces/runtime';
 
@@ -11,12 +11,13 @@ export interface Market extends Struct {
   readonly creation: MarketCreation;
   readonly creator_fee: u8;
   readonly oracle: AccountId;
-  readonly end: MarketEnd;
+  readonly period: MarketPeriod;
   readonly metadata: Bytes;
   readonly market_type: MarketType;
-  readonly market_status: MarketStatus;
+  readonly status: MarketStatus;
   readonly report: Option<Report>;
   readonly resolved_outcome: Option<OutcomeReport>;
+  readonly mdm: MarketDisputeMechanism;
 }
 
 /** @name MarketCreation */
@@ -32,16 +33,24 @@ export interface MarketDispute extends Struct {
   readonly outcome: OutcomeReport;
 }
 
-/** @name MarketEnd */
-export interface MarketEnd extends Enum {
-  readonly isBlock: boolean;
-  readonly asBlock: BlockNumber;
-  readonly isTimestamp: boolean;
-  readonly asTimestamp: u64;
+/** @name MarketDisputeMechanism */
+export interface MarketDisputeMechanism extends Enum {
+  readonly isAuthorized: boolean;
+  readonly asAuthorized: BlockNumber;
+  readonly isCourt: boolean;
+  readonly isSimpleDisputes: boolean;
 }
 
 /** @name MarketId */
 export interface MarketId extends u128 {}
+
+/** @name MarketPeriod */
+export interface MarketPeriod extends Enum {
+  readonly isBlock: boolean;
+  readonly asBlock: Range;
+  readonly isTimestamp: boolean;
+  readonly asTimestamp: Range;
+}
 
 /** @name MarketStatus */
 export interface MarketStatus extends Enum {
