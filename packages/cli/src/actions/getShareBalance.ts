@@ -42,7 +42,9 @@ const getShareBalance = async (opts: Options): Promise<void> => {
 
   const data =
     asset === "ztg"
-      ? await sdk.api.query.system.account(address).then((res) => res.toRawType())
+      ? await sdk.api.query.system
+          .account(address)
+          .then((res) => res.toRawType())
       : await sdk.api.query.tokens.accounts(
           address,
           util.AssetIdFromString(asset)

@@ -60,7 +60,9 @@ const getShareBalances = async (opts: Options): Promise<void> => {
   const balances = assets.map(async (asset) => {
     const data =
       asset === "ztg"
-        ? await sdk.api.query.system.account(address).then((res) => res.toRawType())
+        ? await sdk.api.query.system
+            .account(address)
+            .then((res) => res.toRawType())
         : await sdk.api.query.tokens.accounts(
             address,
             util.AssetIdFromString(asset)
