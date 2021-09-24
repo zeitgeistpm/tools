@@ -3,7 +3,7 @@
 
 import type { Bytes, Enum, Option, Struct, u128, u16, u8 } from '@polkadot/types';
 import type { ITuple } from '@polkadot/types/types';
-import type { AccountId, BlockNumber } from '@polkadot/types/interfaces/runtime';
+import type { AccountId, BlockNumber, Moment } from '@polkadot/types/interfaces/runtime';
 
 /** @name Market */
 export interface Market extends Struct {
@@ -47,9 +47,9 @@ export interface MarketId extends u128 {}
 /** @name MarketPeriod */
 export interface MarketPeriod extends Enum {
   readonly isBlock: boolean;
-  readonly asBlock: Range;
+  readonly asBlock: ITuple<[BlockNumber, BlockNumber]>;
   readonly isTimestamp: boolean;
-  readonly asTimestamp: Range;
+  readonly asTimestamp: ITuple<[Moment, Moment]>;
 }
 
 /** @name MarketStatus */

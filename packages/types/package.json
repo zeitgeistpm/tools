@@ -10,11 +10,10 @@
   "author": "Zeitgeist PM <contact@zeitgeist.pm>",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@polkadot/typegen": "^4.6.2"
+    "@polkadot/typegen": "^5.5.1"
   },
   "dependencies": {
-    "@polkadot/metadata": "^4.6.2",
-    "@polkadot/types": "^4.6.2",
+    "@polkadot/types": "^5.5.1",
     "@zeitgeistpm/type-defs": "^0.2.10",
     "axios": "^0.21.1"
   },
