@@ -8,7 +8,7 @@ import {
   FilteredMarketResponse,
   KeyringPairOrExtSigner,
   MarketCreation,
-  MarketEnd,
+  MarketPeriod,
   Report,
   MarketDispute,
   AssetId,
@@ -16,7 +16,7 @@ import {
   CategoryMetadata,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
-import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
+import { Asset, OutcomeReport, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
 /**
@@ -34,19 +34,19 @@ class Market {
   /** The oracle that is designated to report on the market. */
   public oracle: string;
   /** The end block or timestamp for this market. */
-  public end: MarketEnd;
+  public period: MarketPeriod;
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
   public marketType: AssetId;
   /** The status of the market. */
-  public marketStatus: string;
+  public status: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
   public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
   public categories: CategoryMetadata[] | null;
   /** The resolved outcome for the market. */
-  public resolvedOutcome: number | null;
+  public resolvedOutcome: OutcomeReport | null;
   /** The description of the market. */
   public description: string;
   /** The market question. */
@@ -76,10 +76,10 @@ class Market {
       creation: this.creation,
       creator_fee: this.creatorFee,
       oracle: this.oracle,
-      end: this.end,
+      period: this.period,
       metadata: this.metadata,
       market_type: this.marketType as any,
-      market_status: this.marketStatus,
+      status: this.status,
       report: this.report,
       resolved_outcome: this.resolvedOutcome,
       outcomeAssets: this.outcomeAssets,
@@ -151,14 +151,14 @@ class Market {
    * Get timestamp at the end of the block (MarketEnd)
    */
   async getEndTimestamp(): Promise<number> {
-    if ("timestamp" in this.end) {
-      return this.end.timestamp;
+    if ("timestamp" in this.period) {
+      return this.period.timestamp;
     }
 
     const now = (await this.api.query.timestamp.now()).toNumber();
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
-    const diffInMs = 6000 * (this.end.block - blockNum);
+    const diffInMs = 6000 * (this.period.block - blockNum);
     return now + diffInMs;
   }
 

@@ -1,6 +1,10 @@
 {
   "name": "@zeitgeistpm/sdk",
+<<<<<<< Updated upstream
   "version": "0.2.10",
+=======
+  "version": "0.2.11",
+>>>>>>> Stashed changes
   "description": "Zeitgeist network javascript library.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,11 +21,16 @@
   "author": "Zeitgeist PM <contact@zeitgeist.pm>",
   "license": "GPL-3.0",
   "dependencies": {
-    "@polkadot/api": "^4.4.1",
+    "@polkadot/api": "^5.4.1",
     "@polkadot/keyring": "^6.0.5",
     "@polkadot/util": "^6.0.5",
+<<<<<<< Updated upstream
     "@zeitgeistpm/type-defs": "^0.2.10",
     "@zeitgeistpm/types": "^0.2.10",
+=======
+    "@zeitgeistpm/type-defs": "^0.2.9",
+    "@zeitgeistpm/types": "^0.2.9",
+>>>>>>> Stashed changes
     "commander": "^7.2.0",
     "ipfs-http-client": "^49.0.4",
     "it-all": "^1.0.4",

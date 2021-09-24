@@ -5,7 +5,7 @@ type Options = {
   title: string;
   description: string;
   oracle: string;
-  end: string;
+  period: string;
   bounds?: number[];
   advised: boolean;
   seed: string;
@@ -17,7 +17,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     title,
     description,
     oracle,
-    end,
+    period,
     bounds,
     advised,
     endpoint,
@@ -36,16 +36,16 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     );
   }
 
-  const marketEnd = timestamp
-    ? { timestamp: Number(end) }
-    : { block: Number(end) };
+  const marketPeriod = timestamp
+    ? { timestamp: Number(period) }
+    : { block: Number(period) };
 
   const marketId = await sdk.models.createScalarMarket(
     signer,
     title,
     description,
     oracle,
-    marketEnd,
+    marketPeriod,
     advised ? "Advised" : "Permissionless",
     bounds ? bounds : [0, 100]
   );

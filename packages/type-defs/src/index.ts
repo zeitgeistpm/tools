@@ -34,7 +34,7 @@ export const index = {
     Index: "u64",
     Lookup: "MultiAddress",
     MarketIdOf: "u128",
-    MaxUsize: "u64",
+    MaxRuntimeUsize: "u64",
     Moment: "u64",
     MultiHash: {
       _enum: {

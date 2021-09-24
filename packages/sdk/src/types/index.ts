@@ -76,12 +76,12 @@ export type MarketResponse = {
   creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  end: MarketEnd;
+  period: MarketPeriod;
   metadata: string;
   market_type: MarketType;
-  market_status: string;
+  status: string;
   report: Report | null;
-  resolved_outcome: number | null;
+  resolved_outcome: OutcomeReport | null;
   outcomeAssets: Asset[];
 };
 
@@ -91,13 +91,13 @@ export type ExtendedMarketResponse = {
   creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  end: MarketEnd;
+  period: MarketPeriod;
   metadata: string;
   market_type: MarketType;
-  market_status: string;
+  status: string;
   report: Report | null;
   categories: string[] | null;
-  resolved_outcome: number | null;
+  resolved_outcome: OutcomeReport | null;
   // new ones
   marketId: number;
   title: string;
@@ -112,13 +112,13 @@ export type FilteredMarketResponse = {
   creation?: MarketCreation;
   creator_fee?: number;
   oracle?: string;
-  end?: MarketEnd;
+  period?: MarketPeriod;
   metadata?: string;
   market_type?: string;
-  market_status?: string;
+  status?: string;
   report?: Report | null;
   categories?: number | null;
-  resolved_outcome?: number | null;
+  resolved_outcome?: OutcomeReport | null;
   // new ones
   marketId?: number;
   title?: string;
@@ -133,7 +133,7 @@ export type Report = {
   outcome: OutcomeReport;
 };
 
-export type MarketEnd = { block: number } | { timestamp: number };
+export type MarketPeriod = { block: number } | { timestamp: number };
 
 export type MarketCreation = "Permissioned" | "Advised";
 

@@ -6,7 +6,7 @@ import { Pool } from "@zeitgeistpm/types/dist/interfaces/swaps";
 import { Option } from "@polkadot/types";
 
 import {
-  MarketEnd,
+  MarketPeriod,
   MarketId,
   MarketResponse,
   KeyringPairOrExtSigner,
@@ -78,7 +78,7 @@ export default class Models {
   async createNewMarket(
     signer: KeyringPairOrExtSigner,
     oracle: string,
-    end: MarketEnd,
+    period: MarketPeriod,
     creationType = "Advised",
     metadata: DecodedMarketMetadata,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -129,7 +129,7 @@ export default class Models {
         const unsub = await this.api.tx.predictionMarkets
           .createCategoricalMarket(
             oracle,
-            end,
+            period,
             multihash,
             creationType,
             categories.length
@@ -143,7 +143,7 @@ export default class Models {
         const unsub = await this.api.tx.predictionMarkets
           .createCategoricalMarket(
             oracle,
-            end,
+            period,
             multihash,
             creationType,
             categories.length
@@ -173,7 +173,7 @@ export default class Models {
     title: string,
     description: string,
     oracle: string,
-    end: MarketEnd,
+    period: MarketPeriod,
     creationType = "Advised",
     bounds = [0, 100],
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
@@ -223,7 +223,7 @@ export default class Models {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .createScalarMarket(oracle, end, multihash, creationType, bounds)
+          .createScalarMarket(oracle, period, multihash, creationType, bounds)
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -231,7 +231,7 @@ export default class Models {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .createScalarMarket(oracle, end, multihash, creationType, bounds)
+          .createScalarMarket(oracle, period, multihash, creationType, bounds)
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)
@@ -247,6 +247,7 @@ export default class Models {
    */
   async fetchMarketData(marketId: MarketId): Promise<Market> {
     const marketRaw = await this.api.query.marketCommons.markets(marketId);
+    console.log("Here now")
 
     const marketJson = marketRaw.toJSON() as never as MarketResponse;
 

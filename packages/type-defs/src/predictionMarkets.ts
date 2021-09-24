@@ -36,7 +36,7 @@ export default {
     MarketType: {
       _enum: {
         Categorical: "u16",
-        Scalar: "(u128, u128)",
+        Scalar: "RangeInclusive<u128>",
       },
     },
     MarketStatus: {
