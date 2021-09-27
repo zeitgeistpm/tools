@@ -9,6 +9,7 @@ import {
   KeyringPairOrExtSigner,
   MarketCreation,
   MarketEnd,
+  MarketPeriod,
   Report,
   MarketDispute,
   AssetId,
@@ -33,8 +34,8 @@ class Market {
   public creatorFee: number;
   /** The oracle that is designated to report on the market. */
   public oracle: string;
-  /** The end block or timestamp for this market. */
-  public end: MarketEnd;
+  /** The period block or timestamp for this market. */
+  public period: MarketPeriod;
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
@@ -76,7 +77,7 @@ class Market {
       creation: this.creation,
       creator_fee: this.creatorFee,
       oracle: this.oracle,
-      end: this.end,
+      period: this.period,
       metadata: this.metadata,
       market_type: this.marketType as any,
       market_status: this.marketStatus,
@@ -148,17 +149,17 @@ class Market {
   }
 
   /**
-   * Get timestamp at the end of the block (MarketEnd)
+   * Get timestamp at the end of the block (MarketPeriod)
    */
   async getEndTimestamp(): Promise<number> {
-    if ("timestamp" in this.end) {
-      return this.end.timestamp;
+    if ("timestamp" in this.period) {
+      return this.period.timestamp[1];
     }
 
     const now = (await this.api.query.timestamp.now()).toNumber();
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
-    const diffInMs = 6000 * (this.end.block - blockNum);
+    const diffInMs = 6000 * (this.period.block[1] - blockNum);
     return now + diffInMs;
   }
 

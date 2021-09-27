@@ -9,7 +9,7 @@ type Options = {
   slug: string;
   description: string;
   oracle: string;
-  end: string;
+  period: number[];
   categories?: string[];
   question: string;
   advised: boolean;
@@ -22,7 +22,7 @@ const createMarket = async (opts: Options): Promise<void> => {
     slug,
     description,
     oracle,
-    end,
+    period,
     categories,
     advised,
     endpoint,
@@ -73,15 +73,16 @@ const createMarket = async (opts: Options): Promise<void> => {
     categories: categoriesMeta,
   };
 
-  const marketEnd = timestamp
-    ? { timestamp: Number(end) }
-    : { block: Number(end) };
+  const marketPeriod = { block: period };
+
+  const mdm = { SimpleDisputes: null };
 
   const marketId = await sdk.models.createNewMarket(
     signer,
     oracle,
-    marketEnd,
+    marketPeriod,
     advised ? "Advised" : "Permissionless",
+    mdm,
     metadata
   );
 

@@ -76,7 +76,7 @@ export type MarketResponse = {
   creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  end: MarketEnd;
+  period: MarketPeriod;
   metadata: string;
   market_type: MarketType;
   market_status: string;
@@ -91,7 +91,7 @@ export type ExtendedMarketResponse = {
   creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  end: MarketEnd;
+  period: MarketPeriod;
   metadata: string;
   market_type: MarketType;
   market_status: string;
@@ -112,7 +112,7 @@ export type FilteredMarketResponse = {
   creation?: MarketCreation;
   creator_fee?: number;
   oracle?: string;
-  end?: MarketEnd;
+  period?: MarketPeriod;
   metadata?: string;
   market_type?: string;
   market_status?: string;
@@ -133,9 +133,16 @@ export type Report = {
   outcome: OutcomeReport;
 };
 
+export type MarketPeriod = { block: number[] } | { timestamp: number[] };
+
 export type MarketEnd = { block: number } | { timestamp: number };
 
 export type MarketCreation = "Permissioned" | "Advised";
+
+export type MarketDisputeMechanism =
+  | { Authorized: null }
+  | { Court: null }
+  | { SimpleDisputes: null };
 
 export type MarketDispute = {
   at: number;

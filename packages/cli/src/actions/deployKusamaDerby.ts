@@ -20,8 +20,9 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
     const marketId = await sdk.models.createNewMarket(
       signer,
       "5D2L4ghyiYE8p2z7VNJo9JYwRuc8uzPWtMBqdVyvjRcsnw4P",
-      { timestamp: 1620504000000 },
+      { timestamp: [1620504000000, 1620604000000] },
       "Permissionless",
+      { SimpleDisputes: null },
       {
         categories: [
           { name: "karura" },

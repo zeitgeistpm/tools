@@ -7,11 +7,13 @@ import { Option } from "@polkadot/types";
 
 import {
   MarketEnd,
+  MarketPeriod,
   MarketId,
   MarketResponse,
   KeyringPairOrExtSigner,
   PoolId,
   DecodedMarketMetadata,
+  MarketDisputeMechanism,
 } from "../types";
 import { changeEndianness, isExtSigner } from "../util";
 
@@ -78,8 +80,9 @@ export default class Models {
   async createNewMarket(
     signer: KeyringPairOrExtSigner,
     oracle: string,
-    end: MarketEnd,
+    period: MarketPeriod,
     creationType = "Advised",
+    mdm: MarketDisputeMechanism,
     metadata: DecodedMarketMetadata,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
@@ -129,10 +132,11 @@ export default class Models {
         const unsub = await this.api.tx.predictionMarkets
           .createCategoricalMarket(
             oracle,
-            end,
+            period,
             multihash,
             creationType,
-            categories.length
+            categories.length,
+            mdm
           )
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -143,10 +147,11 @@ export default class Models {
         const unsub = await this.api.tx.predictionMarkets
           .createCategoricalMarket(
             oracle,
-            end,
+            period,
             multihash,
             creationType,
-            categories.length
+            categories.length,
+            mdm
           )
           .signAndSend(signer, (result) =>
             callback
