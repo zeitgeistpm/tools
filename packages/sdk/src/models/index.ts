@@ -334,7 +334,7 @@ export default class Models {
    */
   async fetchDisputes(marketId: MarketId): Promise<any> {
     const res = (
-      await this.api.query.simpleDisputes.disputes(marketId)
+      await this.api.query.predictionMarkets.disputes(marketId)
     ).toJSON();
 
     if (!Array.isArray(res)) {

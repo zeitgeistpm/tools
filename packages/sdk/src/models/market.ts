@@ -15,6 +15,7 @@ import {
   AssetId,
   DecodedMarketMetadata,
   CategoryMetadata,
+  OutcomeReport,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
@@ -39,7 +40,7 @@ class Market {
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
-  public marketType: AssetId;
+  public marketType: string;
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
@@ -47,7 +48,7 @@ class Market {
   /** The categories of a categorical market. Null if not a categorical market. */
   public categories: CategoryMetadata[] | null;
   /** The resolved outcome for the market. */
-  public resolvedOutcome: number | null;
+  public resolvedOutcome: OutcomeReport | null;
   /** The description of the market. */
   public description: string;
   /** The market question. */
@@ -199,7 +200,7 @@ class Market {
    */
   getDisputes = async (): Promise<MarketDispute[]> => {
     return (
-      await this.api.query.simpleDisputes.disputes(this.marketId)
+      await this.api.query.predictionMarkets.disputes(this.marketId)
     ).toJSON() as any[];
   };
 
@@ -432,7 +433,7 @@ class Market {
    */
   async reportOutcome(
     signer: KeyringPairOrExtSigner,
-    outcome: number,
+    outcome: OutcomeReport,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
@@ -487,7 +488,7 @@ class Market {
    */
   async dispute(
     signer: KeyringPairOrExtSigner,
-    outcome: number,
+    outcome: OutcomeReport,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (

@@ -1,9 +1,6 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
-import {
-  MarketType,
-  OutcomeReport,
-} from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
+import { MarketType } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
 import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
 // The possible fields available on the decoded market metadata.
@@ -81,7 +78,7 @@ export type MarketResponse = {
   market_type: MarketType;
   market_status: string;
   report: Report | null;
-  resolved_outcome: number | null;
+  resolved_outcome: OutcomeReport | null;
   outcomeAssets: Asset[];
 };
 
@@ -97,7 +94,7 @@ export type ExtendedMarketResponse = {
   market_status: string;
   report: Report | null;
   categories: string[] | null;
-  resolved_outcome: number | null;
+  resolved_outcome: OutcomeReport | null;
   // new ones
   marketId: number;
   title: string;
@@ -118,7 +115,7 @@ export type FilteredMarketResponse = {
   market_status?: string;
   report?: Report | null;
   categories?: number | null;
-  resolved_outcome?: number | null;
+  resolved_outcome?: OutcomeReport | null;
   // new ones
   marketId?: number;
   title?: string;
@@ -132,6 +129,8 @@ export type Report = {
   by: string;
   outcome: OutcomeReport;
 };
+
+export type OutcomeReport = { categorical: number } | { scalar: number };
 
 export type MarketPeriod = { block: number[] } | { timestamp: number[] };
 
