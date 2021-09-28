@@ -77,7 +77,7 @@ export default class Models {
    * @param metadata Market metadata
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
-  async createNewMarket(
+  async createCategoricalMarket(
     signer: KeyringPairOrExtSigner,
     oracle: string,
     period: MarketPeriod,
