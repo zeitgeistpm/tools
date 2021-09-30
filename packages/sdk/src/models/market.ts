@@ -15,7 +15,7 @@ import {
   AssetId,
   DecodedMarketMetadata,
   CategoryMetadata,
-  OutcomeReport,
+  Outcome,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
@@ -48,7 +48,7 @@ class Market {
   /** The categories of a categorical market. Null if not a categorical market. */
   public categories: CategoryMetadata[] | null;
   /** The resolved outcome for the market. */
-  public resolvedOutcome: OutcomeReport | null;
+  public resolvedOutcome: Outcome | null;
   /** The description of the market. */
   public description: string;
   /** The market question. */
@@ -433,7 +433,7 @@ class Market {
    */
   async reportOutcome(
     signer: KeyringPairOrExtSigner,
-    outcome: OutcomeReport,
+    outcome: Outcome,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
@@ -488,7 +488,7 @@ class Market {
    */
   async dispute(
     signer: KeyringPairOrExtSigner,
-    outcome: OutcomeReport,
+    outcome: Outcome,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (

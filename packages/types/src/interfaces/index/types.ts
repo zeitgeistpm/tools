@@ -3,7 +3,7 @@
 
 import type { Enum, U8aFixed, i128, u128, u16, u64 } from '@polkadot/types';
 import type { ITuple } from '@polkadot/types/types';
-import type { Balance, MultiAddress } from '@polkadot/types/interfaces/runtime';
+import type { AccountId, Balance, MultiAddress } from '@polkadot/types/interfaces/runtime';
 import type { MarketId } from '@zeitgeistpm/types/interfaces/predictionMarkets';
 
 /** @name Address */
@@ -27,6 +27,9 @@ export interface Asset extends Enum {
   readonly isZtg: boolean;
 }
 
+/** @name AuthorId */
+export interface AuthorId extends AccountId {}
+
 /** @name BlockNumber */
 export interface BlockNumber extends u64 {}
 
@@ -48,8 +51,8 @@ export interface Lookup extends MultiAddress {}
 /** @name MarketIdOf */
 export interface MarketIdOf extends u128 {}
 
-/** @name MaxUsize */
-export interface MaxUsize extends u64 {}
+/** @name MaxRuntimeUsize */
+export interface MaxRuntimeUsize extends u64 {}
 
 /** @name Moment */
 export interface Moment extends u64 {}

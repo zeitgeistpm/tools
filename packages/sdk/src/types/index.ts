@@ -78,7 +78,7 @@ export type MarketResponse = {
   market_type: MarketType;
   market_status: string;
   report: Report | null;
-  resolved_outcome: OutcomeReport | null;
+  resolved_outcome: Outcome | null;
   outcomeAssets: Asset[];
 };
 
@@ -94,7 +94,7 @@ export type ExtendedMarketResponse = {
   market_status: string;
   report: Report | null;
   categories: string[] | null;
-  resolved_outcome: OutcomeReport | null;
+  resolved_outcome: Outcome | null;
   // new ones
   marketId: number;
   title: string;
@@ -115,7 +115,7 @@ export type FilteredMarketResponse = {
   market_status?: string;
   report?: Report | null;
   categories?: number | null;
-  resolved_outcome?: OutcomeReport | null;
+  resolved_outcome?: Outcome | null;
   // new ones
   marketId?: number;
   title?: string;
@@ -127,10 +127,10 @@ export type FilteredMarketResponse = {
 export type Report = {
   at: number;
   by: string;
-  outcome: OutcomeReport;
+  outcome: Outcome;
 };
 
-export type OutcomeReport = { categorical: number } | { scalar: number };
+export type Outcome = { categorical: number } | { scalar: number };
 
 export type MarketPeriod = { block: number[] } | { timestamp: number[] };
 
@@ -146,7 +146,7 @@ export type MarketDisputeMechanism =
 export type MarketDispute = {
   at: number;
   by: string;
-  outcome: OutcomeReport;
+  outcome: Outcome;
 };
 
 export type PoolResponse = {

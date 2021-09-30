@@ -26,6 +26,7 @@ export const index = {
         Ztg: null,
       },
     },
+    AuthorId: "AccountId",
     SerdeWrapper: "Balance",
     BlockNumber: "u64",
     CategoryIndex: "u16",
