@@ -1,9 +1,6 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
-import {
-  MarketType,
-  OutcomeReport,
-} from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
+import { MarketType } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
 import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
 
 // The possible fields available on the decoded market metadata.
@@ -76,12 +73,12 @@ export type MarketResponse = {
   creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  end: MarketEnd;
+  period: MarketPeriod;
   metadata: string;
   market_type: MarketType;
   market_status: string;
   report: Report | null;
-  resolved_outcome: number | null;
+  resolved_outcome: Outcome | null;
   outcomeAssets: Asset[];
 };
 
@@ -91,13 +88,13 @@ export type ExtendedMarketResponse = {
   creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  end: MarketEnd;
+  period: MarketPeriod;
   metadata: string;
   market_type: MarketType;
   market_status: string;
   report: Report | null;
   categories: string[] | null;
-  resolved_outcome: number | null;
+  resolved_outcome: Outcome | null;
   // new ones
   marketId: number;
   title: string;
@@ -112,13 +109,13 @@ export type FilteredMarketResponse = {
   creation?: MarketCreation;
   creator_fee?: number;
   oracle?: string;
-  end?: MarketEnd;
+  period?: MarketPeriod;
   metadata?: string;
   market_type?: string;
   market_status?: string;
   report?: Report | null;
   categories?: number | null;
-  resolved_outcome?: number | null;
+  resolved_outcome?: Outcome | null;
   // new ones
   marketId?: number;
   title?: string;
@@ -130,17 +127,26 @@ export type FilteredMarketResponse = {
 export type Report = {
   at: number;
   by: string;
-  outcome: OutcomeReport;
+  outcome: Outcome;
 };
+
+export type Outcome = { categorical: number } | { scalar: number };
+
+export type MarketPeriod = { block: number[] } | { timestamp: number[] };
 
 export type MarketEnd = { block: number } | { timestamp: number };
 
 export type MarketCreation = "Permissioned" | "Advised";
 
+export type MarketDisputeMechanism =
+  | { Authorized: null }
+  | { Court: null }
+  | { SimpleDisputes: null };
+
 export type MarketDispute = {
   at: number;
   by: string;
-  outcome: OutcomeReport;
+  outcome: Outcome;
 };
 
 export type PoolResponse = {

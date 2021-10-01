@@ -17,11 +17,12 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
   // first deploy new markets
   const marketIds = [];
   for (let i = 0; i < 3; i++) {
-    const marketId = await sdk.models.createNewMarket(
+    const marketId = await sdk.models.createCategoricalMarket(
       signer,
       "5D2L4ghyiYE8p2z7VNJo9JYwRuc8uzPWtMBqdVyvjRcsnw4P",
-      { timestamp: 1620504000000 },
+      { timestamp: [1620504000000, 1620604000000] },
       "Permissionless",
+      { SimpleDisputes: null },
       {
         categories: [
           { name: "karura" },

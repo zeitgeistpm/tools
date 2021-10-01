@@ -36,7 +36,7 @@ export default {
     MarketType: {
       _enum: {
         Categorical: "u16",
-        Scalar: "(u128, u128)",
+        Scalar: "RangeInclusive<u128>",
       },
     },
     MarketStatus: {
@@ -55,15 +55,15 @@ export default {
       creation: "MarketCreation",
       creator_fee: "u8",
       oracle: "AccountId",
-      period: "MarketPeriod",
       metadata: "Vec<u8>",
       market_type: "MarketType",
+      period: "MarketPeriod",
       status: "MarketStatus",
       report: "Option<Report>",
-      resolved_outcome: "Option<OutcomeReport>",
+      resolved_outcome: "Option<Outcome>",
       mdm: "MarketDisputeMechanism",
     },
-    OutcomeReport: {
+    Outcome: {
       _enum: {
         Categorical: "u16",
         Scalar: "u128",
@@ -72,12 +72,12 @@ export default {
     Report: {
       at: "BlockNumber",
       by: "AccountId",
-      outcome: "OutcomeReport",
+      outcome: "Outcome",
     },
     MarketDispute: {
       at: "BlockNumber",
       by: "AccountId",
-      outcome: "OutcomeReport",
+      outcome: "Outcome",
     },
     MarketDisputeMechanism: {
       _enum: {

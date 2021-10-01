@@ -3,7 +3,7 @@
 
 import type { Bytes, Enum, Option, Struct, u128, u16, u8 } from '@polkadot/types';
 import type { ITuple } from '@polkadot/types/types';
-import type { AccountId, BlockNumber } from '@polkadot/types/interfaces/runtime';
+import type { AccountId, BlockNumber, Moment } from '@polkadot/types/interfaces/runtime';
 
 /** @name Market */
 export interface Market extends Struct {
@@ -11,12 +11,12 @@ export interface Market extends Struct {
   readonly creation: MarketCreation;
   readonly creator_fee: u8;
   readonly oracle: AccountId;
-  readonly period: MarketPeriod;
   readonly metadata: Bytes;
   readonly market_type: MarketType;
+  readonly period: MarketPeriod;
   readonly status: MarketStatus;
   readonly report: Option<Report>;
-  readonly resolved_outcome: Option<OutcomeReport>;
+  readonly resolved_outcome: Option<Outcome>;
   readonly mdm: MarketDisputeMechanism;
 }
 
@@ -30,7 +30,7 @@ export interface MarketCreation extends Enum {
 export interface MarketDispute extends Struct {
   readonly at: BlockNumber;
   readonly by: AccountId;
-  readonly outcome: OutcomeReport;
+  readonly outcome: Outcome;
 }
 
 /** @name MarketDisputeMechanism */
@@ -47,9 +47,9 @@ export interface MarketId extends u128 {}
 /** @name MarketPeriod */
 export interface MarketPeriod extends Enum {
   readonly isBlock: boolean;
-  readonly asBlock: Range;
+  readonly asBlock: ITuple<[BlockNumber, BlockNumber]>;
   readonly isTimestamp: boolean;
-  readonly asTimestamp: Range;
+  readonly asTimestamp: ITuple<[Moment, Moment]>;
 }
 
 /** @name MarketStatus */
@@ -71,8 +71,8 @@ export interface MarketType extends Enum {
   readonly asScalar: ITuple<[u128, u128]>;
 }
 
-/** @name OutcomeReport */
-export interface OutcomeReport extends Enum {
+/** @name Outcome */
+export interface Outcome extends Enum {
   readonly isCategorical: boolean;
   readonly asCategorical: u16;
   readonly isScalar: boolean;
@@ -83,7 +83,7 @@ export interface OutcomeReport extends Enum {
 export interface Report extends Struct {
   readonly at: BlockNumber;
   readonly by: AccountId;
-  readonly outcome: OutcomeReport;
+  readonly outcome: Outcome;
 }
 
 export type PHANTOM_PREDICTIONMARKETS = 'predictionMarkets';

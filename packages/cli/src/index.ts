@@ -6,7 +6,7 @@ import buyCompleteSet from "./actions/buyCompleteSet";
 import createScalarMarket from "./actions/createScalarMarket";
 import cancelPendingMarket from "./actions/cancelPendingMarket";
 import countMarkets from "./actions/countMarkets";
-import createMarket from "./actions/createMarket";
+import createCategoricalMarket from "./actions/createCategoricalMarket";
 import deployKusamaDerby from "./actions/deployKusamaDerby";
 import deployPool from "./actions/deployPool";
 import disputeMarket from "./actions/disputeMarket";
@@ -53,7 +53,9 @@ program
   .action((opts: any) => catchErrorsAndExit(deployKusamaDerby, opts));
 
 program
-  .command("createMarket <slug> <description> <oracle> <end> <question>")
+  .command(
+    "createCategoricalMarket <slug> <description> <oracle> <period> <question>"
+  )
   .option(
     "--advised",
     "Create Advised market instead of Permissionless market",
@@ -79,7 +81,7 @@ program
       slug: string,
       description: string,
       oracle: string,
-      end: string,
+      period: string,
       question: string,
       opts: {
         endpoint: string;
@@ -90,8 +92,8 @@ program
       }
     ) =>
       catchErrorsAndExit(
-        createMarket,
-        Object.assign(opts, { slug, description, oracle, end, question })
+        createCategoricalMarket,
+        Object.assign(opts, { slug, description, oracle, period, question })
       )
   );
 

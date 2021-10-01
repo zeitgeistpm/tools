@@ -7,11 +7,13 @@ import { Option } from "@polkadot/types";
 
 import {
   MarketEnd,
+  MarketPeriod,
   MarketId,
   MarketResponse,
   KeyringPairOrExtSigner,
   PoolId,
   DecodedMarketMetadata,
+  MarketDisputeMechanism,
 } from "../types";
 import { changeEndianness, isExtSigner } from "../util";
 
@@ -75,11 +77,12 @@ export default class Models {
    * @param metadata Market metadata
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
-  async createNewMarket(
+  async createCategoricalMarket(
     signer: KeyringPairOrExtSigner,
     oracle: string,
-    end: MarketEnd,
+    period: MarketPeriod,
     creationType = "Advised",
+    mdm: MarketDisputeMechanism,
     metadata: DecodedMarketMetadata,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
@@ -129,10 +132,11 @@ export default class Models {
         const unsub = await this.api.tx.predictionMarkets
           .createCategoricalMarket(
             oracle,
-            end,
+            period,
             multihash,
             creationType,
-            categories.length
+            categories.length,
+            mdm
           )
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -143,10 +147,11 @@ export default class Models {
         const unsub = await this.api.tx.predictionMarkets
           .createCategoricalMarket(
             oracle,
-            end,
+            period,
             multihash,
             creationType,
-            categories.length
+            categories.length,
+            mdm
           )
           .signAndSend(signer, (result) =>
             callback
@@ -329,7 +334,7 @@ export default class Models {
    */
   async fetchDisputes(marketId: MarketId): Promise<any> {
     const res = (
-      await this.api.query.simpleDisputes.disputes(marketId)
+      await this.api.query.predictionMarkets.disputes(marketId)
     ).toJSON();
 
     if (!Array.isArray(res)) {

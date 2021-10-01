@@ -9,11 +9,13 @@ import {
   KeyringPairOrExtSigner,
   MarketCreation,
   MarketEnd,
+  MarketPeriod,
   Report,
   MarketDispute,
   AssetId,
   DecodedMarketMetadata,
   CategoryMetadata,
+  Outcome,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
@@ -33,12 +35,12 @@ class Market {
   public creatorFee: number;
   /** The oracle that is designated to report on the market. */
   public oracle: string;
-  /** The end block or timestamp for this market. */
-  public end: MarketEnd;
+  /** The period block or timestamp for this market. */
+  public period: MarketPeriod;
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
-  public marketType: AssetId;
+  public marketType: string;
   /** The status of the market. */
   public marketStatus: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
@@ -46,7 +48,7 @@ class Market {
   /** The categories of a categorical market. Null if not a categorical market. */
   public categories: CategoryMetadata[] | null;
   /** The resolved outcome for the market. */
-  public resolvedOutcome: number | null;
+  public resolvedOutcome: Outcome | null;
   /** The description of the market. */
   public description: string;
   /** The market question. */
@@ -76,7 +78,7 @@ class Market {
       creation: this.creation,
       creator_fee: this.creatorFee,
       oracle: this.oracle,
-      end: this.end,
+      period: this.period,
       metadata: this.metadata,
       market_type: this.marketType as any,
       market_status: this.marketStatus,
@@ -148,17 +150,17 @@ class Market {
   }
 
   /**
-   * Get timestamp at the end of the block (MarketEnd)
+   * Get timestamp at the end of the block (MarketPeriod)
    */
   async getEndTimestamp(): Promise<number> {
-    if ("timestamp" in this.end) {
-      return this.end.timestamp;
+    if ("timestamp" in this.period) {
+      return this.period.timestamp[1];
     }
 
     const now = (await this.api.query.timestamp.now()).toNumber();
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
-    const diffInMs = 6000 * (this.end.block - blockNum);
+    const diffInMs = 6000 * (this.period.block[1] - blockNum);
     return now + diffInMs;
   }
 
@@ -198,7 +200,7 @@ class Market {
    */
   getDisputes = async (): Promise<MarketDispute[]> => {
     return (
-      await this.api.query.simpleDisputes.disputes(this.marketId)
+      await this.api.query.predictionMarkets.disputes(this.marketId)
     ).toJSON() as any[];
   };
 
@@ -431,7 +433,7 @@ class Market {
    */
   async reportOutcome(
     signer: KeyringPairOrExtSigner,
-    outcome: number,
+    outcome: Outcome,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
@@ -486,7 +488,7 @@ class Market {
    */
   async dispute(
     signer: KeyringPairOrExtSigner,
-    outcome: number,
+    outcome: Outcome,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (

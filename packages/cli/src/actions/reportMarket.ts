@@ -15,7 +15,11 @@ const reportMarket = async (opts: Options): Promise<void> => {
   const signer = util.signerFromSeed(seed);
 
   const market = await sdk.models.fetchMarketData(Number(marketId));
-  const res = await market.reportOutcome(signer, Number(outcome));
+  const outcomeReport =
+    market.marketType == "Categorical"
+      ? { categorical: Number(outcome) }
+      : { scalar: Number(outcome) };
+  const res = await market.reportOutcome(signer, outcomeReport);
 
   console.log(res);
   return;
