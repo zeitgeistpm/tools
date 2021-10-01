@@ -1,6 +1,6 @@
 {
   "name": "@zeitgeistpm/cli",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "Commandline tool for the Zeitgeist prediction market.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@zeitgeistpm/sdk": "^0.2.10",
+    "@zeitgeistpm/sdk": "^0.2.11",
     "commander": "^7.2.0"
   },
   "devDependencies": {
