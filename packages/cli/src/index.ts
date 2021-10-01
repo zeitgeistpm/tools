@@ -73,7 +73,7 @@ program
   )
   .option(
     "--timestamp",
-    "Interpret the end value as a unix timestamp instead of a block number",
+    "Interpret period as a unix timestamp instead of a block number",
     false
   )
   .action(
@@ -87,8 +87,8 @@ program
         endpoint: string;
         seed: string;
         categories: string[];
-        advised: boolean;
-        timestamp: boolean;
+        isAdvised: boolean;
+        isTimestamp: boolean;
       }
     ) =>
       catchErrorsAndExit(
@@ -98,7 +98,7 @@ program
   );
 
 program
-  .command("createScalarMarket <title> <description> <oracle> <end>")
+  .command("createScalarMarket <title> <description> <oracle> <period>")
   .option(
     "--advised",
     "Create Advised market instead of Permissionless market",
@@ -116,7 +116,7 @@ program
   )
   .option(
     "--timestamp",
-    "Interpret the end value as a unix timestamp instead of a block number",
+    "Interpret period as a unix timestamp instead of a block number",
     false
   )
   .action(
@@ -124,18 +124,18 @@ program
       title: string,
       description: string,
       oracle: string,
-      end: string,
+      period: string,
       opts: {
         endpoint: string;
         seed: string;
         bounds: number[];
-        advised: boolean;
-        timestamp: boolean;
+        isAdvised: boolean;
+        isTimestamp: boolean;
       }
     ) =>
       catchErrorsAndExit(
         createScalarMarket,
-        Object.assign(opts, { title, description, oracle, end })
+        Object.assign(opts, { title, description, oracle, period })
       )
   );
 

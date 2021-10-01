@@ -72,8 +72,9 @@ export default class Models {
    * Creates a new categorical market with the given parameters.
    * @param signer The actual signer provider to sign the transaction.
    * @param oracle The address that will be responsible for reporting the market.
-   * @param end Ending block or the ending unix timestamp of the market.
+   * @param period Start and end block numbers or unix timestamp of the market.
    * @param creationType "Permissionless" or "Advised"
+   * @param mdm Dispute settlement can be authorized, court or simple_disputes
    * @param metadata Market metadata
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
@@ -168,9 +169,10 @@ export default class Models {
    * @param title The title of the new prediction market.
    * @param description The description / extra information for the market.
    * @param oracle The address that will be responsible for reporting the market.
-   * @param end Ending block or the ending unix timestamp of the market.
+   * @param period Start and end block numbers or unix timestamp of the market.
    * @param creationType "Permissionless" or "Advised"
    * @param bounds The array having lower and higher bound values denoting range set.
+   * @param mdm Dispute settlement can be authorized, court or simple_disputes
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
   async createScalarMarket(
@@ -178,9 +180,10 @@ export default class Models {
     title: string,
     description: string,
     oracle: string,
-    end: MarketEnd,
+    period: MarketPeriod,
     creationType = "Advised",
     bounds = [0, 100],
+    mdm: MarketDisputeMechanism,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = new IPFS();
@@ -228,7 +231,14 @@ export default class Models {
 
       if (isExtSigner(signer)) {
         const unsub = await this.api.tx.predictionMarkets
-          .createScalarMarket(oracle, end, multihash, creationType, bounds)
+          .createScalarMarket(
+            oracle,
+            period,
+            multihash,
+            creationType,
+            bounds,
+            mdm
+          )
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
               ? callback(result, unsub)
@@ -236,7 +246,14 @@ export default class Models {
           );
       } else {
         const unsub = await this.api.tx.predictionMarkets
-          .createScalarMarket(oracle, end, multihash, creationType, bounds)
+          .createScalarMarket(
+            oracle,
+            period,
+            multihash,
+            creationType,
+            bounds,
+            mdm
+          )
           .signAndSend(signer, (result) =>
             callback
               ? callback(result, unsub)

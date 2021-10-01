@@ -12,9 +12,9 @@ type Options = {
   period: string;
   categories?: string[];
   question: string;
-  advised: boolean;
+  isAdvised: boolean;
   seed: string;
-  timestamp: boolean;
+  isTimestamp: boolean;
 };
 
 const createCategoricalMarket = async (opts: Options): Promise<void> => {
@@ -24,11 +24,11 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     oracle,
     period,
     categories,
-    advised,
+    isAdvised,
     endpoint,
     seed,
     question,
-    timestamp,
+    isTimestamp,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -73,7 +73,9 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     categories: categoriesMeta,
   };
 
-  const marketPeriod = { block: period.split(" ").map((x) => +x) };
+  const marketPeriod = isTimestamp
+    ? { timestamp: period.split(" ").map((x) => +x) }
+    : { block: period.split(" ").map((x) => +x) };
 
   const mdm = { SimpleDisputes: null };
 
@@ -81,7 +83,7 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     signer,
     oracle,
     marketPeriod,
-    advised ? "Advised" : "Permissionless",
+    isAdvised ? "Advised" : "Permissionless",
     mdm,
     metadata
   );
