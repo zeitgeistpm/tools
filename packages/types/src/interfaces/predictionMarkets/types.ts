@@ -11,9 +11,9 @@ export interface Market extends Struct {
   readonly creation: MarketCreation;
   readonly creator_fee: u8;
   readonly oracle: AccountId;
-  readonly period: MarketPeriod;
   readonly metadata: Bytes;
   readonly market_type: MarketType;
+  readonly period: MarketPeriod;
   readonly status: MarketStatus;
   readonly report: Option<Report>;
   readonly resolved_outcome: Option<Outcome>;
