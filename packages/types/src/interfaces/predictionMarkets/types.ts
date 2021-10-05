@@ -14,6 +14,7 @@ export interface Market extends Struct {
   readonly metadata: Bytes;
   readonly market_type: MarketType;
   readonly period: MarketPeriod;
+  readonly scoring_rule: ScoringRule;
   readonly status: MarketStatus;
   readonly report: Option<Report>;
   readonly resolved_outcome: Option<Outcome>;
@@ -58,6 +59,8 @@ export interface MarketStatus extends Enum {
   readonly isActive: boolean;
   readonly isSuspended: boolean;
   readonly isClosed: boolean;
+  readonly isCollectingSubsidy: boolean;
+  readonly isInsufficientSubsidy: boolean;
   readonly isReported: boolean;
   readonly isDisputed: boolean;
   readonly isResolved: boolean;
@@ -84,6 +87,12 @@ export interface Report extends Struct {
   readonly at: BlockNumber;
   readonly by: AccountId;
   readonly outcome: Outcome;
+}
+
+/** @name ScoringRule */
+export interface ScoringRule extends Enum {
+  readonly isCpmm: boolean;
+  readonly isRikiddoSigmoidFeeMarketEma: boolean;
 }
 
 export type PHANTOM_PREDICTIONMARKETS = 'predictionMarkets';

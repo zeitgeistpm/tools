@@ -45,6 +45,8 @@ export default {
         "Active",
         "Suspended",
         "Closed",
+        "CollectingSubsidy",
+        "InsufficientSubsidy",
         "Reported",
         "Disputed",
         "Resolved",
@@ -58,10 +60,14 @@ export default {
       metadata: "Vec<u8>",
       market_type: "MarketType",
       period: "MarketPeriod",
+      scoring_rule: "ScoringRule",
       status: "MarketStatus",
       report: "Option<Report>",
       resolved_outcome: "Option<Outcome>",
       mdm: "MarketDisputeMechanism",
+    },
+    ScoringRule: {
+      _enum: ["CPMM", "RikiddoSigmoidFeeMarketEma"],
     },
     Outcome: {
       _enum: {

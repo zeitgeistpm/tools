@@ -47,7 +47,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .option("--seed <string>", "The signer's seed", "//Alice")
   .action((opts: any) => catchErrorsAndExit(deployKusamaDerby, opts));
@@ -69,11 +69,16 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .option(
     "--timestamp",
-    "Interpret the end value as a unix timestamp instead of a block number",
+    "Interpret period as a unix timestamp instead of a block number",
+    false
+  )
+  .option(
+    "--cpmm",
+    "Use cpmm as a scoring rule instead of RikiddoSigmoidFeeMarketEma",
     false
   )
   .action(
@@ -87,8 +92,9 @@ program
         endpoint: string;
         seed: string;
         categories: string[];
-        advised: boolean;
-        timestamp: boolean;
+        isAdvised: boolean;
+        isTimestamp: boolean;
+        isCPMM: boolean;
       }
     ) =>
       catchErrorsAndExit(
@@ -98,7 +104,7 @@ program
   );
 
 program
-  .command("createScalarMarket <title> <description> <oracle> <end>")
+  .command("createScalarMarket <title> <description> <oracle> <period>")
   .option(
     "--advised",
     "Create Advised market instead of Permissionless market",
@@ -112,11 +118,16 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .option(
     "--timestamp",
-    "Interpret the end value as a unix timestamp instead of a block number",
+    "Interpret period as a unix timestamp instead of a block number",
+    false
+  )
+  .option(
+    "--cpmm",
+    "Use cpmm as a scoring rule instead of RikiddoSigmoidFeeMarketEma",
     false
   )
   .action(
@@ -124,18 +135,19 @@ program
       title: string,
       description: string,
       oracle: string,
-      end: string,
+      period: string,
       opts: {
         endpoint: string;
         seed: string;
         bounds: number[];
-        advised: boolean;
-        timestamp: boolean;
+        isAdvised: boolean;
+        isTimestamp: boolean;
+        isCPMM: boolean;
       }
     ) =>
       catchErrorsAndExit(
         createScalarMarket,
-        Object.assign(opts, { title, description, oracle, end })
+        Object.assign(opts, { title, description, oracle, period })
       )
   );
 
@@ -146,7 +158,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((opts: { blocks: number[]; link: boolean; endpoint: string }) =>
     catchErrorsAndExit(getBlockHashes, Object.assign(opts))
@@ -166,7 +178,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(viewMarket, Object.assign(opts, { marketId }))
@@ -178,7 +190,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(cancelPendingMarket, Object.assign(opts, { marketId }))
@@ -189,7 +201,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((marketId: number, opts: any) =>
     catchErrorsAndExit(viewSwap, Object.assign(opts, { marketId }))
@@ -201,7 +213,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action(
     (
@@ -221,7 +233,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((marketId: number, amount: number, opts: { seed: string }) =>
     catchErrorsAndExit(
@@ -236,7 +248,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((marketId: number, outcome: number, opts: { seed: string }) =>
     catchErrorsAndExit(reportMarket, Object.assign(opts, { marketId, outcome }))
@@ -248,7 +260,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((marketId: number, outcome: number, opts: { seed: string }) =>
     catchErrorsAndExit(
@@ -263,7 +275,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((marketId: number, opts: { seed: string }) =>
     catchErrorsAndExit(redeemShares, Object.assign(opts, { marketId }))
@@ -275,7 +287,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .option(
     "--weights <weights>",
@@ -292,7 +304,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action(
     (
@@ -315,7 +327,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action(
     (
@@ -337,7 +349,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action(
     (
@@ -360,7 +372,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action(
     (
@@ -393,7 +405,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action(
     (
@@ -423,7 +435,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((addressOrSeed = "//Alice", asset, opts: { endpoint: string }) =>
     catchErrorsAndExit(
@@ -449,7 +461,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action(
     (
@@ -469,7 +481,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action(
     (
@@ -494,7 +506,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((opts: { block: number; endpoint: string }) =>
     catchErrorsAndExit(getAssetsPrices, opts)
@@ -506,7 +518,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   // TODO: check if these params really should be string!
   .action(
@@ -528,7 +540,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((opts: { endpoint: string }) =>
     catchErrorsAndExit(countMarkets, Object.assign(opts))
@@ -539,7 +551,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((opts: { endpoint: string }) =>
     catchErrorsAndExit(getAllMarketIds, Object.assign(opts))
@@ -551,7 +563,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((opts: { endpoint: string; filter: string[] }) =>
     catchErrorsAndExit(getAllMarkets, Object.assign(opts))
@@ -562,7 +574,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .option(
     "--seed <string>",
@@ -578,7 +590,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .option(
     "--seed <string>",
@@ -594,7 +606,7 @@ program
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
-    "wss://bp-rpc.zeitgeist.pm"
+    "wss://bsr.zeitgeist.pm"
   )
   .action((marketId: number, opts: { endpoint: string }) =>
     catchErrorsAndExit(viewDisputes, Object.assign(opts, { marketId }))

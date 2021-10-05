@@ -73,9 +73,10 @@ export type MarketResponse = {
   creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  period: MarketPeriod;
   metadata: string;
   market_type: MarketType;
+  period: MarketPeriod;
+  scoring_rule: ScoringRule;
   market_status: string;
   report: Report | null;
   resolved_outcome: Outcome | null;
@@ -89,6 +90,7 @@ export type ExtendedMarketResponse = {
   creator_fee: number;
   oracle: string;
   period: MarketPeriod;
+  scoring_rule: ScoringRule;
   metadata: string;
   market_type: MarketType;
   market_status: string;
@@ -137,6 +139,8 @@ export type MarketPeriod = { block: number[] } | { timestamp: number[] };
 export type MarketEnd = { block: number } | { timestamp: number };
 
 export type MarketCreation = "Permissioned" | "Advised";
+
+export type ScoringRule = "CPMM" | "RikiddoSigmoidFeeMarketEma";
 
 export type MarketDisputeMechanism =
   | { Authorized: null }

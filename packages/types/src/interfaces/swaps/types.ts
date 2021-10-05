@@ -1,9 +1,10 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { BTreeMap, Enum, Struct, Vec, u128 } from '@polkadot/types';
+import type { BTreeMap, Enum, Option, Struct, Vec, u128 } from '@polkadot/types';
 import type { AccountId, Balance } from '@polkadot/types/interfaces/runtime';
 import type { Asset } from '@zeitgeistpm/types/interfaces/index';
+import type { MarketId, MarketPeriod, ScoringRule } from '@zeitgeistpm/types/interfaces/predictionMarkets';
 
 /** @name CommonPoolEventParams */
 export interface CommonPoolEventParams extends Struct {
@@ -14,10 +15,14 @@ export interface CommonPoolEventParams extends Struct {
 /** @name Pool */
 export interface Pool extends Struct {
   readonly assets: Vec<Asset>;
+  readonly base_asset: Option<Asset>;
+  readonly market_id: MarketId;
   readonly pool_status: PoolStatus;
-  readonly swap_fee: Balance;
-  readonly total_weight: u128;
-  readonly weights: BTreeMap<Asset, u128>;
+  readonly scoring_rule: ScoringRule;
+  readonly swap_fee: Option<Balance>;
+  readonly total_subsidy: Option<Balance>;
+  readonly total_weight: Option<u128>;
+  readonly weights: Option<BTreeMap<Asset, u128>>;
 }
 
 /** @name PoolAssetEvent */
@@ -40,7 +45,14 @@ export interface PoolId extends u128 {}
 /** @name PoolStatus */
 export interface PoolStatus extends Enum {
   readonly isActive: boolean;
+  readonly isCollectingSubsidy: boolean;
   readonly isStale: boolean;
+}
+
+/** @name SubsidyUntil */
+export interface SubsidyUntil extends Struct {
+  readonly market_id: MarketId;
+  readonly period: MarketPeriod;
 }
 
 /** @name SwapEvent */

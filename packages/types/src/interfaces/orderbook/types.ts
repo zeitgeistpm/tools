@@ -2,14 +2,15 @@
 /* eslint-disable */
 
 import type { Enum, Option, Struct } from '@polkadot/types';
-import type { AccountId, Balance, Hash } from '@polkadot/types/interfaces/runtime';
+import type { AccountId, Balance } from '@polkadot/types/interfaces/runtime';
+import type { Asset } from '@zeitgeistpm/types/interfaces/index';
 
 /** @name Order */
 export interface Order extends Struct {
   readonly side: OrderSide;
   readonly maker: AccountId;
   readonly taker: Option<AccountId>;
-  readonly share_id: Hash;
+  readonly asset: Asset;
   readonly total: Balance;
   readonly price: Balance;
   readonly filled: Balance;
