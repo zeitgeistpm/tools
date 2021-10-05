@@ -8,7 +8,7 @@ export default {
       side: "OrderSide",
       maker: "AccountId",
       taker: "Option<AccountId>",
-      share_id: "Hash",
+      asset: "Asset",
       total: "Balance",
       price: "Balance",
       filled: "Balance",

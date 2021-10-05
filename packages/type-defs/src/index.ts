@@ -30,6 +30,7 @@ export const index = {
     SerdeWrapper: "Balance",
     BlockNumber: "u64",
     CategoryIndex: "u16",
+    Currency: "Asset",
     CurrencyIdOf: "Asset",
     CurrencyId: "Asset",
     Index: "u64",

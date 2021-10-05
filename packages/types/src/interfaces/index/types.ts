@@ -36,6 +36,9 @@ export interface BlockNumber extends u64 {}
 /** @name CategoryIndex */
 export interface CategoryIndex extends u16 {}
 
+/** @name Currency */
+export interface Currency extends Asset {}
+
 /** @name CurrencyId */
 export interface CurrencyId extends Asset {}
 
