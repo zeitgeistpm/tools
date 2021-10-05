@@ -8,7 +8,6 @@ import {
   FilteredMarketResponse,
   KeyringPairOrExtSigner,
   MarketCreation,
-  MarketEnd,
   MarketPeriod,
   Report,
   MarketDispute,
@@ -16,6 +15,7 @@ import {
   DecodedMarketMetadata,
   CategoryMetadata,
   Outcome,
+  ScoringRule,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
@@ -37,6 +37,8 @@ class Market {
   public oracle: string;
   /** The period block or timestamp for this market. */
   public period: MarketPeriod;
+  /** The scoring rule used for the market. */
+  public scoringRule: ScoringRule;
   /** The hex-encoded raw metadata for the market. */
   public metadata: string;
   /** The type of market. */
@@ -79,6 +81,7 @@ class Market {
       creator_fee: this.creatorFee,
       oracle: this.oracle,
       period: this.period,
+      scoring_rule: this.scoringRule,
       metadata: this.metadata,
       market_type: this.marketType as any,
       market_status: this.marketStatus,

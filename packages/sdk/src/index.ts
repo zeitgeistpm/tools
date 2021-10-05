@@ -14,7 +14,7 @@ export default class SDK {
   public models: Models;
 
   static async initialize(
-    endpoint = "wss://bp-rpc.zeitgeist.pm",
+    endpoint = "wss://bsr.zeitgeist.pm",
     opts = { logEndpointInitTime: true }
   ): Promise<SDK> {
     const start = Date.now();

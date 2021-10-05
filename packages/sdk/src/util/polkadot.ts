@@ -19,7 +19,7 @@ const typesFromDefs = (
 };
 
 export const initApi = (
-  endpoint = "wss://bp-rpc.zeitgeist.pm"
+  endpoint = "wss://bsr.zeitgeist.pm"
 ): Promise<ApiPromise> => {
   return ApiPromise.create({
     provider: new WsProvider(endpoint),

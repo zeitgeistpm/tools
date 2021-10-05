@@ -43,6 +43,7 @@ export const index = {
         Sha3_384: "[u8; 50]",
       },
     },
+    RoundIndex: "u32",
     ScalarPosition: {
       _enum: ["Long", "Short"],
     },

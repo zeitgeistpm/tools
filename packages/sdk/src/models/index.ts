@@ -84,6 +84,7 @@ export default class Models {
     period: MarketPeriod,
     creationType = "Advised",
     mdm: MarketDisputeMechanism,
+    scoringRule = "CPMM",
     metadata: DecodedMarketMetadata,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
@@ -137,7 +138,8 @@ export default class Models {
             multihash,
             creationType,
             categories.length,
-            mdm
+            mdm,
+            scoringRule
           )
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -152,7 +154,8 @@ export default class Models {
             multihash,
             creationType,
             categories.length,
-            mdm
+            mdm,
+            scoringRule
           )
           .signAndSend(signer, (result) =>
             callback
@@ -184,6 +187,7 @@ export default class Models {
     creationType = "Advised",
     bounds = [0, 100],
     mdm: MarketDisputeMechanism,
+    scoringRule = "CPMM",
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = new IPFS();
@@ -237,7 +241,8 @@ export default class Models {
             multihash,
             creationType,
             bounds,
-            mdm
+            mdm,
+            scoringRule
           )
           .signAndSend(signer.address, { signer: signer.signer }, (result) =>
             callback
@@ -252,7 +257,8 @@ export default class Models {
             multihash,
             creationType,
             bounds,
-            mdm
+            mdm,
+            scoringRule
           )
           .signAndSend(signer, (result) =>
             callback

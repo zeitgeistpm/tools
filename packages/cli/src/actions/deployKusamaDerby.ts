@@ -23,6 +23,7 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
       { timestamp: [1620504000000, 1620604000000] },
       "Permissionless",
       { SimpleDisputes: null },
+      "CPMM",
       {
         categories: [
           { name: "karura" },

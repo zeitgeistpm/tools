@@ -10,6 +10,7 @@ type Options = {
   isAdvised: boolean;
   seed: string;
   isTimestamp: boolean;
+  isCPMM: boolean;
 };
 
 const createScalarMarket = async (opts: Options): Promise<void> => {
@@ -23,6 +24,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     endpoint,
     seed,
     isTimestamp,
+    isCPMM,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -50,7 +52,8 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     marketPeriod,
     isAdvised ? "Advised" : "Permissionless",
     bounds ? bounds : [0, 100],
-    mdm
+    mdm,
+    isCPMM ? "CPMM" : "RikiddoSigmoidFeeMarketEma"
   );
 
   console.log(`Market created! Market Id: ${marketId}`);

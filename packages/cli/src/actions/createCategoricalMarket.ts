@@ -15,6 +15,7 @@ type Options = {
   isAdvised: boolean;
   seed: string;
   isTimestamp: boolean;
+  isCPMM: boolean;
 };
 
 const createCategoricalMarket = async (opts: Options): Promise<void> => {
@@ -29,6 +30,7 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     seed,
     question,
     isTimestamp,
+    isCPMM,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -85,6 +87,7 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     marketPeriod,
     isAdvised ? "Advised" : "Permissionless",
     mdm,
+    isCPMM ? "CPMM" : "RikiddoSigmoidFeeMarketEma",
     metadata
   );
 
