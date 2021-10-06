@@ -77,9 +77,10 @@ export type MarketResponse = {
   market_type: MarketType;
   period: MarketPeriod;
   scoring_rule: ScoringRule;
-  market_status: string;
+  status: string;
   report: Report | null;
   resolved_outcome: Outcome | null;
+  mdm: MarketDisputeMechanism;
   outcomeAssets: Asset[];
 };
 
@@ -93,10 +94,11 @@ export type ExtendedMarketResponse = {
   scoring_rule: ScoringRule;
   metadata: string;
   market_type: MarketType;
-  market_status: string;
+  status: string;
   report: Report | null;
   categories: string[] | null;
   resolved_outcome: Outcome | null;
+  mdm: MarketDisputeMechanism;
   // new ones
   marketId: number;
   title: string;
@@ -114,7 +116,7 @@ export type FilteredMarketResponse = {
   period?: MarketPeriod;
   metadata?: string;
   market_type?: string;
-  market_status?: string;
+  status?: string;
   report?: Report | null;
   categories?: number | null;
   resolved_outcome?: Outcome | null;

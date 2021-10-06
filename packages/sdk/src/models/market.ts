@@ -16,6 +16,7 @@ import {
   CategoryMetadata,
   Outcome,
   ScoringRule,
+  MarketDisputeMechanism,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
 import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
@@ -44,13 +45,15 @@ class Market {
   /** The type of market. */
   public marketType: string;
   /** The status of the market. */
-  public marketStatus: string;
+  public status: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
   public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
   public categories: CategoryMetadata[] | null;
   /** The resolved outcome for the market. */
   public resolvedOutcome: Outcome | null;
+
+  public mdm: MarketDisputeMechanism;
   /** The description of the market. */
   public description: string;
   /** The market question. */
@@ -84,9 +87,10 @@ class Market {
       scoring_rule: this.scoringRule,
       metadata: this.metadata,
       market_type: this.marketType as any,
-      market_status: this.marketStatus,
+      status: this.status,
       report: this.report,
       resolved_outcome: this.resolvedOutcome,
+      mdm: this.mdm,
       outcomeAssets: this.outcomeAssets,
     } = market);
 
