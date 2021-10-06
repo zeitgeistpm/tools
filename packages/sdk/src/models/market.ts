@@ -11,7 +11,6 @@ import {
   MarketPeriod,
   Report,
   MarketDispute,
-  AssetId,
   DecodedMarketMetadata,
   CategoryMetadata,
   Outcome,
@@ -26,7 +25,7 @@ import { Option } from "@polkadot/types";
  */
 class Market {
   /** The short name for the market, ex. 'TEAM 1 v.s TEAM 2'. */
-  public slug: string;
+  public shortName: string;
   /** The creator of the market. */
   public creator: string;
   /** The creation type of the market. Can be `Permissionless` or `Advised`. */
@@ -53,8 +52,8 @@ class Market {
   public resolvedOutcome: Outcome | null;
   /** The description of the market. */
   public description: string;
-  /** The market question. */
-  public question: string;
+  /** The market name including question. */
+  public name: string;
   /** The share identifiers */
   public outcomeAssets: Asset[];
   /** Market tags */
@@ -91,8 +90,8 @@ class Market {
     } = market);
 
     ({
-      slug: this.slug,
-      question: this.question,
+      shortName: this.shortName,
+      name: this.name,
       description: this.description,
       categories: this.categories,
       tags: this.tags,

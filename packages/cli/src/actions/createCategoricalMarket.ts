@@ -6,12 +6,12 @@ import {
 
 type Options = {
   endpoint: string;
-  slug: string;
+  shortName: string;
   description: string;
   oracle: string;
   period: string;
   categories?: string[];
-  question: string;
+  name: string;
   isAdvised: boolean;
   seed: string;
   isTimestamp: boolean;
@@ -20,7 +20,7 @@ type Options = {
 
 const createCategoricalMarket = async (opts: Options): Promise<void> => {
   const {
-    slug,
+    shortName,
     description,
     oracle,
     period,
@@ -28,7 +28,7 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     isAdvised,
     endpoint,
     seed,
-    question,
+    name,
     isTimestamp,
     isCPMM,
   } = opts;
@@ -70,8 +70,8 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
 
   const metadata: DecodedMarketMetadata = {
     description,
-    slug,
-    question,
+    shortName,
+    name,
     categories: categoriesMeta,
   };
 
