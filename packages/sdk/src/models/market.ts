@@ -14,7 +14,7 @@ import {
   AssetId,
   DecodedMarketMetadata,
   CategoryMetadata,
-  Outcome,
+  OutcomeReport,
   ScoringRule,
   MarketDisputeMechanism,
 } from "../types";
@@ -51,7 +51,7 @@ class Market {
   /** The categories of a categorical market. Null if not a categorical market. */
   public categories: CategoryMetadata[] | null;
   /** The resolved outcome for the market. */
-  public resolvedOutcome: Outcome | null;
+  public resolvedOutcome: OutcomeReport | null;
 
   public mdm: MarketDisputeMechanism;
   /** The description of the market. */
@@ -440,7 +440,7 @@ class Market {
    */
   async reportOutcome(
     signer: KeyringPairOrExtSigner,
-    outcome: Outcome,
+    outcome: OutcomeReport,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (
@@ -495,7 +495,7 @@ class Market {
    */
   async dispute(
     signer: KeyringPairOrExtSigner,
-    outcome: Outcome,
+    outcome: OutcomeReport,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const _callback = (

@@ -1,7 +1,7 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { Enum, U8aFixed, i128, u128, u16, u64 } from '@polkadot/types';
+import type { Enum, U8aFixed, i128, u128, u16, u32, u64 } from '@polkadot/types';
 import type { ITuple } from '@polkadot/types/types';
 import type { AccountId, Balance, MultiAddress } from '@polkadot/types/interfaces/runtime';
 import type { MarketId } from '@zeitgeistpm/types/interfaces/predictionMarkets';
@@ -65,6 +65,9 @@ export interface MultiHash extends Enum {
   readonly isSha3384: boolean;
   readonly asSha3384: U8aFixed;
 }
+
+/** @name RoundIndex */
+export interface RoundIndex extends u32 {}
 
 /** @name ScalarPosition */
 export interface ScalarPosition extends Enum {
