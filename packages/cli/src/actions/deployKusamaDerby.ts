@@ -35,9 +35,9 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
           { name: "hydradx" },
           { name: "shiden" },
         ],
-        slug: `kusama-derby-test-${i}`,
+        shortName: `kusama-derby-test-${i}`,
         description: "test description",
-        question: "who will win?",
+        name: "who will win?",
       }
     );
 
