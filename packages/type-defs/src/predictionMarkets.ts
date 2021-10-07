@@ -63,13 +63,13 @@ export default {
       scoring_rule: "ScoringRule",
       status: "MarketStatus",
       report: "Option<Report>",
-      resolved_outcome: "Option<Outcome>",
+      resolved_outcome: "Option<OutcomeReport>",
       mdm: "MarketDisputeMechanism",
     },
     ScoringRule: {
       _enum: ["CPMM", "RikiddoSigmoidFeeMarketEma"],
     },
-    Outcome: {
+    OutcomeReport: {
       _enum: {
         Categorical: "u16",
         Scalar: "u128",
@@ -78,12 +78,12 @@ export default {
     Report: {
       at: "BlockNumber",
       by: "AccountId",
-      outcome: "Outcome",
+      outcome: "OutcomeReport",
     },
     MarketDispute: {
       at: "BlockNumber",
       by: "AccountId",
-      outcome: "Outcome",
+      outcome: "OutcomeReport",
     },
     MarketDisputeMechanism: {
       _enum: {
