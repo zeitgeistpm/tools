@@ -287,7 +287,7 @@ export default class Models {
 
     // Default to no metadata, but actually parse it below if it exists.
     let metadata = {
-      shortName: "No metadata",
+      slug: "No metadata",
     } as Partial<DecodedMarketMetadata>;
 
     try {
