@@ -4,7 +4,6 @@
 import type { Bytes, Enum, Option, Struct, u128, u16, u8 } from '@polkadot/types';
 import type { ITuple } from '@polkadot/types/types';
 import type { AccountId, BlockNumber, Moment } from '@polkadot/types/interfaces/runtime';
-import type { Outcome } from '@polkadot/types/interfaces/xcm';
 
 /** @name Market */
 export interface Market extends Struct {
@@ -32,7 +31,7 @@ export interface MarketCreation extends Enum {
 export interface MarketDispute extends Struct {
   readonly at: BlockNumber;
   readonly by: AccountId;
-  readonly outcome: Outcome;
+  readonly outcome: OutcomeReport;
 }
 
 /** @name MarketDisputeMechanism */
@@ -87,7 +86,7 @@ export interface OutcomeReport extends Enum {
 export interface Report extends Struct {
   readonly at: BlockNumber;
   readonly by: AccountId;
-  readonly outcome: Outcome;
+  readonly outcome: OutcomeReport;
 }
 
 /** @name ScoringRule */
