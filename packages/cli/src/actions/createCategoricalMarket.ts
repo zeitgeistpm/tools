@@ -100,7 +100,11 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     metadata
   );
 
-  console.log(`Market created! Market Id: ${marketId}`);
+  if (marketId && marketId.length > 0) {
+    console.log(`Categorical market created! Market Id: ${marketId}`);
+  } else {
+    console.log(`Categorical market creation failed!`);
+  }
 
   process.exit(0);
 };

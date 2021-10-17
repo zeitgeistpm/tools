@@ -65,7 +65,11 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     cpmm ? "CPMM" : "RikiddoSigmoidFeeMarketEma"
   );
 
-  console.log(`Market created! Market Id: ${marketId}`);
+  if (marketId && marketId.length > 0) {
+    console.log(`Scalar market created! Market Id: ${marketId}`);
+  } else {
+    console.log(`Scalar market creation failed!`);
+  }
 
   process.exit(0);
 };
