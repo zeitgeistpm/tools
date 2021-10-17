@@ -77,8 +77,8 @@ program
     false
   )
   .option(
-    "--authorized <number>",
-    "Specify block number in Authorized as Market Dispute Mechanism"
+    "--authorized <string>",
+    "Specify account id which is authorized to handle Market Dispute Mechanism"
   )
   .option(
     "--court",
@@ -103,7 +103,7 @@ program
         categories: string[];
         advised: boolean;
         timestamp: boolean;
-        authorized: number;
+        authorized: string;
         court: boolean;
         cpmm: boolean;
       }
@@ -137,8 +137,8 @@ program
     false
   )
   .option(
-    "--authorized <number>",
-    "Specify block number in Authorized as Market Dispute Mechanism"
+    "--authorized <string>",
+    "Specify account id which is authorized to handle Market Dispute Mechanism"
   )
   .option(
     "--court",
@@ -162,7 +162,7 @@ program
         categories: string[];
         advised: boolean;
         timestamp: boolean;
-        authorized: number;
+        authorized: string;
         court: boolean;
         cpmm: boolean;
       }

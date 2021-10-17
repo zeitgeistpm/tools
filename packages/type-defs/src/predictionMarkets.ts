@@ -87,7 +87,7 @@ export default {
     },
     MarketDisputeMechanism: {
       _enum: {
-        Authorized: "BlockNumber",
+        Authorized: "AccountId",
         Court: null,
         SimpleDisputes: null,
       },

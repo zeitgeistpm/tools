@@ -10,7 +10,7 @@ type Options = {
   advised: boolean;
   seed: string;
   timestamp: boolean;
-  authorized: number;
+  authorized: string;
   court: boolean;
   cpmm: boolean;
 };
