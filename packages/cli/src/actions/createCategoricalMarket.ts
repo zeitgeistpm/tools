@@ -12,10 +12,12 @@ type Options = {
   period: string;
   categories?: string[];
   question: string;
-  isAdvised: boolean;
+  advised: boolean;
   seed: string;
-  isTimestamp: boolean;
-  isCPMM: boolean;
+  timestamp: boolean;
+  authorized: number;
+  court: boolean;
+  cpmm: boolean;
 };
 
 const createCategoricalMarket = async (opts: Options): Promise<void> => {
@@ -25,12 +27,14 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     oracle,
     period,
     categories,
-    isAdvised,
+    advised,
     endpoint,
     seed,
     question,
-    isTimestamp,
-    isCPMM,
+    timestamp,
+    authorized,
+    court,
+    cpmm,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -75,19 +79,24 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     categories: categoriesMeta,
   };
 
-  const marketPeriod = isTimestamp
+  const marketPeriod = timestamp
     ? { timestamp: period.split(" ").map((x) => +x) }
     : { block: period.split(" ").map((x) => +x) };
 
-  const mdm = { SimpleDisputes: null };
+  let mdm = null;
+  if (authorized) {
+    mdm = { Authorized: authorized };
+  } else {
+    mdm = court ? { Court: null } : { SimpleDisputes: null };
+  }
 
   const marketId = await sdk.models.createCategoricalMarket(
     signer,
     oracle,
     marketPeriod,
-    isAdvised ? "Advised" : "Permissionless",
+    advised ? "Advised" : "Permissionless",
     mdm,
-    isCPMM ? "CPMM" : "RikiddoSigmoidFeeMarketEma",
+    cpmm ? "CPMM" : "RikiddoSigmoidFeeMarketEma",
     metadata
   );
 

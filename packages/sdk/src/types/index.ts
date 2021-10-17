@@ -145,7 +145,7 @@ export type MarketCreation = "Permissioned" | "Advised";
 export type ScoringRule = "CPMM" | "RikiddoSigmoidFeeMarketEma";
 
 export type MarketDisputeMechanism =
-  | { Authorized: null }
+  | { Authorized: number }
   | { Court: null }
   | { SimpleDisputes: null };
 
