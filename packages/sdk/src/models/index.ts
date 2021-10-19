@@ -14,6 +14,7 @@ import {
   PoolId,
   DecodedMarketMetadata,
   MarketDisputeMechanism,
+  CurrencyIdOf,
 } from "../types";
 import { changeEndianness, isExtSigner } from "../util";
 
@@ -563,5 +564,63 @@ export default class Models {
     console.log("Requests outstanding:", outstandingRequests);
 
     return extrinsics;
+  }
+
+  async currencyTransfer(
+    signer: KeyringPairOrExtSigner,
+    dest: string,
+    currencyId: CurrencyIdOf,
+    amount: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> {
+    return new Promise(async (resolve) => {
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
+
+        if (status.isInBlock) {
+          console.log(`Transaction included at blockHash ${status.asInBlock}`);
+
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+            if (method == "CurrencyTransferred") {
+              _resolve(data[0].toString());
+            } else if (method == "ExtrinsicFailed") {
+              const { index, error } = data.toJSON()[0].module;
+              const { errorName, documentation } = this.errorTable.getEntry(
+                index,
+                error
+              );
+              console.log(`${errorName}: ${documentation}`);
+              _resolve("");
+            }
+
+            unsubOrWarns(_unsub);
+          });
+        }
+      };
+
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.currency
+          .transfer(dest, currencyId, amount)
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.currency
+          .transfer(dest, currencyId, amount)
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
   }
 }
