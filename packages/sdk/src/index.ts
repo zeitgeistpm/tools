@@ -13,20 +13,48 @@ export default class SDK {
   public errorTable: ErrorTable;
   public models: Models;
 
+  static promiseWithTimeout<T>(
+    timeoutMs: number,
+    promise: Promise<T>,
+    failureMessage?: string
+  ) {
+    let timeoutHandle: NodeJS.Timeout;
+    const timeoutPromise = new Promise<never>((resolve, reject) => {
+      timeoutHandle = setTimeout(
+        () => reject(new Error(failureMessage)),
+        timeoutMs
+      );
+    });
+
+    return Promise.race([promise, timeoutPromise]).then((result) => {
+      clearTimeout(timeoutHandle);
+      return result;
+    });
+  }
+
   static async initialize(
     endpoint = "wss://bsr.zeitgeist.pm",
     opts = { logEndpointInitTime: true }
   ): Promise<SDK> {
-    const start = Date.now();
-    const api = await initApi(endpoint);
-    if (opts.logEndpointInitTime) {
-      console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
+    try {
+      const start = Date.now();
+      const api = await SDK.promiseWithTimeout(
+        10000,
+        initApi(endpoint),
+        "Timed out while connecting to the zeitgeist node. Check your node address."
+      );
+
+      if (opts.logEndpointInitTime) {
+        console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
+      }
+
+      const eTable = await ErrorTable.populate(api);
+      const sdk = new SDK(api, eTable);
+
+      return sdk;
+    } catch (e) {
+      throw e;
     }
-
-    const eTable = await ErrorTable.populate(api);
-    const sdk = new SDK(api, eTable);
-
-    return sdk;
   }
 
   static mock(mockedAPI: ApiPromise): SDK {
