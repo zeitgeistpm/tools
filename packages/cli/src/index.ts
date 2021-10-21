@@ -77,6 +77,15 @@ program
     false
   )
   .option(
+    "--authorized <string>",
+    "Specify account id which is authorized to handle Market Dispute Mechanism"
+  )
+  .option(
+    "--court",
+    "Use Court instead of Simple Disputes as Market Dispute Mechanism",
+    false
+  )
+  .option(
     "--cpmm",
     "Use cpmm as a scoring rule instead of RikiddoSigmoidFeeMarketEma",
     false
@@ -92,9 +101,11 @@ program
         endpoint: string;
         seed: string;
         categories: string[];
-        isAdvised: boolean;
-        isTimestamp: boolean;
-        isCPMM: boolean;
+        advised: boolean;
+        timestamp: boolean;
+        authorized: string;
+        court: boolean;
+        cpmm: boolean;
       }
     ) =>
       catchErrorsAndExit(
@@ -126,6 +137,15 @@ program
     false
   )
   .option(
+    "--authorized <string>",
+    "Specify account id which is authorized to handle Market Dispute Mechanism"
+  )
+  .option(
+    "--court",
+    "Use Court instead of Simple Disputes as Market Dispute Mechanism",
+    false
+  )
+  .option(
     "--cpmm",
     "Use cpmm as a scoring rule instead of RikiddoSigmoidFeeMarketEma",
     false
@@ -139,10 +159,12 @@ program
       opts: {
         endpoint: string;
         seed: string;
-        bounds: number[];
-        isAdvised: boolean;
-        isTimestamp: boolean;
-        isCPMM: boolean;
+        categories: string[];
+        advised: boolean;
+        timestamp: boolean;
+        authorized: string;
+        court: boolean;
+        cpmm: boolean;
       }
     ) =>
       catchErrorsAndExit(

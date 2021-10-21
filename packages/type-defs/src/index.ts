@@ -29,11 +29,31 @@ export const index = {
     AuthorId: "AccountId",
     SerdeWrapper: "Balance",
     BlockNumber: "u64",
+    Bond: {
+      owner: "AccountId",
+      amount: "Balance",
+    },
     CategoryIndex: "u16",
+    CollatorSnapshot: {
+      bond: "Balance",
+      nominators: "Vec<Bond>",
+      total: "Balance",
+    },
     Currency: "Asset",
     CurrencyIdOf: "Asset",
     CurrencyId: "Asset",
+    ExitQ: {
+      candidates: "Vec<AccountId>",
+      nominators_leaving: "Vec<AccountId>",
+      candidate_schedule: "Vec<(AccountId, RoundIndex)>",
+      nominator_schedule: "Vec<(AccountId, Option<AccountId>, RoundIndex)>",
+    },
     Index: "u64",
+    InflationInfo: {
+      expect: "RangeBalance",
+      annual: "RangePerbill",
+      round: "RangePerbill",
+    },
     Lookup: "MultiAddress",
     MarketIdOf: "u128",
     MaxRuntimeUsize: "u64",
@@ -43,9 +63,35 @@ export const index = {
         Sha3_384: "[u8; 50]",
       },
     },
+    OrderedSet: "Vec<Bond>",
+    ParachainBondConfig: {
+      account: "AccountId",
+      percent: "Percent",
+    },
+    RangeBalance: {
+      min: "Balance",
+      ideal: "Balance",
+      max: "Balance",
+    },
+    RangePerbill: {
+      min: "Perbill",
+      ideal: "Perbill",
+      max: "Perbill",
+    },
+    RelayChainAccountId: "AccountId32",
+    RewardInfo: {
+      total_reward: "Balance",
+      claimed_reward: "Balance",
+    },
     RoundIndex: "u32",
+    RoundInfo: {
+      current: "RoundIndex",
+      first: "BlockNumber",
+      length: "u32",
+    },
     ScalarPosition: {
       _enum: ["Long", "Short"],
     },
+    VestingBlockNumber: "u32",
   },
 };
