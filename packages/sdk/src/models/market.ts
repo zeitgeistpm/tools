@@ -157,7 +157,7 @@ class Market {
   }
 
   /**
-   * Get timestamp at the end of the block (MarketPeriod)
+   * Get timestamp at the end of the market period.
    */
   async getEndTimestamp(): Promise<number> {
     if ("timestamp" in this.period) {
@@ -167,7 +167,9 @@ class Market {
     const now = (await this.api.query.timestamp.now()).toNumber();
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
-    const diffInMs = 6000 * (this.period.block[1] - blockNum);
+    const diffInMs =
+      (await this.api.consts.timestamp.minimumPeriod).toNumber() *
+      (this.period.block[1] - blockNum);
     return now + diffInMs;
   }
 
