@@ -49,15 +49,20 @@ const currencyTransfer = async (opts: Options): Promise<void> => {
     currencyId = { CombinatorialOutcome: null };
   }
 
-  const destId = await sdk.models.currencyTransfer(
+  const res = await sdk.models.currencyTransfer(
     signer,
     dest,
     currencyId,
     amount
   );
 
-  console.log(`Transfer successful to ${destId}`);
-
+  if (res) {
+    console.log(`Successfully transferred ${JSON.stringify(currencyId)}`);
+  } else {
+    console.log(
+      `Unable to transfer ${JSON.stringify(currencyId)} - check balance.`
+    );
+  }
   process.exit(0);
 };
 

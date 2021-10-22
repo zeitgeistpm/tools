@@ -566,61 +566,56 @@ export default class Models {
     return extrinsics;
   }
 
-  async currencyTransfer(
+  currencyTransfer = async (
     signer: KeyringPairOrExtSigner,
     dest: string,
     currencyId: CurrencyIdOf,
     amount: number,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<string> {
-    return new Promise(async (resolve) => {
-      const _callback = (
-        result: ISubmittableResult,
-        _resolve: (value: string | PromiseLike<string>) => void,
-        _unsub: () => void
-      ) => {
-        const { events, status } = result;
+  ): Promise<boolean> => {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
 
-        if (status.isInBlock) {
-          console.log(`Transaction included at blockHash ${status.asInBlock}`);
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
 
-          events.forEach(({ phase, event: { data, method, section } }) => {
-            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-
-            if (method == "CurrencyTransferred") {
-              _resolve(data[0].toString());
-            } else if (method == "ExtrinsicFailed") {
-              const { index, error } = data.toJSON()[0].module;
-              const { errorName, documentation } = this.errorTable.getEntry(
-                index,
-                error
-              );
-              console.log(`${errorName}: ${documentation}`);
-              _resolve("");
-            }
-
+          if (method == "ExtrinsicSuccess") {
             unsubOrWarns(_unsub);
-          });
-        }
-      };
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
+      }
+    };
 
+    const tx = this.api.tx.currency.transfer(dest, currencyId, amount);
+
+    return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.currency
-          .transfer(dest, currencyId, amount)
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+              : _callback(result, resolve, unsub);
+          }
+        );
       } else {
-        const unsub = await this.api.tx.currency
-          .transfer(dest, currencyId, amount)
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
       }
     });
-  }
+  };
 }
