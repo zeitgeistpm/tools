@@ -539,12 +539,8 @@ program
 program
   .command("currencyTransfer <dest> <amount")
   .option(
-    "--address <string>",
-    "An address on which to report ownership of assets."
-  )
-  .option(
     "--seed <string>",
-    "A seed from which to calculate an address on which to report ownership of assets",
+    "The seed used to derive the address from which the assets should be transferred",
     "//Alice"
   )
   .option(
