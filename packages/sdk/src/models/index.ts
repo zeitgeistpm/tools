@@ -566,6 +566,14 @@ export default class Models {
     return extrinsics;
   }
 
+  /**
+   * Transfers specified asset from self to any account.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param dest The address that will receive the asset (token).
+   * @param currencyId Can be outcome tokens or PoolShare or Ztg.
+   * @param amount The number of `currencyId` to be transferred.
+   * @returns True or False
+   */
   currencyTransfer = async (
     signer: KeyringPairOrExtSigner,
     dest: string,
