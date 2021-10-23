@@ -7,6 +7,7 @@ import createScalarMarket from "./actions/createScalarMarket";
 import cancelPendingMarket from "./actions/cancelPendingMarket";
 import countMarkets from "./actions/countMarkets";
 import createCategoricalMarket from "./actions/createCategoricalMarket";
+import currencyTransfer from "./actions/currencyTransfer";
 import deployKusamaDerby from "./actions/deployKusamaDerby";
 import deployPool from "./actions/deployPool";
 import disputeMarket from "./actions/disputeMarket";
@@ -555,6 +556,33 @@ program
         transfer,
         Object.assign(opts, { marketId, sharesIndex, to, amount })
       )
+  );
+
+program
+  .command("currencyTransfer <dest> <amount")
+  .option(
+    "--seed <string>",
+    "The seed used to derive the address from which the assets should be transferred",
+    "//Alice"
+  )
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option("--marketId <string>", "The unique identifier of the market")
+  .option(
+    "--categoryIndex <number>",
+    "An index from the list of categories as categorical outcome"
+  )
+  .option(
+    "--scalarPos <string>",
+    "The scalar position can be either Long or Short"
+  )
+  .option("--poolShare <number>", "The amount of pool share to be transferred")
+  .option("--ztg", "Use ztg as currency instead of CombinatorialOutcome", false)
+  .action((dest: string, amount: number, opts: any) =>
+    catchErrorsAndExit(currencyTransfer, Object.assign(opts, { dest, amount }))
   );
 
 program

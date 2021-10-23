@@ -49,6 +49,19 @@ type categoricalOutcomeIndex = [number, number];
 
 type scalarOutcomeIndex = [number, "Long" | "Short"];
 
+export type CurrencyIdOf =
+  | CategoricalOutcome
+  | ScalarOutcome
+  | {
+      CombinatorialOutcome: null;
+    }
+  | {
+      Ztg: null;
+    }
+  | {
+      PoolShare: number;
+    };
+
 export type AssetId =
   | CategoricalOutcome
   | ScalarOutcome

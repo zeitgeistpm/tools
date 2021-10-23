@@ -14,6 +14,7 @@ import {
   PoolId,
   DecodedMarketMetadata,
   MarketDisputeMechanism,
+  CurrencyIdOf,
 } from "../types";
 import { changeEndianness, isExtSigner } from "../util";
 
@@ -564,4 +565,65 @@ export default class Models {
 
     return extrinsics;
   }
+
+  /**
+   * Transfers specified asset from self to any account.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param dest The address that will receive the asset (token).
+   * @param currencyId Can be outcome tokens or PoolShare or Ztg.
+   * @param amount The number of `currencyId` to be transferred.
+   * @returns True or False
+   */
+  currencyTransfer = async (
+    signer: KeyringPairOrExtSigner,
+    dest: string,
+    currencyId: CurrencyIdOf,
+    amount: number,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<boolean> => {
+    const _callback = (
+      result: ISubmittableResult,
+      _resolve: (value: boolean | PromiseLike<boolean>) => void,
+      _unsub: () => void
+    ) => {
+      const { events, status } = result;
+
+      if (status.isInBlock) {
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+          if (method == "ExtrinsicSuccess") {
+            unsubOrWarns(_unsub);
+            _resolve(true);
+          }
+          if (method == "ExtrinsicFailed") {
+            unsubOrWarns(_unsub);
+            _resolve(false);
+          }
+        });
+      }
+    };
+
+    const tx = this.api.tx.currency.transfer(dest, currencyId, amount);
+
+    return new Promise(async (resolve) => {
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) => {
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub);
+          }
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) => {
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
+      }
+    });
+  };
 }
