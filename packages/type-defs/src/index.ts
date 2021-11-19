@@ -1,6 +1,7 @@
 export { default as orderbook } from "./orderbook";
 export { default as predictionMarkets } from "./predictionMarkets";
 export { default as swaps } from "./swaps";
+export { default as court } from "./court";
 
 export const index = {
   rpc: {},
@@ -64,6 +65,12 @@ export const index = {
       },
     },
     OrderedSet: "Vec<Bond>",
+    OwnedValuesParams: {
+      participated_blocks: "BlockNumber",
+      perpetual_incentives: "Balance",
+      total_incentives: "Balance",
+      total_shares: "Balance",
+    },
     ParachainBondConfig: {
       account: "AccountId",
       percent: "Percent",
