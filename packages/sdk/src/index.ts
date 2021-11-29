@@ -13,13 +13,13 @@ export default class SDK {
   public errorTable: ErrorTable;
   public models: Models;
 
-  static promiseWithTimeout<T>(
+  static async promiseWithTimeout<T>(
     timeoutMs: number,
     promise: Promise<T>,
     failureMessage?: string
-  ) {
+  ): Promise<T> {
     let timeoutHandle: NodeJS.Timeout;
-    const timeoutPromise = new Promise<never>((resolve, reject) => {
+    const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutHandle = setTimeout(
         () => reject(new Error(failureMessage)),
         timeoutMs
