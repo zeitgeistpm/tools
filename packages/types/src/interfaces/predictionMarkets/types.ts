@@ -37,7 +37,7 @@ export interface MarketDispute extends Struct {
 /** @name MarketDisputeMechanism */
 export interface MarketDisputeMechanism extends Enum {
   readonly isAuthorized: boolean;
-  readonly asAuthorized: BlockNumber;
+  readonly asAuthorized: AccountId;
   readonly isCourt: boolean;
   readonly isSimpleDisputes: boolean;
 }
