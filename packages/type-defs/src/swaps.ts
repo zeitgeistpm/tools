@@ -28,11 +28,7 @@ export default {
     },
     PoolId: "u128",
     PoolStatus: {
-      _enum: {
-        Active: null,
-        CollectingSubsidy: null,
-        Stale: null,
-      },
+      _enum: ["Active", "CollectingSubsidy", "Stale"],
     },
     SubsidyUntil: {
       market_id: "MarketId",

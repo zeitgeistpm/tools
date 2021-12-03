@@ -35,19 +35,66 @@ export const index = {
       amount: "Balance",
     },
     CategoryIndex: "u16",
+    Collator2: {
+      id: "AccountId",
+      bond: "Balance",
+      nominators: "Vec<AccountId>",
+      top_nominators: "Vec<Bond>",
+      bottom_nominators: "Vec<Bond>",
+      total_counted: "Balance",
+      total_backing: "Balance",
+      state: "CollatorStatus",
+    },
     CollatorSnapshot: {
       bond: "Balance",
-      nominators: "Vec<Bond>",
+      delegations: "Vec<Bond>",
       total: "Balance",
+    },
+    CollatorStatus: {
+      _enum: {
+        Active: null,
+        Idle: null,
+        Leaving: "RoundIndex",
+      },
     },
     Currency: "Asset",
     CurrencyIdOf: "Asset",
     CurrencyId: "Asset",
+    DelegatorStatus: {
+      _enum: {
+        Active: null,
+        Leaving: "RoundIndex",
+      },
+    },
+    EmaConfig: {
+      ema_period: "Timespan",
+      ema_period_estimate_after: "Option<Timespan>",
+      smoothing: "u128",
+    },
+    EmaMarketVolume: {
+      config: "EmaConfig",
+      ema: "u128",
+      multiplier: "u128",
+      last_time: "UnixTimestamp",
+      state: "MarketVolumeState",
+      start_time: "UnixTimestamp",
+      volumes_per_period: "u128",
+    },
     ExitQ: {
       candidates: "Vec<AccountId>",
       nominators_leaving: "Vec<AccountId>",
       candidate_schedule: "Vec<(AccountId, RoundIndex)>",
       nominator_schedule: "Vec<(AccountId, Option<AccountId>, RoundIndex)>",
+    },
+    FeeSigmoid: {
+      config: "FeeSigmoidConfig",
+    },
+    FeeSigmoidConfig: {
+      m: "i128",
+      p: "i128",
+      n: "i128",
+      initial_fee: "i128",
+      min_revenue: "i128",
     },
     Index: "u64",
     InflationInfo: {
@@ -57,11 +104,28 @@ export const index = {
     },
     Lookup: "MultiAddress",
     MarketIdOf: "u128",
+    MarketVolumeState: {
+      _enum: ["Uninitialized", "DataCollectionStarted", "DataCollected"],
+    },
     MaxRuntimeUsize: "u64",
     Moment: "u64",
     MultiHash: {
       _enum: {
         Sha3_384: "[u8; 50]",
+      },
+    },
+    Nominator2: {
+      delegations: "Vec<Bond>",
+      revocations: "Vec<AccountId>",
+      total: "Balance",
+      scheduled_revocations_count: "u32",
+      scheduled_revocations_total: "Balance",
+      status: "DelegatorStatus",
+    },
+    NominatorAdded: {
+      _enum: {
+        AddedToTop: "Balance",
+        AddedToBottom: null,
       },
     },
     OrderedSet: "Vec<Bond>",
@@ -90,6 +154,16 @@ export const index = {
       total_reward: "Balance",
       claimed_reward: "Balance",
     },
+    Rikiddo: {
+      config: "RikiddoConfig",
+      fees: "FeeSigmoid",
+      ma_short: "EmaMarketVolume",
+      ma_long: "EmaMarketVolume",
+    },
+    RikiddoConfig: {
+      initial_fee: "i128",
+      log2_e: "i128",
+    },
     RoundIndex: "u32",
     RoundInfo: {
       current: "RoundIndex",
@@ -99,6 +173,16 @@ export const index = {
     ScalarPosition: {
       _enum: ["Long", "Short"],
     },
+    Timespan: {
+      _enum: {
+        Seconds: "u32",
+        Minutes: "u32",
+        Hours: "u32",
+        Days: "u16",
+        Weeks: "u16",
+      },
+    },
+    UnixTimestamp: "u64",
     VestingBlockNumber: "u32",
   },
 };
