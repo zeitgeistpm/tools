@@ -1,4 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
+import { GraphQLClient } from "graphql-request";
 
 import ErrorTable from "./errorTable";
 import Models from "./models";
@@ -8,9 +9,12 @@ export * as models from "./models";
 export * as types from "./types";
 export * as util from "./util";
 
+type InitOptions = {
+  logEndpointInitTime?: boolean;
+  graphQlEndpoint?: string;
+};
+
 export default class SDK {
-  public api: ApiPromise;
-  public errorTable: ErrorTable;
   public models: Models;
 
   static async promiseWithTimeout<T>(
@@ -34,7 +38,7 @@ export default class SDK {
 
   static async initialize(
     endpoint = "wss://bsr.zeitgeist.pm",
-    opts = { logEndpointInitTime: true }
+    opts: InitOptions = { logEndpointInitTime: true }
   ): Promise<SDK> {
     try {
       const start = Date.now();
@@ -48,8 +52,15 @@ export default class SDK {
         console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
       }
 
+      const { graphQlEndpoint } = opts;
+      let graphQLClient: GraphQLClient;
+
+      if (graphQlEndpoint != null) {
+        graphQLClient = new GraphQLClient(graphQlEndpoint, {});
+      }
+
       const eTable = await ErrorTable.populate(api);
-      const sdk = new SDK(api, eTable);
+      const sdk = new SDK(api, eTable, graphQLClient);
 
       return sdk;
     } catch (e) {
@@ -61,10 +72,12 @@ export default class SDK {
     return new SDK(mockedAPI);
   }
 
-  constructor(api: ApiPromise, errorTable?: ErrorTable) {
-    this.api = api;
-    this.errorTable = errorTable;
-    this.models = new Models(this.api, errorTable);
+  constructor(
+    public api: ApiPromise,
+    public errorTable?: ErrorTable,
+    public graphQLClient?: GraphQLClient
+  ) {
+    this.models = new Models(this.api, errorTable, { graphQLClient });
   }
 }
 

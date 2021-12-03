@@ -1,4 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
+import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber } from "@polkadot/util";
 import { unsubOrWarns } from "../util";
@@ -6,7 +7,6 @@ import { Pool } from "@zeitgeistpm/types/dist/interfaces/swaps";
 import { Option } from "@polkadot/types";
 
 import {
-  MarketEnd,
   MarketPeriod,
   MarketId,
   MarketResponse,
@@ -27,17 +27,21 @@ export { Market, Swap };
 
 type Options = {
   MAX_RPC_REQUESTS?: number;
+  graphQLClient?: GraphQLClient;
 };
 
 export default class Models {
   private api: ApiPromise;
   private errorTable: ErrorTable;
+  private graphQLClient?: GraphQLClient;
+
   MAX_RPC_REQUESTS: number;
 
   constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options = {}) {
     this.api = api;
     this.errorTable = errorTable;
     this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
+    this.graphQLClient = opts.graphQLClient;
   }
 
   /**
@@ -46,6 +50,21 @@ export default class Models {
    * @returns The `marketId` of all markets.
    */
   async getAllMarketIds(): Promise<number[]> {
+    if (this.graphQLClient != null) {
+      const query = gql`
+        {
+          markets {
+            marketId
+          }
+        }
+      `;
+
+      const data = await this.graphQLClient.request<{
+        markets: { marketId: number }[];
+      }>(query);
+      return data.markets.map((i) => i.marketId);
+    }
+
     const keys =
       this.api["config"] !== "mock"
         ? await this.api.query.marketCommons.markets.keys()

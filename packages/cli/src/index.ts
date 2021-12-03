@@ -31,6 +31,7 @@ import viewDisputes from "./actions/viewDisputes";
 import viewMarket from "./actions/viewMarket";
 import viewSpotPrices from "./actions/viewPoolSpotPrices";
 import viewSwap from "./actions/viewSwap";
+import queryAllMarketIds from "./actions/queryAllMarketIds";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -661,5 +662,22 @@ program
   .action((marketId: number, opts: { endpoint: string }) =>
     catchErrorsAndExit(viewDisputes, Object.assign(opts, { marketId }))
   );
+
+// graphql
+program
+  .command("queryMarketIds")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--graphQlEndpoint <string>",
+    "Endpoint of the graphql query node",
+    "http://localhost:4000/graphql"
+  )
+  .action((opts: { endpoint: string; graphQlEndpoint: string }) => {
+    catchErrorsAndExit(queryAllMarketIds, { ...opts });
+  });
 
 program.parse(process.argv);
