@@ -86,7 +86,7 @@ export type MarketResponse = {
   creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  metadata: string;
+  metadata?: string;
   market_type: MarketType;
   period: MarketPeriod;
   scoring_rule: ScoringRule;
@@ -238,3 +238,10 @@ export type ExtSigner = { address: string; signer: Signer };
 export type KeyringPairOrExtSigner = KeyringPair | ExtSigner;
 
 export type MarketIdOf = MarketId;
+
+export type MarketStatusText =
+  | "Proposed"
+  | "Active"
+  | "Reported"
+  | "Disputed"
+  | "Resolved";

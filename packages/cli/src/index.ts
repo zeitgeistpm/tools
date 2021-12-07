@@ -1,4 +1,4 @@
-import program from "commander";
+import program, { Option } from "commander";
 
 import approveMarket from "./actions/approveMarket";
 import getBlockHashes from "./actions/blockHashes";
@@ -31,7 +31,10 @@ import viewDisputes from "./actions/viewDisputes";
 import viewMarket from "./actions/viewMarket";
 import viewSpotPrices from "./actions/viewPoolSpotPrices";
 import viewSwap from "./actions/viewSwap";
-import queryAllMarketIds from "./actions/queryAllMarketIds";
+
+import queryAllMarketIds from "./actions/graphql/queryAllMarketIds";
+import queryMarket from "./actions/graphql/queryMarket";
+import queryFilteredMarkets from "./actions/graphql/queryFilteredMarkets";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -674,10 +677,77 @@ program
   .option(
     "--graphQlEndpoint <string>",
     "Endpoint of the graphql query node",
-    "http://localhost:4000/graphql"
+    "https://processor.zeitgeist.pm/graphql"
   )
-  .action((opts: { endpoint: string; graphQlEndpoint: string }) => {
-    catchErrorsAndExit(queryAllMarketIds, { ...opts });
+  .action((opts) => {
+    catchErrorsAndExit(queryAllMarketIds, opts);
   });
+
+program
+  .command("queryMarket <marketId>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--graphQlEndpoint <string>",
+    "Endpoint of the graphql query node",
+    "https://processor.zeitgeist.pm/graphql"
+  )
+  .action((marketId, opts) => {
+    marketId = Number(marketId);
+    catchErrorsAndExit(queryMarket, { marketId, ...opts });
+  });
+
+program
+  .command("queryFilteredMarkets")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--graphQlEndpoint <string>",
+    "Endpoint of the graphql query node",
+    "https://processor.zeitgeist.pm/graphql"
+  )
+  .option("--statuses <strings...>", "Statuses of markets to display", "Active")
+  .option("--page-number <number>", "Page number of market results", "1")
+  .option("--page-size <number>", "Page size for the results", "100")
+  .addOption(
+    new Option("--ordering <string>", "Ordering of markets")
+      .choices(["ASC", "DESC"])
+      .default("ASC")
+  )
+  .action(
+    ({
+      graphQlEndpoint,
+      endpoint,
+      statuses,
+      pageNumber,
+      pageSize,
+      ordering,
+    }: {
+      graphQlEndpoint: string;
+      endpoint: string;
+      statuses: string | string[];
+      pageNumber: string;
+      pageSize: string;
+      ordering: string;
+    }) => {
+      if (typeof statuses === "string") {
+        statuses = [statuses];
+      }
+      catchErrorsAndExit(queryFilteredMarkets, {
+        statuses,
+        graphQlEndpoint,
+        endpoint,
+        pageNumber: Number(pageNumber),
+        pageSize: Number(pageSize),
+        ordering,
+      });
+    }
+  );
 
 program.parse(process.argv);
