@@ -55,7 +55,7 @@ program
     "wss://bsr.zeitgeist.pm"
   )
   .option("--seed <string>", "The signer's seed", "//Alice")
-  .action((opts: any) => catchErrorsAndExit(deployKusamaDerby, opts));
+  .action((opts) => catchErrorsAndExit(deployKusamaDerby, opts));
 
 program
   .command(
@@ -207,7 +207,7 @@ program
     "The endpoint URL of the API connection",
     "wss://bsr.zeitgeist.pm"
   )
-  .action((marketId: number, opts: any) =>
+  .action((marketId: number, opts) =>
     catchErrorsAndExit(viewMarket, Object.assign(opts, { marketId }))
   );
 
@@ -219,7 +219,7 @@ program
     "The endpoint URL of the API connection",
     "wss://bsr.zeitgeist.pm"
   )
-  .action((marketId: number, opts: any) =>
+  .action((marketId: number, opts) =>
     catchErrorsAndExit(cancelPendingMarket, Object.assign(opts, { marketId }))
   );
 
@@ -230,7 +230,7 @@ program
     "The endpoint URL of the API connection",
     "wss://bsr.zeitgeist.pm"
   )
-  .action((marketId: number, opts: any) =>
+  .action((marketId: number, opts) =>
     catchErrorsAndExit(viewSwap, Object.assign(opts, { marketId }))
   );
 
@@ -585,7 +585,7 @@ program
   )
   .option("--poolShare <number>", "The amount of pool share to be transferred")
   .option("--ztg", "Use ztg as currency instead of CombinatorialOutcome", false)
-  .action((dest: string, amount: number, opts: any) =>
+  .action((dest: string, amount: number, opts) =>
     catchErrorsAndExit(currencyTransfer, Object.assign(opts, { dest, amount }))
   );
 
@@ -635,7 +635,7 @@ program
     "The signer's seed. Must be an ApprovalOrigin",
     "//Alice"
   )
-  .action((marketId: number, opts: any) =>
+  .action((marketId: number, opts) =>
     catchErrorsAndExit(approveMarket, Object.assign(opts, { marketId }))
   );
 
@@ -651,7 +651,7 @@ program
     "The signer's seed. Must be an ApprovalOrigin",
     "//Alice"
   )
-  .action((marketId: number, opts: any) =>
+  .action((marketId: number, opts) =>
     catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId }))
   );
 
