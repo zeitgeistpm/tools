@@ -6,7 +6,6 @@ import { Pool } from "@zeitgeistpm/types/dist/interfaces/swaps";
 import { Option } from "@polkadot/types";
 
 import {
-  MarketEnd,
   MarketPeriod,
   MarketId,
   MarketResponse,

@@ -1,5 +1,4 @@
 import SDK, { util } from "@zeitgeistpm/sdk";
-import { poolJoinBounds } from "../../../sdk/src/types";
 
 type Options = {
   endpoint: string;
@@ -13,7 +12,7 @@ type Options = {
 const sdkJoinPoolFunctionToUse = "joinPoolMultifunc";
 
 const joinPool = async (opts: Options): Promise<void> => {
-  const { endpoint, seed, poolId, amountIn, amountOut, ...bounds } = opts;
+  const { endpoint, seed, poolId, amountIn, amountOut } = opts;
   const trimmedBounds = {
     poolAmount: Number(amountOut),
     assetMax: amountIn.split(",").map(Number),

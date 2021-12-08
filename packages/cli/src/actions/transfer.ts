@@ -1,16 +1,16 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+// import SDK, { util } from "@zeitgeistpm/sdk";
 
-type Options = {
-  endpoint: string;
-  marketId: string;
-  sharesIndex: string;
-  to: string;
-  amount: string;
-  seed: string;
-};
+// type Options = {
+//   endpoint: string;
+//   marketId: string;
+//   sharesIndex: string;
+//   to: string;
+//   amount: string;
+//   seed: string;
+// };
 
-const transfer = async (opts: Options): Promise<void> => {
-  const { endpoint, marketId, sharesIndex, to, amount, seed } = opts;
+const transfer = async (): Promise<void> => {
+  // const { endpoint, marketId, sharesIndex, to, amount, seed } = opts;
 
   console.log("transfer not implemented for tokens pallet!");
 

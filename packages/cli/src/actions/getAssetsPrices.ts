@@ -1,4 +1,4 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK from "@zeitgeistpm/sdk";
 
 type Options = {
   block: string | number;
