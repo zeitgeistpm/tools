@@ -1,4 +1,4 @@
-import SDK, { util } from "@zeitgeistpm/sdk";
+import SDK from "@zeitgeistpm/sdk";
 
 type Options = {
   endpoint: string;
@@ -8,14 +8,9 @@ type Options = {
 };
 
 const viewMarket = async (opts: Options): Promise<void> => {
-  const { endpoint, marketId, seed } = opts;
-  let { address } = opts;
+  const { endpoint, marketId } = opts;
 
   const sdk = await SDK.initialize(endpoint);
-
-  if (seed) {
-    address = address || util.signerFromSeed(seed).address;
-  }
 
   const market = await sdk.models.fetchMarketData(Number(marketId));
   console.log(market.toJSONString());
