@@ -28,7 +28,7 @@ jobs:
       - name: lerna bootstrap = Install dependencies, check TypeScript compiliation, lint SDK and CLI
         run: |
           yarn install
-          learna clean && lerna bootstrap
+          lerna clean && lerna bootstrap
           ./scripts/ci-lint.sh
 
       # - name: Run tests in all packages
