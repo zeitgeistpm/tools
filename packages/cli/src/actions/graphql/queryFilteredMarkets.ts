@@ -14,6 +14,7 @@ type Options = {
   pageNumber: number;
   pageSize: number;
   creator?: string;
+  oracle?: string;
 };
 
 const queryFilteredMarkets = async (opts: Options): Promise<void> => {
@@ -26,12 +27,13 @@ const queryFilteredMarkets = async (opts: Options): Promise<void> => {
     pageNumber,
     pageSize,
     creator,
+    oracle,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint, { graphQlEndpoint });
 
   const res = await sdk.models.filterMarkets(
-    { statuses, creator },
+    { statuses, creator, oracle },
     {
       ordering,
       orderBy,

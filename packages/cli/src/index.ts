@@ -719,6 +719,7 @@ program
     "--creator [string]",
     "Filter only markets created by account address"
   )
+  .option("--oracle [string]", "Filter only markets created by market oracle")
   .addOption(
     new Option("--ordering <string>", "Ordering of markets")
       .choices(["asc", "desc"])
@@ -739,6 +740,7 @@ program
       ordering,
       orderBy,
       creator,
+      oracle,
     }: {
       graphQlEndpoint: string;
       endpoint: string;
@@ -748,6 +750,7 @@ program
       ordering: string;
       orderBy: string;
       creator?: string;
+      oracle?: string;
     }) => {
       if (typeof statuses === "string") {
         statuses = [statuses];
@@ -761,6 +764,7 @@ program
         ordering,
         orderBy,
         creator,
+        oracle,
       });
     }
   );

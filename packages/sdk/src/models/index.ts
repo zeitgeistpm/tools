@@ -413,9 +413,11 @@ export default class Models {
     {
       statuses,
       creator,
+      oracle,
     }: {
       statuses: MarketStatusText[];
       creator?: string;
+      oracle?: string;
     },
     paginationOptions: {
       ordering: MarketsOrdering;
@@ -434,9 +436,14 @@ export default class Models {
         $offset: Int!
         $orderByQuery: [MarketOrderByInput!]
         $creator: String
+        $oracle: String
       ) {
         markets(
-          where: { status_in: $statuses, creator_eq: $creator }
+          where: {
+            status_in: $statuses
+            creator_eq: $creator
+            oracle_eq: $oracle
+          }
           limit: $pageSize
           offset: $offset
           orderBy: $orderByQuery
@@ -458,7 +465,7 @@ export default class Models {
       orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
     const data = await this.graphQLClient.request<{
       markets: MarketQueryData[];
-    }>(query, { statuses, pageSize, offset, orderByQuery, creator });
+    }>(query, { statuses, pageSize, offset, orderByQuery, creator, oracle });
 
     const { markets: queriedMarkets } = data;
 
