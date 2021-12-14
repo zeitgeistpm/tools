@@ -95,6 +95,7 @@ export type MarketResponse = {
   resolved_outcome: OutcomeReport | null;
   mdm: MarketDisputeMechanism;
   outcomeAssets: Asset[];
+  end: BigInt;
 };
 
 // The extended market data from which a market may be created.
@@ -245,3 +246,7 @@ export type MarketStatusText =
   | "Reported"
   | "Disputed"
   | "Resolved";
+
+export type MarketsOrdering = "asc" | "desc";
+
+export type MarketsOrderBy = "newest" | "end";

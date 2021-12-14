@@ -17,6 +17,8 @@ import {
   MarketDisputeMechanism,
   CurrencyIdOf,
   MarketStatusText,
+  MarketsOrdering,
+  MarketsOrderBy,
 } from "../types";
 import { changeEndianness, isExtSigner } from "../util";
 
@@ -368,6 +370,7 @@ export default class Models {
       data.report != null ? this.api.createType("Report", data.report) : null;
 
     const basicMarketData: MarketResponse = {
+      end: data.end,
       creation: data.creation,
       creator: data.creator,
       creator_fee: 0,
@@ -408,7 +411,8 @@ export default class Models {
 
   async filterMarkets(
     statuses: MarketStatusText[],
-    ordering: "ASC" | "DESC" = "DESC",
+    ordering: MarketsOrdering = "desc",
+    orderBy: MarketsOrderBy = "newest",
     paginationOptions: {
       pageSize: number;
       pageNumber: number;
@@ -422,13 +426,13 @@ export default class Models {
         $statuses: [String!]
         $pageSize: Int!
         $offset: Int!
-        $orderBy: [MarketOrderByInput!]
+        $orderByQuery: [MarketOrderByInput!]
       ) {
         markets(
           where: { status_in: $statuses }
           limit: $pageSize
           offset: $offset
-          orderBy: $orderBy
+          orderBy: $orderByQuery
         ) {
           ...MarketDetails
         }
@@ -439,10 +443,15 @@ export default class Models {
     const { pageSize, pageNumber } = paginationOptions;
 
     const offset = (pageNumber - 1) * pageSize;
-    const orderBy = `marketId_${ordering}`;
+    let orderingStr = ordering.toUpperCase();
+    if (orderBy === "newest") {
+      orderingStr = ordering === "asc" ? "DESC" : "ASC";
+    }
+    const orderByQuery =
+      orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
     const data = await this.graphQLClient.request<{
       markets: MarketQueryData[];
-    }>(query, { statuses, pageSize, offset, orderBy });
+    }>(query, { statuses, pageSize, offset, orderByQuery });
 
     const { markets: queriedMarkets } = data;
 

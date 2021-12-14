@@ -717,8 +717,13 @@ program
   .option("--page-size <number>", "Page size for the results", "100")
   .addOption(
     new Option("--ordering <string>", "Ordering of markets")
-      .choices(["ASC", "DESC"])
-      .default("ASC")
+      .choices(["asc", "desc"])
+      .default("asc")
+  )
+  .addOption(
+    new Option("--order-by <string>", "Order markets by paramater")
+      .choices(["newest", "end"])
+      .default("newest")
   )
   .action(
     ({
@@ -728,6 +733,7 @@ program
       pageNumber,
       pageSize,
       ordering,
+      orderBy,
     }: {
       graphQlEndpoint: string;
       endpoint: string;
@@ -735,6 +741,7 @@ program
       pageNumber: string;
       pageSize: string;
       ordering: string;
+      orderBy: string;
     }) => {
       if (typeof statuses === "string") {
         statuses = [statuses];
@@ -746,6 +753,7 @@ program
         pageNumber: Number(pageNumber),
         pageSize: Number(pageSize),
         ordering,
+        orderBy,
       });
     }
   );

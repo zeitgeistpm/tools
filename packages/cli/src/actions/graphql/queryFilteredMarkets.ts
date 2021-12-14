@@ -1,11 +1,16 @@
 import SDK from "@zeitgeistpm/sdk";
-import { MarketStatusText } from "@zeitgeistpm/sdk/dist/types";
+import {
+  MarketStatusText,
+  MarketsOrdering,
+  MarketsOrderBy,
+} from "@zeitgeistpm/sdk/dist/types";
 
 type Options = {
   endpoint: string;
   graphQlEndpoint: string;
   statuses: MarketStatusText[];
-  ordering: "ASC" | "DESC";
+  ordering: MarketsOrdering;
+  orderBy: MarketsOrderBy;
   pageNumber: number;
   pageSize: number;
 };
@@ -16,13 +21,14 @@ const queryFilteredMarkets = async (opts: Options): Promise<void> => {
     graphQlEndpoint,
     statuses,
     ordering,
+    orderBy,
     pageNumber,
     pageSize,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint, { graphQlEndpoint });
 
-  const res = await sdk.models.filterMarkets(statuses, ordering, {
+  const res = await sdk.models.filterMarkets(statuses, ordering, orderBy, {
     pageSize,
     pageNumber,
   });

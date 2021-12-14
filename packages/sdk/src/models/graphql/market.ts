@@ -5,6 +5,7 @@ export const FRAGMENT_MARKET_DETAILS = gql`
   fragment MarketDetails on Market {
     marketId
     description
+    end
     creator
     creatorFee
     creation
@@ -15,7 +16,6 @@ export const FRAGMENT_MARKET_DETAILS = gql`
     status
     scoringRule
     resolvedOutcome
-    outcomeAssets
     marketType {
       categorical
       scalar
@@ -72,7 +72,7 @@ export type MarketQueryData = {
   status: string;
   scoringRule: ScoringRule;
   resolvedOutcome: number | null;
-  outcomeAssets: string[];
+  end: BigInt;
   oracle: string;
   question: string;
   categories: { ticker: string; name: string; color: string }[];

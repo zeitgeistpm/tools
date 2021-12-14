@@ -50,6 +50,9 @@ class Market {
   /** The resolved outcome for the market. */
   public resolvedOutcome: OutcomeReport | null;
 
+  /** Timestamp at which market should end */
+  public end: BigInt;
+
   public mdm: MarketDisputeMechanism;
   /** The description of the market. */
   public description: string;
@@ -88,6 +91,7 @@ class Market {
       resolved_outcome: this.resolvedOutcome,
       mdm: this.mdm,
       outcomeAssets: this.outcomeAssets,
+      end: this.end,
     } = market);
 
     ({
@@ -164,7 +168,7 @@ class Market {
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
     const diffInMs =
-      (await this.api.consts.timestamp.minimumPeriod).toNumber() *
+      this.api.consts.timestamp.minimumPeriod.toNumber() *
       (this.period.block[1] - blockNum);
     return now + diffInMs;
   }
