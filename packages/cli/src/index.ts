@@ -715,6 +715,10 @@ program
   .option("--statuses <strings...>", "Statuses of markets to display", "Active")
   .option("--page-number <number>", "Page number of market results", "1")
   .option("--page-size <number>", "Page size for the results", "100")
+  .option(
+    "--creator [string]",
+    "Filter only markets created by account address"
+  )
   .addOption(
     new Option("--ordering <string>", "Ordering of markets")
       .choices(["asc", "desc"])
@@ -734,6 +738,7 @@ program
       pageSize,
       ordering,
       orderBy,
+      creator,
     }: {
       graphQlEndpoint: string;
       endpoint: string;
@@ -742,6 +747,7 @@ program
       pageSize: string;
       ordering: string;
       orderBy: string;
+      creator?: string;
     }) => {
       if (typeof statuses === "string") {
         statuses = [statuses];
@@ -754,6 +760,7 @@ program
         pageSize: Number(pageSize),
         ordering,
         orderBy,
+        creator,
       });
     }
   );

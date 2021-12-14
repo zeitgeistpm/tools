@@ -410,13 +410,19 @@ export default class Models {
   }
 
   async filterMarkets(
-    statuses: MarketStatusText[],
-    ordering: MarketsOrdering = "desc",
-    orderBy: MarketsOrderBy = "newest",
+    {
+      statuses,
+      creator,
+    }: {
+      statuses: MarketStatusText[];
+      creator?: string;
+    },
     paginationOptions: {
+      ordering: MarketsOrdering;
+      orderBy: MarketsOrderBy;
       pageSize: number;
       pageNumber: number;
-    } = { pageSize: 10, pageNumber: 1 }
+    } = { ordering: "desc", orderBy: "newest", pageSize: 10, pageNumber: 1 }
   ): Promise<Market[]> {
     if (this.graphQLClient == null) {
       throw Error("(getMarketsWithStatuses) cannot use without graphQLClient.");
@@ -427,9 +433,10 @@ export default class Models {
         $pageSize: Int!
         $offset: Int!
         $orderByQuery: [MarketOrderByInput!]
+        $creator: String
       ) {
         markets(
-          where: { status_in: $statuses }
+          where: { status_in: $statuses, creator_eq: $creator }
           limit: $pageSize
           offset: $offset
           orderBy: $orderByQuery
@@ -440,7 +447,7 @@ export default class Models {
       ${FRAGMENT_MARKET_DETAILS}
     `;
 
-    const { pageSize, pageNumber } = paginationOptions;
+    const { pageSize, pageNumber, ordering, orderBy } = paginationOptions;
 
     const offset = (pageNumber - 1) * pageSize;
     let orderingStr = ordering.toUpperCase();
@@ -451,7 +458,7 @@ export default class Models {
       orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
     const data = await this.graphQLClient.request<{
       markets: MarketQueryData[];
-    }>(query, { statuses, pageSize, offset, orderByQuery });
+    }>(query, { statuses, pageSize, offset, orderByQuery, creator });
 
     const { markets: queriedMarkets } = data;
 

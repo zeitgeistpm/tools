@@ -13,6 +13,7 @@ type Options = {
   orderBy: MarketsOrderBy;
   pageNumber: number;
   pageSize: number;
+  creator?: string;
 };
 
 const queryFilteredMarkets = async (opts: Options): Promise<void> => {
@@ -24,14 +25,20 @@ const queryFilteredMarkets = async (opts: Options): Promise<void> => {
     orderBy,
     pageNumber,
     pageSize,
+    creator,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint, { graphQlEndpoint });
 
-  const res = await sdk.models.filterMarkets(statuses, ordering, orderBy, {
-    pageSize,
-    pageNumber,
-  });
+  const res = await sdk.models.filterMarkets(
+    { statuses, creator },
+    {
+      ordering,
+      orderBy,
+      pageSize,
+      pageNumber,
+    }
+  );
 
   for (const market of res) {
     console.log(`\nData for market of id ${market.marketId}\n`);
