@@ -1,8 +1,10 @@
 import { ApiPromise } from "@polkadot/api";
+import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber } from "@polkadot/util";
 import { unsubOrWarns } from "../util";
 import { Pool } from "@zeitgeistpm/types/dist/interfaces/swaps";
+import { Asset, MarketType } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
 import {
@@ -14,8 +16,13 @@ import {
   DecodedMarketMetadata,
   MarketDisputeMechanism,
   CurrencyIdOf,
+  MarketStatusText,
+  MarketsOrdering,
+  MarketsOrderBy,
 } from "../types";
 import { changeEndianness, isExtSigner } from "../util";
+
+import { FRAGMENT_MARKET_DETAILS, MarketQueryData } from "./graphql/market";
 
 import Market from "./market";
 import Swap from "./swaps";
@@ -26,17 +33,25 @@ export { Market, Swap };
 
 type Options = {
   MAX_RPC_REQUESTS?: number;
+  graphQLClient?: GraphQLClient;
 };
 
 export default class Models {
   private api: ApiPromise;
   private errorTable: ErrorTable;
+  private graphQLClient?: GraphQLClient;
+
   MAX_RPC_REQUESTS: number;
 
   constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options = {}) {
     this.api = api;
     this.errorTable = errorTable;
     this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
+    this.graphQLClient = opts.graphQLClient;
+  }
+
+  getGraphQLClient(): GraphQLClient {
+    return this.graphQLClient;
   }
 
   /**
@@ -45,6 +60,21 @@ export default class Models {
    * @returns The `marketId` of all markets.
    */
   async getAllMarketIds(): Promise<number[]> {
+    if (this.graphQLClient != null) {
+      const query = gql`
+        {
+          markets {
+            marketId
+          }
+        }
+      `;
+
+      const data = await this.graphQLClient.request<{
+        markets: { marketId: number }[];
+      }>(query);
+      return data.markets.map((i) => i.marketId);
+    }
+
     const keys =
       this.api["config"] !== "mock"
         ? await this.api.query.marketCommons.markets.keys()
@@ -269,11 +299,187 @@ export default class Models {
     });
   }
 
+  private createAssetsForMarket(
+    marketId: MarketId,
+    marketType: MarketType
+  ): Asset[] {
+    return marketType.isCategorical
+      ? [...Array(marketType.asCategorical.toNumber()).keys()].map((catIdx) => {
+          return this.api.createType("Asset", {
+            categoricalOutcome: [marketId, catIdx],
+          });
+        })
+      : ["Long", "Short"].map((pos) => {
+          const position = this.api.createType("ScalarPosition", pos);
+          return this.api.createType("Asset", {
+            scalarOutcome: [marketId, position.toString()],
+          });
+        });
+  }
+
+  private constructMarketFromQueryData(data: MarketQueryData): Market {
+    const { marketType, period, mdm, marketId } = data;
+
+    for (const type in marketType) {
+      const val = marketType[type];
+      if (val == null) {
+        continue;
+      }
+      if (typeof val === "string") {
+        marketType[type] = Number(val);
+      }
+    }
+
+    const marketPeriod: Partial<MarketPeriod> = {};
+
+    for (const p in period) {
+      const val = period[p];
+      if (val == null) {
+        continue;
+      }
+      if (typeof val === "string") {
+        marketPeriod[p] = JSON.parse(val);
+      }
+    }
+
+    for (const dispMech in mdm) {
+      const val = mdm[dispMech];
+      if (val == null) {
+        delete mdm[dispMech];
+      } else {
+        mdm[dispMech] = val;
+      }
+    }
+
+    const metadata: DecodedMarketMetadata = {
+      question: data.question,
+      slug: data.slug,
+      categories: data.categories,
+      description: data.description,
+      tags: data.tags ?? [],
+    };
+
+    const marketTypeAsType = this.api.createType("MarketType", marketType);
+
+    const outcomeAssets = this.createAssetsForMarket(
+      marketId,
+      this.api.createType("MarketType", marketType)
+    );
+
+    const marketReport =
+      data.report != null ? this.api.createType("Report", data.report) : null;
+
+    const basicMarketData: MarketResponse = {
+      end: data.end,
+      creation: data.creation,
+      creator: data.creator,
+      creator_fee: 0,
+      scoring_rule: data.scoringRule,
+      oracle: data.oracle,
+      status: data.status,
+      outcomeAssets,
+      market_type: marketTypeAsType,
+      mdm: this.api.createType("MarketDisputeMechanism", mdm).toJSON(),
+      report: marketReport,
+      period: this.api.createType("MarketPeriod", marketPeriod).toJSON(),
+      //@ts-ignore
+      resolved_outcome: data.resolvedOutcome,
+    };
+
+    const market = new Market(marketId, basicMarketData, metadata, this.api);
+    return market;
+  }
+
+  private async queryMarket(marketId: MarketId): Promise<Market> {
+    const query = gql`
+      query marketData($marketId: Int!) {
+        markets(where: { marketId_eq: $marketId }) {
+          ...MarketDetails
+        }
+      }
+      ${FRAGMENT_MARKET_DETAILS}
+    `;
+
+    const data = await this.graphQLClient.request<{
+      markets: MarketQueryData[];
+    }>(query, { marketId });
+
+    const queriedMarketData = data.markets[0];
+
+    return this.constructMarketFromQueryData(queriedMarketData);
+  }
+
+  async filterMarkets(
+    {
+      statuses,
+      creator,
+      oracle,
+    }: {
+      statuses: MarketStatusText[];
+      creator?: string;
+      oracle?: string;
+    },
+    paginationOptions: {
+      ordering: MarketsOrdering;
+      orderBy: MarketsOrderBy;
+      pageSize: number;
+      pageNumber: number;
+    } = { ordering: "desc", orderBy: "newest", pageSize: 10, pageNumber: 1 }
+  ): Promise<Market[]> {
+    if (this.graphQLClient == null) {
+      throw Error("(getMarketsWithStatuses) cannot use without graphQLClient.");
+    }
+    const query = gql`
+      query marketPage(
+        $statuses: [String!]
+        $pageSize: Int!
+        $offset: Int!
+        $orderByQuery: [MarketOrderByInput!]
+        $creator: String
+        $oracle: String
+      ) {
+        markets(
+          where: {
+            status_in: $statuses
+            creator_eq: $creator
+            oracle_eq: $oracle
+          }
+          limit: $pageSize
+          offset: $offset
+          orderBy: $orderByQuery
+        ) {
+          ...MarketDetails
+        }
+      }
+      ${FRAGMENT_MARKET_DETAILS}
+    `;
+
+    const { pageSize, pageNumber, ordering, orderBy } = paginationOptions;
+
+    const offset = (pageNumber - 1) * pageSize;
+    let orderingStr = ordering.toUpperCase();
+    if (orderBy === "newest") {
+      orderingStr = ordering === "asc" ? "DESC" : "ASC";
+    }
+    const orderByQuery =
+      orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
+    const data = await this.graphQLClient.request<{
+      markets: MarketQueryData[];
+    }>(query, { statuses, pageSize, offset, orderByQuery, creator, oracle });
+
+    const { markets: queriedMarkets } = data;
+
+    return queriedMarkets.map((m) => this.constructMarketFromQueryData(m));
+  }
+
   /**
    * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
    * @param marketId The unique identifier for the market you want to fetch.
    */
   async fetchMarketData(marketId: MarketId): Promise<Market> {
+    if (this.graphQLClient != null) {
+      return this.queryMarket(marketId);
+    }
     const marketRaw = await this.api.query.marketCommons.markets(marketId);
 
     const marketJson = marketRaw.toJSON() as never as MarketResponse;
@@ -305,20 +511,10 @@ export default class Models {
     //@ts-ignore
     const market = marketRaw.unwrap();
 
-    basicMarketData.outcomeAssets = market.market_type.isCategorical
-      ? [...Array(market.market_type.asCategorical.toNumber()).keys()].map(
-          (catIdx) => {
-            return this.api.createType("Asset", {
-              categoricalOutcome: [marketId, catIdx],
-            });
-          }
-        )
-      : ["Long", "Short"].map((pos) => {
-          const position = this.api.createType("ScalarPosition", pos);
-          return this.api.createType("Asset", {
-            scalarOutcome: [marketId, position.toString()],
-          });
-        });
+    basicMarketData.outcomeAssets = this.createAssetsForMarket(
+      marketId,
+      market.market_type
+    );
 
     basicMarketData.report = market.report.isSome ? market.report.value : null;
     basicMarketData.resolved_outcome = market.resolved_outcome.isSome

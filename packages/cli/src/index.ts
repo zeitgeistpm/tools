@@ -1,4 +1,4 @@
-import program from "commander";
+import program, { Option } from "commander";
 
 import approveMarket from "./actions/approveMarket";
 import getBlockHashes from "./actions/blockHashes";
@@ -31,6 +31,10 @@ import viewDisputes from "./actions/viewDisputes";
 import viewMarket from "./actions/viewMarket";
 import viewSpotPrices from "./actions/viewPoolSpotPrices";
 import viewSwap from "./actions/viewSwap";
+
+import queryAllMarketIds from "./actions/graphql/queryAllMarketIds";
+import queryMarket from "./actions/graphql/queryMarket";
+import queryFilteredMarkets from "./actions/graphql/queryFilteredMarkets";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -660,6 +664,109 @@ program
   )
   .action((marketId: number, opts: { endpoint: string }) =>
     catchErrorsAndExit(viewDisputes, Object.assign(opts, { marketId }))
+  );
+
+// graphql
+program
+  .command("queryMarketIds")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--graphQlEndpoint <string>",
+    "Endpoint of the graphql query node",
+    "https://processor.zeitgeist.pm/graphql"
+  )
+  .action((opts) => {
+    catchErrorsAndExit(queryAllMarketIds, opts);
+  });
+
+program
+  .command("queryMarket <marketId>")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--graphQlEndpoint <string>",
+    "Endpoint of the graphql query node",
+    "https://processor.zeitgeist.pm/graphql"
+  )
+  .action((marketId, opts) => {
+    marketId = Number(marketId);
+    catchErrorsAndExit(queryMarket, { marketId, ...opts });
+  });
+
+program
+  .command("queryFilteredMarkets")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--graphQlEndpoint <string>",
+    "Endpoint of the graphql query node",
+    "https://processor.zeitgeist.pm/graphql"
+  )
+  .option("--statuses <strings...>", "Statuses of markets to display", "Active")
+  .option("--page-number <number>", "Page number of market results", "1")
+  .option("--page-size <number>", "Page size for the results", "100")
+  .option(
+    "--creator [string]",
+    "Filter only markets created by account address"
+  )
+  .option("--oracle [string]", "Filter only markets created by market oracle")
+  .addOption(
+    new Option("--ordering <string>", "Ordering of markets")
+      .choices(["asc", "desc"])
+      .default("asc")
+  )
+  .addOption(
+    new Option("--order-by <string>", "Order markets by paramater")
+      .choices(["newest", "end"])
+      .default("newest")
+  )
+  .action(
+    ({
+      graphQlEndpoint,
+      endpoint,
+      statuses,
+      pageNumber,
+      pageSize,
+      ordering,
+      orderBy,
+      creator,
+      oracle,
+    }: {
+      graphQlEndpoint: string;
+      endpoint: string;
+      statuses: string | string[];
+      pageNumber: string;
+      pageSize: string;
+      ordering: string;
+      orderBy: string;
+      creator?: string;
+      oracle?: string;
+    }) => {
+      if (typeof statuses === "string") {
+        statuses = [statuses];
+      }
+      catchErrorsAndExit(queryFilteredMarkets, {
+        statuses,
+        graphQlEndpoint,
+        endpoint,
+        pageNumber: Number(pageNumber),
+        pageSize: Number(pageSize),
+        ordering,
+        orderBy,
+        creator,
+        oracle,
+      });
+    }
   );
 
 program.parse(process.argv);

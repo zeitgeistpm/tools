@@ -24,6 +24,8 @@
     "@zeitgeistpm/type-defs": "^0.3.8",
     "@zeitgeistpm/types": "^0.3.8",
     "commander": "^7.2.0",
+    "graphql": "15.x",
+    "graphql-request": "^3.6.1",
     "ipfs-http-client": "^49.0.4",
     "it-all": "^1.0.4",
     "uint8arrays": "^2.1.4"

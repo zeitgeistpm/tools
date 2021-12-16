@@ -86,7 +86,7 @@ export type MarketResponse = {
   creation: MarketCreation;
   creator_fee: number;
   oracle: string;
-  metadata: string;
+  metadata?: string;
   market_type: MarketType;
   period: MarketPeriod;
   scoring_rule: ScoringRule;
@@ -95,6 +95,7 @@ export type MarketResponse = {
   resolved_outcome: OutcomeReport | null;
   mdm: MarketDisputeMechanism;
   outcomeAssets: Asset[];
+  end: BigInt;
 };
 
 // The extended market data from which a market may be created.
@@ -238,3 +239,14 @@ export type ExtSigner = { address: string; signer: Signer };
 export type KeyringPairOrExtSigner = KeyringPair | ExtSigner;
 
 export type MarketIdOf = MarketId;
+
+export type MarketStatusText =
+  | "Proposed"
+  | "Active"
+  | "Reported"
+  | "Disputed"
+  | "Resolved";
+
+export type MarketsOrdering = "asc" | "desc";
+
+export type MarketsOrderBy = "newest" | "end";

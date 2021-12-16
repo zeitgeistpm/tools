@@ -11,7 +11,6 @@ import {
   MarketPeriod,
   Report,
   MarketDispute,
-  AssetId,
   DecodedMarketMetadata,
   CategoryMetadata,
   OutcomeReport,
@@ -19,7 +18,7 @@ import {
   MarketDisputeMechanism,
 } from "../types";
 import { isExtSigner, unsubOrWarns } from "../util";
-import { Asset, Pool } from "@zeitgeistpm/types/dist/interfaces";
+import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
 /**
@@ -40,10 +39,8 @@ class Market {
   public period: MarketPeriod;
   /** The scoring rule used for the market. */
   public scoringRule: ScoringRule;
-  /** The hex-encoded raw metadata for the market. */
-  public metadata: string;
   /** The type of market. */
-  public marketType: string;
+  public marketType: MarketType;
   /** The status of the market. */
   public status: string;
   /** The reported outcome of the market. Null if the market was not reported yet. */
@@ -52,6 +49,9 @@ class Market {
   public categories: CategoryMetadata[] | null;
   /** The resolved outcome for the market. */
   public resolvedOutcome: OutcomeReport | null;
+
+  /** Timestamp at which market should end */
+  public end: BigInt;
 
   public mdm: MarketDisputeMechanism;
   /** The description of the market. */
@@ -85,13 +85,13 @@ class Market {
       oracle: this.oracle,
       period: this.period,
       scoring_rule: this.scoringRule,
-      metadata: this.metadata,
-      market_type: this.marketType as any,
+      market_type: this.marketType,
       status: this.status,
       report: this.report,
       resolved_outcome: this.resolvedOutcome,
       mdm: this.mdm,
       outcomeAssets: this.outcomeAssets,
+      end: this.end,
     } = market);
 
     ({
@@ -168,7 +168,7 @@ class Market {
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
     const diffInMs =
-      (await this.api.consts.timestamp.minimumPeriod).toNumber() *
+      this.api.consts.timestamp.minimumPeriod.toNumber() *
       (this.period.block[1] - blockNum);
     return now + diffInMs;
   }
