@@ -20,6 +20,7 @@ export interface Order extends Struct {
 export interface OrderSide extends Enum {
   readonly isBid: boolean;
   readonly isAsk: boolean;
+  readonly type: 'Bid' | 'Ask';
 }
 
 export type PHANTOM_ORDERBOOK = 'orderbook';

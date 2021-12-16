@@ -2,8 +2,8 @@
 /* eslint-disable */
 
 import type { Enum, Option, Struct, U8aFixed, Vec, i128, u128, u16, u32, u64 } from '@polkadot/types';
-import type { ITuple } from '@polkadot/types/types';
 import type { AccountId, AccountId32, Balance, MultiAddress, Perbill, Percent } from '@polkadot/types/interfaces/runtime';
+import type { ITuple } from '@polkadot/types/types';
 import type { MarketId } from '@zeitgeistpm/types/interfaces/predictionMarkets';
 
 /** @name Address */
@@ -25,6 +25,7 @@ export interface Asset extends Enum {
   readonly isPoolShare: boolean;
   readonly asPoolShare: u128;
   readonly isZtg: boolean;
+  readonly type: 'CategoricalOutcome' | 'ScalarOutcome' | 'CombinatorialOutcome' | 'PoolShare' | 'Ztg';
 }
 
 /** @name AuthorId */
@@ -67,6 +68,7 @@ export interface CollatorStatus extends Enum {
   readonly isIdle: boolean;
   readonly isLeaving: boolean;
   readonly asLeaving: RoundIndex;
+  readonly type: 'Active' | 'Idle' | 'Leaving';
 }
 
 /** @name Currency */
@@ -83,6 +85,7 @@ export interface DelegatorStatus extends Enum {
   readonly isActive: boolean;
   readonly isLeaving: boolean;
   readonly asLeaving: RoundIndex;
+  readonly type: 'Active' | 'Leaving';
 }
 
 /** @name EmaConfig */
@@ -146,6 +149,7 @@ export interface MarketVolumeState extends Enum {
   readonly isUninitialized: boolean;
   readonly isDataCollectionStarted: boolean;
   readonly isDataCollected: boolean;
+  readonly type: 'Uninitialized' | 'DataCollectionStarted' | 'DataCollected';
 }
 
 /** @name MaxRuntimeUsize */
@@ -158,6 +162,7 @@ export interface Moment extends u64 {}
 export interface MultiHash extends Enum {
   readonly isSha3384: boolean;
   readonly asSha3384: U8aFixed;
+  readonly type: 'Sha3384';
 }
 
 /** @name Nominator2 */
@@ -175,6 +180,7 @@ export interface NominatorAdded extends Enum {
   readonly isAddedToTop: boolean;
   readonly asAddedToTop: Balance;
   readonly isAddedToBottom: boolean;
+  readonly type: 'AddedToTop' | 'AddedToBottom';
 }
 
 /** @name OrderedSet */
@@ -245,6 +251,7 @@ export interface RoundInfo extends Struct {
 export interface ScalarPosition extends Enum {
   readonly isLong: boolean;
   readonly isShort: boolean;
+  readonly type: 'Long' | 'Short';
 }
 
 /** @name SerdeWrapper */
@@ -262,6 +269,7 @@ export interface Timespan extends Enum {
   readonly asDays: u16;
   readonly isWeeks: boolean;
   readonly asWeeks: u16;
+  readonly type: 'Seconds' | 'Minutes' | 'Hours' | 'Days' | 'Weeks';
 }
 
 /** @name UnixTimestamp */
