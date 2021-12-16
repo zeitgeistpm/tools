@@ -3,8 +3,7 @@ import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber } from "@polkadot/util";
 import { unsubOrWarns } from "../util";
-import { Pool } from "@zeitgeistpm/types/dist/interfaces/swaps";
-import { Asset, MarketType } from "@zeitgeistpm/types/dist/interfaces";
+import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
 import {
@@ -19,6 +18,7 @@ import {
   MarketStatusText,
   MarketsOrdering,
   MarketsOrderBy,
+  MarketTypeOf,
 } from "../types";
 import { changeEndianness, isExtSigner } from "../util";
 
@@ -96,6 +96,123 @@ export default class Models {
     const ids = await this.getAllMarketIds();
 
     return Promise.all(ids.map((id) => this.fetchMarketData(id)));
+  }
+
+  /**
+   * Create a market using CPMM scoring rule, buy a complete set of the assets used and deploy
+   * within and deploy an arbitrary amount of those that's greater than the minimum amount.
+   * @param signer The actual signer provider to sign the transaction.
+   * @param oracle The address that will be responsible for reporting the market.
+   * @param period Start and end block numbers or unix timestamp of the market.
+   * @param creationType "Permissionless" or "Advised"
+   * @param marketType "Categorical" or "Scalar"
+   * @param mdm Dispute settlement can be authorized, court or simple_disputes
+   * @param metadata Market metadata
+   * @param amounts List of amounts of each outcome asset that should be deployed.
+   * @param weights List of relative denormalized weights of each asset price.
+   * @param keep Specifies how many assets to keep.
+   */
+  async createCpmmMarketAndDeployAssets(
+    signer: KeyringPairOrExtSigner,
+    oracle: string,
+    period: MarketPeriod,
+    creationType = "Advised",
+    marketType: MarketTypeOf,
+    mdm: MarketDisputeMechanism,
+    amounts: string[],
+    weights: string[],
+    keep: string[],
+    metadata: DecodedMarketMetadata,
+    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  ): Promise<string> {
+    const ipfs = new IPFS();
+
+    const cid = await ipfs.add(
+      JSON.stringify({
+        ...metadata,
+      })
+    );
+
+    const multihash = { Sha3_384: cid.multihash };
+
+    return new Promise(async (resolve) => {
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
+
+        if (status.isInBlock) {
+          console.log(`Transaction included at blockHash ${status.asInBlock}`);
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            //console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+
+            if (method == "MarketCreated") {
+              unsubOrWarns(_unsub);
+              console.log(
+                `Market created with market ID: ${data[0].toString()}`
+              );
+            }
+            if (method == "PoolCreate") {
+              unsubOrWarns(_unsub);
+              console.log(
+                `Canonical pool for market deployed - pool ID: ${data[0]["pool_id"]}`
+              );
+              _resolve(data[0]["pool_id"]);
+            }
+            if (method == "ExtrinsicFailed") {
+              unsubOrWarns(_unsub);
+              const { index, error } = data.toJSON()[0].module;
+              const { errorName, documentation } = this.errorTable.getEntry(
+                index,
+                error
+              );
+              console.log(`${errorName}: ${documentation}`);
+              _resolve("");
+            }
+          });
+        }
+      };
+
+      if (isExtSigner(signer)) {
+        const unsub = await this.api.tx.predictionMarkets
+          .createCpmmMarketAndDeployAssets(
+            oracle,
+            period,
+            multihash,
+            creationType,
+            marketType,
+            mdm,
+            amounts,
+            weights,
+            keep
+          )
+          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      } else {
+        const unsub = await this.api.tx.predictionMarkets
+          .createCpmmMarketAndDeployAssets(
+            oracle,
+            period,
+            multihash,
+            creationType,
+            marketType,
+            mdm,
+            amounts,
+            weights,
+            keep
+          )
+          .signAndSend(signer, (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+          );
+      }
+    });
   }
 
   /**
