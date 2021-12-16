@@ -6,6 +6,7 @@ import buyCompleteSet from "./actions/buyCompleteSet";
 import createScalarMarket from "./actions/createScalarMarket";
 import cancelPendingMarket from "./actions/cancelPendingMarket";
 import countMarkets from "./actions/countMarkets";
+import createMarketAndDeployPool from "./actions/createMarketAndDeployPool";
 import createCategoricalMarket from "./actions/createCategoricalMarket";
 import currencyTransfer from "./actions/currencyTransfer";
 import deployKusamaDerby from "./actions/deployKusamaDerby";
@@ -56,6 +57,76 @@ program
   )
   .option("--seed <string>", "The signer's seed", "//Alice")
   .action((opts) => catchErrorsAndExit(deployKusamaDerby, opts));
+
+program
+  .command(
+    "createMarketAndDeployPool <slug> <description> <oracle> <period> <question>"
+  )
+  .option(
+    "--advised",
+    "Create Advised market instead of Permissionless market",
+    false
+  )
+  .option(
+    "-c --categories [categories...]",
+    "A space-separated strings for names of categories for the market"
+  )
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--timestamp",
+    "Interpret period as a unix timestamp instead of a block number",
+    false
+  )
+  .option(
+    "--authorized <string>",
+    "Specify account id which is authorized to handle Market Dispute Mechanism"
+  )
+  .option(
+    "--court",
+    "Use Court instead of Simple Disputes as Market Dispute Mechanism",
+    false
+  )
+  .option(
+    "--amounts <amounts>",
+    "A comma-separated list of amounts of each outcome asset that should be deployed",
+    ""
+  )
+  .option(
+    "--weights <weights>",
+    "A comma-separated list of relative denormalized weights of each asset price",
+    ""
+  )
+  .option("--keep <keep>", "A comma-separated list of assets to keep", "")
+  .action(
+    (
+      slug: string,
+      description: string,
+      oracle: string,
+      period: string,
+      question: string,
+      opts: {
+        endpoint: string;
+        seed: string;
+        categories: string[];
+        advised: boolean;
+        timestamp: boolean;
+        authorized: string;
+        court: boolean;
+        amounts: string;
+        weights: string;
+        keep: string;
+      }
+    ) =>
+      catchErrorsAndExit(
+        createMarketAndDeployPool,
+        Object.assign(opts, { slug, description, oracle, period, question })
+      )
+  );
 
 program
   .command(

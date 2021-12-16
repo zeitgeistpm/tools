@@ -2,8 +2,8 @@
 /* eslint-disable */
 
 import type { Bytes, Enum, Option, Struct, u128, u16, u8 } from '@polkadot/types';
-import type { ITuple } from '@polkadot/types/types';
 import type { AccountId, BlockNumber, Moment } from '@polkadot/types/interfaces/runtime';
+import type { ITuple } from '@polkadot/types/types';
 
 /** @name Market */
 export interface Market extends Struct {
@@ -25,6 +25,7 @@ export interface Market extends Struct {
 export interface MarketCreation extends Enum {
   readonly isPermissionless: boolean;
   readonly isAdvised: boolean;
+  readonly type: 'Permissionless' | 'Advised';
 }
 
 /** @name MarketDispute */
@@ -40,6 +41,7 @@ export interface MarketDisputeMechanism extends Enum {
   readonly asAuthorized: AccountId;
   readonly isCourt: boolean;
   readonly isSimpleDisputes: boolean;
+  readonly type: 'Authorized' | 'Court' | 'SimpleDisputes';
 }
 
 /** @name MarketId */
@@ -51,6 +53,7 @@ export interface MarketPeriod extends Enum {
   readonly asBlock: ITuple<[BlockNumber, BlockNumber]>;
   readonly isTimestamp: boolean;
   readonly asTimestamp: ITuple<[Moment, Moment]>;
+  readonly type: 'Block' | 'Timestamp';
 }
 
 /** @name MarketStatus */
@@ -64,6 +67,7 @@ export interface MarketStatus extends Enum {
   readonly isReported: boolean;
   readonly isDisputed: boolean;
   readonly isResolved: boolean;
+  readonly type: 'Proposed' | 'Active' | 'Suspended' | 'Closed' | 'CollectingSubsidy' | 'InsufficientSubsidy' | 'Reported' | 'Disputed' | 'Resolved';
 }
 
 /** @name MarketType */
@@ -72,6 +76,7 @@ export interface MarketType extends Enum {
   readonly asCategorical: u16;
   readonly isScalar: boolean;
   readonly asScalar: ITuple<[u128, u128]>;
+  readonly type: 'Categorical' | 'Scalar';
 }
 
 /** @name OutcomeReport */
@@ -80,6 +85,7 @@ export interface OutcomeReport extends Enum {
   readonly asCategorical: u16;
   readonly isScalar: boolean;
   readonly asScalar: u128;
+  readonly type: 'Categorical' | 'Scalar';
 }
 
 /** @name Report */
@@ -93,6 +99,7 @@ export interface Report extends Struct {
 export interface ScoringRule extends Enum {
   readonly isCpmm: boolean;
   readonly isRikiddoSigmoidFeeMarketEma: boolean;
+  readonly type: 'Cpmm' | 'RikiddoSigmoidFeeMarketEma';
 }
 
 export type PHANTOM_PREDICTIONMARKETS = 'predictionMarkets';

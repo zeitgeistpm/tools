@@ -17,11 +17,13 @@ export default {
       who: "AccountId",
     },
     PoolAssetEvent: {
+      asset: "Asset",
       bound: "Balance",
       cpep: "CommonPoolEventParams<AccountId>",
       transferred: "Balance",
     },
     PoolAssetsEvent: {
+      assets: "Vec<Asset>",
       bounds: "Vec<Balance>",
       cpep: "CommonPoolEventParams<AccountId>",
       transferred: "Vec<Balance>",
@@ -38,6 +40,8 @@ export default {
       asset_amount_in: "Balance",
       asset_amount_out: "Balance",
       asset_bound: "Balance",
+      asset_in: "Asset",
+      asset_out: "Asset",
       cpep: "CommonPoolEventParams<AccountId>",
       max_price: "Balance",
     },

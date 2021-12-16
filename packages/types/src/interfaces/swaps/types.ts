@@ -27,6 +27,7 @@ export interface Pool extends Struct {
 
 /** @name PoolAssetEvent */
 export interface PoolAssetEvent extends Struct {
+  readonly asset: Asset;
   readonly bound: Balance;
   readonly cpep: CommonPoolEventParams;
   readonly transferred: Balance;
@@ -34,6 +35,7 @@ export interface PoolAssetEvent extends Struct {
 
 /** @name PoolAssetsEvent */
 export interface PoolAssetsEvent extends Struct {
+  readonly assets: Vec<Asset>;
   readonly bounds: Vec<Balance>;
   readonly cpep: CommonPoolEventParams;
   readonly transferred: Vec<Balance>;
@@ -47,6 +49,7 @@ export interface PoolStatus extends Enum {
   readonly isActive: boolean;
   readonly isCollectingSubsidy: boolean;
   readonly isStale: boolean;
+  readonly type: 'Active' | 'CollectingSubsidy' | 'Stale';
 }
 
 /** @name SubsidyUntil */
@@ -60,6 +63,8 @@ export interface SwapEvent extends Struct {
   readonly asset_amount_in: Balance;
   readonly asset_amount_out: Balance;
   readonly asset_bound: Balance;
+  readonly asset_in: Asset;
+  readonly asset_out: Asset;
   readonly cpep: CommonPoolEventParams;
   readonly max_price: Balance;
 }

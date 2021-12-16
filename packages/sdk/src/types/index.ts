@@ -1,7 +1,6 @@
 import { KeyringPair } from "@polkadot/keyring/types";
 import { Signer } from "@polkadot/types/types";
-import { MarketType } from "@zeitgeistpm/types/dist/interfaces/predictionMarkets";
-import { Asset } from "@zeitgeistpm/types/dist/interfaces/index";
+import { Asset, MarketType } from "@zeitgeistpm/types/dist/interfaces/index";
 
 // The possible fields available on the decoded market metadata.
 export type DecodedMarketMetadata = {
@@ -155,6 +154,8 @@ export type MarketPeriod = { block: number[] } | { timestamp: number[] };
 export type MarketEnd = { block: number } | { timestamp: number };
 
 export type MarketCreation = "Permissioned" | "Advised";
+
+export type MarketTypeOf = { Categorical: number } | { Scalar: number[] };
 
 export type ScoringRule = "CPMM" | "RikiddoSigmoidFeeMarketEma";
 

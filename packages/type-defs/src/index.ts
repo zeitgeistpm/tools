@@ -10,7 +10,8 @@ export const index = {
       AccountData: {
         free: "Balance",
         reserved: "Balance",
-        frozen: "Balance",
+        misc_frozen: "Balance",
+        fee_frozen: "Balance",
       },
     },
   },
