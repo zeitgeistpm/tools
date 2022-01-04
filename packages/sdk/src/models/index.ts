@@ -652,10 +652,10 @@ export default class Models {
    * @returns The `market_count` from Zeitgeist chain.
    */
   async getMarketCount(): Promise<number | null> {
-    const count = (await this.api.query.marketCommons.marketCount()).toJSON();
+    const count = (await this.api.query.marketCommons.marketCounter()).toJSON();
     if (typeof count !== "number") {
       throw new Error(
-        "Expected a number to return from api.query.marketCommons.marketCount (even if variable remains unset)"
+        "Expected a number to return from api.query.marketCommons.marketCounter (even if variable remains unset)"
       );
     }
     return count;
