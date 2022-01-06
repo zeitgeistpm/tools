@@ -18,6 +18,7 @@ type Options = {
   authorized: string;
   court: boolean;
   amounts: string;
+  baseAssetAmount: string;
   weights: string;
   keep: string;
 };
@@ -37,6 +38,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     authorized,
     court,
     amounts,
+    baseAssetAmount,
     weights,
     keep,
   } = opts;
@@ -108,6 +110,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     marketType,
     mdm,
     amts,
+    baseAssetAmount,
     wts,
     kp,
     metadata

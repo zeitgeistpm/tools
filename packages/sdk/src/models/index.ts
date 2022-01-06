@@ -109,6 +109,7 @@ export default class Models {
    * @param mdm Dispute settlement can be authorized, court or simple_disputes
    * @param metadata Market metadata
    * @param amounts List of amounts of each outcome asset that should be deployed.
+   * @param baseAssetAmount Amount for native currency liquidity
    * @param weights List of relative denormalized weights of each asset price.
    * @param keep Specifies how many assets to keep.
    */
@@ -120,6 +121,7 @@ export default class Models {
     marketType: MarketTypeOf,
     mdm: MarketDisputeMechanism,
     amounts: string[],
+    baseAssetAmount: string,
     weights: string[],
     keep: string[],
     metadata: DecodedMarketMetadata,
@@ -184,6 +186,7 @@ export default class Models {
             creationType,
             marketType,
             mdm,
+            baseAssetAmount,
             amounts,
             weights,
             keep
@@ -202,6 +205,7 @@ export default class Models {
             creationType,
             marketType,
             mdm,
+            baseAssetAmount,
             amounts,
             weights,
             keep
