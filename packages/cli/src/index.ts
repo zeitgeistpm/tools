@@ -97,6 +97,11 @@ program
     ""
   )
   .option(
+    "--base-asset-amount <amount>",
+    "Amount to deploy for native currency",
+    ""
+  )
+  .option(
     "--weights <weights>",
     "A comma-separated list of relative denormalized weights of each asset price",
     ""
@@ -118,6 +123,7 @@ program
         authorized: string;
         court: boolean;
         amounts: string;
+        baseAssetAmount: string;
         weights: string;
         keep: string;
       }
