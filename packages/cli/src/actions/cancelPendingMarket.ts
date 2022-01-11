@@ -15,7 +15,7 @@ const cancelPendingMarket = async (opts: Options): Promise<void> => {
   const signer = util.signerFromSeed(seed);
 
   const market = await sdk.models.fetchMarketData(Number(marketId));
-  const res = await market.cancelAdvised(signer);
+  const res = await market.cancelAdvised(signer, false);
 
   console.log(res);
   return;

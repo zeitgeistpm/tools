@@ -35,7 +35,7 @@ const deployPool = async (opts: Options): Promise<void> => {
     wts = Array(outcomeAssets.length + 1).fill("1".concat("0".repeat(10)));
   }
 
-  const res = await market.deploySwapPool(signer, wts);
+  const res = await market.deploySwapPool(signer, wts, false);
   const poolId = await market.getPoolId();
 
   console.log(res);

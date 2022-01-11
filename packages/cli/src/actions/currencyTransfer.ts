@@ -53,7 +53,8 @@ const currencyTransfer = async (opts: Options): Promise<void> => {
     signer,
     dest,
     currencyId,
-    amount
+    amount,
+    false
   );
 
   if (res) {

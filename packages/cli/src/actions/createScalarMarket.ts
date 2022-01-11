@@ -62,7 +62,8 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     advised ? "Advised" : "Permissionless",
     bounds ? bounds : [0, 100],
     mdm,
-    cpmm ? "CPMM" : "RikiddoSigmoidFeeMarketEma"
+    cpmm ? "CPMM" : "RikiddoSigmoidFeeMarketEma",
+    false
   );
 
   if (marketId && marketId.length > 0) {
