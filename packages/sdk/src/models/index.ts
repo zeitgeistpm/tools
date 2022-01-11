@@ -2,7 +2,7 @@ import { ApiPromise } from "@polkadot/api";
 import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber } from "@polkadot/util";
-import { unsubOrWarns } from "../util";
+import { getEstimatedFee, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
@@ -112,6 +112,7 @@ export default class Models {
    * @param baseAssetAmount Amount for native currency liquidity
    * @param weights List of relative denormalized weights of each asset price.
    * @param keep Specifies how many assets to keep.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   async createCpmmMarketAndDeployAssets(
     signer: KeyringPairOrExtSigner,
@@ -125,6 +126,7 @@ export default class Models {
     weights: string[],
     keep: string[],
     metadata: DecodedMarketMetadata,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = new IPFS();
@@ -136,6 +138,23 @@ export default class Models {
     );
 
     const multihash = { Sha3_384: cid.multihash };
+
+    const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
+      oracle,
+      period,
+      multihash,
+      creationType,
+      marketType,
+      mdm,
+      baseAssetAmount,
+      amounts,
+      weights,
+      keep
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
 
     return new Promise(async (resolve) => {
       const _callback = (
@@ -178,43 +197,18 @@ export default class Models {
       };
 
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .createCpmmMarketAndDeployAssets(
-            oracle,
-            period,
-            multihash,
-            creationType,
-            marketType,
-            mdm,
-            baseAssetAmount,
-            amounts,
-            weights,
-            keep
-          )
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .createCpmmMarketAndDeployAssets(
-            oracle,
-            period,
-            multihash,
-            creationType,
-            marketType,
-            mdm,
-            baseAssetAmount,
-            amounts,
-            weights,
-            keep
-          )
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -227,6 +221,7 @@ export default class Models {
    * @param creationType "Permissionless" or "Advised"
    * @param mdm Dispute settlement can be authorized, court or simple_disputes
    * @param metadata Market metadata
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
   async createCategoricalMarket(
@@ -237,6 +232,7 @@ export default class Models {
     mdm: MarketDisputeMechanism,
     scoringRule = "CPMM",
     metadata: DecodedMarketMetadata,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = new IPFS();
@@ -249,6 +245,20 @@ export default class Models {
     );
 
     const multihash = { Sha3_384: cid.multihash };
+
+    const tx = this.api.tx.predictionMarkets.createCategoricalMarket(
+      oracle,
+      period,
+      multihash,
+      creationType,
+      categories.length,
+      mdm,
+      scoringRule
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
 
     return new Promise(async (resolve) => {
       const _callback = (
@@ -282,37 +292,18 @@ export default class Models {
       };
 
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(
-            oracle,
-            period,
-            multihash,
-            creationType,
-            categories.length,
-            mdm,
-            scoringRule
-          )
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .createCategoricalMarket(
-            oracle,
-            period,
-            multihash,
-            creationType,
-            categories.length,
-            mdm,
-            scoringRule
-          )
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -327,6 +318,7 @@ export default class Models {
    * @param creationType "Permissionless" or "Advised"
    * @param bounds The array having lower and higher bound values denoting range set.
    * @param mdm Dispute settlement can be authorized, court or simple_disputes
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
   async createScalarMarket(
@@ -339,6 +331,7 @@ export default class Models {
     bounds = [0, 100],
     mdm: MarketDisputeMechanism,
     scoringRule = "CPMM",
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
     const ipfs = new IPFS();
@@ -352,6 +345,20 @@ export default class Models {
     );
 
     const multihash = { Sha3_384: cid.multihash };
+
+    const tx = this.api.tx.predictionMarkets.createScalarMarket(
+      oracle,
+      period,
+      multihash,
+      creationType,
+      bounds,
+      mdm,
+      scoringRule
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
 
     return new Promise(async (resolve) => {
       const _callback = (
@@ -385,37 +392,18 @@ export default class Models {
       };
 
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .createScalarMarket(
-            oracle,
-            period,
-            multihash,
-            creationType,
-            bounds,
-            mdm,
-            scoringRule
-          )
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .createScalarMarket(
-            oracle,
-            period,
-            multihash,
-            creationType,
-            bounds,
-            mdm,
-            scoringRule
-          )
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -888,6 +876,7 @@ export default class Models {
    * @param dest The address that will receive the asset (token).
    * @param currencyId Can be outcome tokens or PoolShare or Ztg.
    * @param amount The number of `currencyId` to be transferred.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    * @returns True or False
    */
   currencyTransfer = async (
@@ -895,8 +884,9 @@ export default class Models {
     dest: string,
     currencyId: CurrencyIdOf,
     amount: number,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> => {
+  ): Promise<string | boolean> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
@@ -921,6 +911,10 @@ export default class Models {
     };
 
     const tx = this.api.tx.currency.transfer(dest, currencyId, amount);
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
