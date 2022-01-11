@@ -28,10 +28,14 @@ const joinPool = async (opts: Options): Promise<void> => {
   /* @ts-ignore */
   const res =
     (sdkJoinPoolFunctionToUse as any) === "joinPool"
-      ? await pool.joinPool(signer, amountOut, amountIn.split(","))
-      : await pool.joinPoolMultifunc(signer, {
-          bounds: trimmedBounds as any,
-        });
+      ? await pool.joinPool(signer, amountOut, amountIn.split(","), false)
+      : await pool.joinPoolMultifunc(
+          signer,
+          {
+            bounds: trimmedBounds as any,
+          },
+          false
+        );
   console.log(res);
 };
 

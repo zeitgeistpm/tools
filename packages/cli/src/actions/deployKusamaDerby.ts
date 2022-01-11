@@ -38,7 +38,8 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
         slug: `kusama-derby-test-${i}`,
         description: "test description",
         question: "who will win?",
-      }
+      },
+      false
     );
 
     marketIds.push(marketId);
@@ -48,30 +49,39 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
 
   for (const marketId of marketIds) {
     const market = await sdk.models.fetchMarketData(marketId);
-    await market.buyCompleteSet(signer, "5000000000000" as any);
-    await market.deploySwapPool(signer, [
-      "10000000000",
-      "10000000000",
-      "10000000000",
-      "10000000000",
-      "10000000000",
-      "10000000000",
-      "10000000000",
-      "10000000000",
-      "80000000000",
-    ]);
+    await market.buyCompleteSet(signer, "5000000000000" as any, false);
+    await market.deploySwapPool(
+      signer,
+      [
+        "10000000000",
+        "10000000000",
+        "10000000000",
+        "10000000000",
+        "10000000000",
+        "10000000000",
+        "10000000000",
+        "10000000000",
+        "80000000000",
+      ],
+      false
+    );
     const pool = await market.getPool();
-    await pool.joinPool(signer, "4000000000000", [
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-      "8000000000000",
-    ]);
+    await pool.joinPool(
+      signer,
+      "4000000000000",
+      [
+        "8000000000000",
+        "8000000000000",
+        "8000000000000",
+        "8000000000000",
+        "8000000000000",
+        "8000000000000",
+        "8000000000000",
+        "8000000000000",
+        "8000000000000",
+      ],
+      false
+    );
   }
 };
 

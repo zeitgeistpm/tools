@@ -113,7 +113,8 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     baseAssetAmount,
     wts,
     kp,
-    metadata
+    metadata,
+    false
   );
 
   if (!poolId) {

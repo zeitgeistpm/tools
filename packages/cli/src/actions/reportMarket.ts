@@ -18,7 +18,7 @@ const reportMarket = async (opts: Options): Promise<void> => {
   const outcomeReport = market.marketType.isCategorical
     ? { categorical: Number(outcome) }
     : { scalar: Number(outcome) };
-  const res = await market.reportOutcome(signer, outcomeReport);
+  const res = await market.reportOutcome(signer, outcomeReport, false);
 
   console.log(res);
   return;

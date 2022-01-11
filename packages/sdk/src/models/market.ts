@@ -17,7 +17,7 @@ import {
   ScoringRule,
   MarketDisputeMechanism,
 } from "../types";
-import { isExtSigner, unsubOrWarns } from "../util";
+import { getEstimatedFee, isExtSigner, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
@@ -217,16 +217,27 @@ class Market {
    * Creates swap pool for this market via `api.tx.predictionMarkets.deploySwapPoolForMarket(marketId, weights)`.
    * @param signer The actual signer provider to sign the transaction.
    * @param weights List of lengths for each asset.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    * @throws Error if swap pool already exists for the market.
    */
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
     weights: string[],
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId) {
       throw new Error("Pool already exists for this market.");
+    }
+
+    const tx = this.api.tx.predictionMarkets.deploySwapPoolForMarket(
+      this.marketId,
+      weights
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
     }
 
     const _callback = (
@@ -290,21 +301,18 @@ class Market {
       }
 
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .deploySwapPoolForMarket(this.marketId, weights)
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .deploySwapPoolForMarket(this.marketId, weights)
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   };
@@ -333,12 +341,23 @@ class Market {
    * Note: This is the only way to create new shares.
    * @param signer The actual signer provider to sign the transaction.
    * @param amount The amount of each share.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
+    const tx = this.api.tx.predictionMarkets.buyCompleteSet(
+      this.marketId,
+      amount
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -363,21 +382,18 @@ class Market {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .buyCompleteSet(this.marketId, amount)
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .buyCompleteSet(this.marketId, amount)
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -386,12 +402,23 @@ class Market {
    * Sells/Destroys a complete set of outcome shares for the market.
    * @param signer The actual signer provider to sign the transaction.
    * @param amount The amount of each share.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   async sellCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
+    const tx = this.api.tx.predictionMarkets.sellCompleteSet(
+      this.marketId,
+      amount
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -416,21 +443,18 @@ class Market {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .sellCompleteSet(this.marketId, amount)
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .sellCompleteSet(this.marketId, amount)
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -439,12 +463,19 @@ class Market {
    * Reports an outcome for the market.
    * @param signer The actual signer provider to sign the transaction.
    * @param outcome The outcome of the market
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   async reportOutcome(
     signer: KeyringPairOrExtSigner,
     outcome: OutcomeReport,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
+    const tx = this.api.tx.predictionMarkets.report(this.marketId, outcome);
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -471,21 +502,18 @@ class Market {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .report(this.marketId, outcome)
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .report(this.marketId, outcome)
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -494,12 +522,19 @@ class Market {
    * Submits a disputed outcome for the market.
    * @param signer The actual signer provider to sign the transaction.
    * @param outcome The outcome of the market
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   async dispute(
     signer: KeyringPairOrExtSigner,
     outcome: OutcomeReport,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
+    const tx = this.api.tx.predictionMarkets.dispute(this.marketId, outcome);
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -526,21 +561,18 @@ class Market {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .dispute(this.marketId, outcome)
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .dispute(this.marketId, outcome)
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -549,11 +581,18 @@ class Market {
    * Redeems the winning shares for the market.
    * @param signer The actual signer provider to sign the transaction.
    * @param outcome The outcome of the market
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   async redeemShares(
     signer: KeyringPairOrExtSigner,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> {
+  ): Promise<string | boolean> {
+    const tx = this.api.tx.predictionMarkets.redeemShares(this.marketId);
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
@@ -580,21 +619,18 @@ class Market {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .redeemShares(this.marketId)
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .redeemShares(this.marketId)
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }
@@ -602,11 +638,18 @@ class Market {
   /**
    * Approves the `Proposed` market that is waiting for approval from the advisory committee.
    * @param signer The actual signer provider to sign the transaction.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   async approve(
     signer: KeyringPairOrExtSigner,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
+    const tx = this.api.tx.predictionMarkets.approveMarket(this.marketId);
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -632,11 +675,7 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
-      const call = await this.api.tx.predictionMarkets.approveMarket(
-        this.marketId
-      );
-
-      const sudoTx = await this.api.tx.sudo.sudo(call);
+      const sudoTx = await this.api.tx.sudo.sudo(tx);
 
       if (isExtSigner(signer)) {
         const unsub = await sudoTx.signAndSend(
@@ -658,11 +697,18 @@ class Market {
   /**
    * Rejects the `Proposed` market that is waiting for approval from the advisory committee.
    * @param signer The actual signer provider to sign the transaction.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   async reject(
     signer: KeyringPairOrExtSigner,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
+    const tx = this.api.tx.predictionMarkets.rejectMarket(this.marketId);
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -688,11 +734,7 @@ class Market {
     };
 
     return new Promise(async (resolve) => {
-      const call = await this.api.tx.predictionMarkets.rejectMarket(
-        this.marketId
-      );
-
-      const sudoTx = await this.api.tx.sudo.sudo(call);
+      const sudoTx = await this.api.tx.sudo.sudo(tx);
 
       if (isExtSigner(signer)) {
         const unsub = await sudoTx.signAndSend(
@@ -714,11 +756,19 @@ class Market {
   /**
    * Allows the proposer of the market that is currently in a `Proposed` state to cancel the market proposal.
    * @param signer The actual signer provider to sign the transaction.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   async cancelAdvised(
     signer: KeyringPairOrExtSigner,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
   ): Promise<string> {
+    const tx = this.api.tx.predictionMarkets.cancelPendingMarket(this.marketId);
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: string | PromiseLike<string>) => void,
@@ -745,21 +795,18 @@ class Market {
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
-        const unsub = await this.api.tx.predictionMarkets
-          .cancelPendingMarket(this.marketId)
-          .signAndSend(signer.address, { signer: signer.signer }, (result) =>
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub)
-          );
+        );
       } else {
-        const unsub = await this.api.tx.predictionMarkets
-          .cancelPendingMarket(this.marketId)
-          .signAndSend(signer, (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-          );
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
       }
     });
   }

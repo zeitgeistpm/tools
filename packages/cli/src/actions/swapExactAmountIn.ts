@@ -35,7 +35,8 @@ const swapExactAmountIn = async (opts: Options): Promise<void> => {
     assetAmountIn,
     assetOut,
     minAmountOut,
-    maxPrice
+    maxPrice,
+    false
   );
   console.log(res);
 };

@@ -17,7 +17,12 @@ const exitPool = async (opts: Options): Promise<void> => {
   console.log("Sending transaction from", signer.address);
 
   const pool = await sdk.models.fetchPoolData(poolId);
-  const res = await pool.exitPool(signer, amountIn, amountOut.split(","));
+  const res = await pool.exitPool(
+    signer,
+    amountIn,
+    amountOut.split(","),
+    false
+  );
   console.log(res);
 };
 

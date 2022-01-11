@@ -2,7 +2,12 @@ import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 import { KeyringPairOrExtSigner, AssetId, poolJoinOpts } from "../types";
-import { AssetIdFromString, isExtSigner, unsubOrWarns } from "../util";
+import {
+  AssetIdFromString,
+  getEstimatedFee,
+  isExtSigner,
+  unsubOrWarns,
+} from "../util";
 import {
   Asset,
   Pool,
@@ -146,13 +151,25 @@ export default class Swap {
    * @param signer The actual signer provider to sign the transaction.
    * @param poolAmountOut The amount of LP shares for this pool that should be minted to the provider.
    * @param maxAmountsIn List of asset upper bounds. The values are maximum limit for the assets.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   joinPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,
     maxAmountsIn: string[],
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> => {
+  ): Promise<string | boolean> => {
+    const tx = this.api.tx.swaps.poolJoin(
+      this.poolId,
+      poolAmountOut,
+      maxAmountsIn
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
@@ -175,12 +192,6 @@ export default class Swap {
         });
       }
     };
-
-    const tx = this.api.tx.swaps.poolJoin(
-      this.poolId,
-      poolAmountOut,
-      maxAmountsIn
-    );
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
@@ -209,14 +220,28 @@ export default class Swap {
    * @param assetIn Asset entering the pool.
    * @param assetAmount Asset amount that is entering the pool.
    * @param minPoolAmount The calculated amount for the pool must be equal or greater than the given value.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   poolJoinWithExactAssetAmount = async (
     signer: KeyringPairOrExtSigner,
     assetIn: any,
     assetAmount: any,
     minPoolAmount: any,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> => {
+  ): Promise<string | boolean> => {
+    // Create the transaction type and supply it with the arguments.
+    const tx = this.api.tx.swaps.poolJoinWithExactAssetAmount(
+      this.poolId,
+      assetIn,
+      assetAmount,
+      minPoolAmount
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     // Define the default callback if none is provided by the invoker of this function.
     const _callback = (
       result: ISubmittableResult,
@@ -240,14 +265,6 @@ export default class Swap {
         });
       }
     };
-
-    // Create the transaction type and supply it with the arguments.
-    const tx = this.api.tx.swaps.poolJoinWithExactAssetAmount(
-      this.poolId,
-      assetIn,
-      assetAmount,
-      minPoolAmount
-    );
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
@@ -275,12 +292,14 @@ export default class Swap {
    * @param opts To be provided with `asset`, `bounds.assetAmount`, `bounds.poolMin` for MinPool
    * and with `asset`, `bounds.poolAmount`, `bounds.AssetMin` for MaxAsset
    * and with `bounds.poolAmount`, `bounds.AssetMin` for `sdk.models.swaps.joinPool`.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   joinPoolMultifunc = async (
     signer: KeyringPairOrExtSigner,
     opts: poolJoinOpts,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> => {
+  ): Promise<string | boolean> => {
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
@@ -364,6 +383,10 @@ export default class Swap {
         poolId, bounds = { assetAmount, poolMin } \n`);
     }
 
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
         const unsub = await tx.signAndSend(
@@ -390,13 +413,25 @@ export default class Swap {
    * @param signer The actual signer provider to sign the transaction.
    * @param poolAmountIn The amount of LP shares of this pool being burned based on the retrieved assets.
    * @param minAmountsOut List of asset lower bounds. The values are minimum limit for the assets.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   exitPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountIn: string,
     minAmountsOut: string[],
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> => {
+  ): Promise<string | boolean> => {
+    const tx = this.api.tx.swaps.poolExit(
+      this.poolId,
+      poolAmountIn,
+      minAmountsOut
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
@@ -420,12 +455,6 @@ export default class Swap {
         });
       }
     };
-
-    const tx = this.api.tx.swaps.poolExit(
-      this.poolId,
-      poolAmountIn,
-      minAmountsOut
-    );
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
@@ -456,6 +485,7 @@ export default class Swap {
    * @param assetOut Asset leaving the pool.
    * @param minAmountOut Minimum asset amount that can leave the pool.
    * @param maxPrice Market price must be equal or less than the provided value.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   swapExactAmountIn = async (
     signer: KeyringPairOrExtSigner,
@@ -464,8 +494,22 @@ export default class Swap {
     assetOut: string,
     minAmountOut: string,
     maxPrice: string,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> => {
+  ): Promise<string | boolean> => {
+    const tx = this.api.tx.swaps.swapExactAmountIn(
+      this.poolId,
+      AssetIdFromString(assetIn),
+      assetAmountIn,
+      AssetIdFromString(assetOut),
+      minAmountOut,
+      maxPrice
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
@@ -489,15 +533,6 @@ export default class Swap {
         });
       }
     };
-
-    const tx = this.api.tx.swaps.swapExactAmountIn(
-      this.poolId,
-      AssetIdFromString(assetIn),
-      assetAmountIn,
-      AssetIdFromString(assetOut),
-      minAmountOut,
-      maxPrice
-    );
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
@@ -528,6 +563,7 @@ export default class Swap {
    * @param assetOut Asset leaving the pool.
    * @param assetAmountOut Amount that will be transferred from the pool to the provider.
    * @param maxPrice Market price must be equal or less than the provided value.
+   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
    */
   swapExactAmountOut = async (
     signer: KeyringPairOrExtSigner,
@@ -536,8 +572,22 @@ export default class Swap {
     assetOut: string,
     assetAmountOut: string,
     maxPrice: string,
+    paymentInfo: boolean,
     callback?: (result: ISubmittableResult, _unsub: () => void) => void
-  ): Promise<boolean> => {
+  ): Promise<string | boolean> => {
+    const tx = this.api.tx.swaps.swapExactAmountOut(
+      this.poolId,
+      AssetIdFromString(assetIn),
+      maxAmountIn,
+      AssetIdFromString(assetOut),
+      assetAmountOut,
+      maxPrice
+    );
+
+    if (paymentInfo) {
+      return getEstimatedFee(tx, signer.address);
+    }
+
     const _callback = (
       result: ISubmittableResult,
       _resolve: (value: boolean | PromiseLike<boolean>) => void,
@@ -561,15 +611,6 @@ export default class Swap {
         });
       }
     };
-
-    const tx = this.api.tx.swaps.swapExactAmountOut(
-      this.poolId,
-      AssetIdFromString(assetIn),
-      maxAmountIn,
-      AssetIdFromString(assetOut),
-      assetAmountOut,
-      maxPrice
-    );
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {

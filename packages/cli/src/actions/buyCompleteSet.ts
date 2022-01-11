@@ -18,7 +18,7 @@ const buyCompleteSet = async (opts: Options): Promise<void> => {
   );
 
   const market = await sdk.models.fetchMarketData(Number(marketId));
-  const res = await market.buyCompleteSet(signer, Number(amount));
+  const res = await market.buyCompleteSet(signer, Number(amount), false);
 
   if (res) {
     console.log(

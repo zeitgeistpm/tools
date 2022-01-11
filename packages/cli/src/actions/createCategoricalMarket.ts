@@ -97,7 +97,8 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     advised ? "Advised" : "Permissionless",
     mdm,
     cpmm ? "CPMM" : "RikiddoSigmoidFeeMarketEma",
-    metadata
+    metadata,
+    false
   );
 
   if (marketId && marketId.length > 0) {

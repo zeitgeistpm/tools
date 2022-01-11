@@ -15,7 +15,7 @@ const rejectMarket = async (opts: Options): Promise<void> => {
   const signer = util.signerFromSeed(seed);
 
   const market = await sdk.models.fetchMarketData(Number(marketId));
-  const res = await market.reject(signer);
+  const res = await market.reject(signer, false);
 
   console.log(res);
   return;
