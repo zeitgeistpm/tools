@@ -1,3 +1,5 @@
+import { ISubmittableResult } from "@polkadot/types/types";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { initIpfs } from "./ipfs";
 import {
   initApi,
@@ -99,4 +101,12 @@ export const AssetIdFromString = (stringAsset: string | AssetId): AssetId => {
   throw new Error(
     `Could not parse asset "${stringAsset}". Try ztg, [X,Y], '[X,"Long"]', '[X,"Short"]', poolX.`
   );
+};
+
+export const getEstimatedFee = async (
+  tx: SubmittableExtrinsic<"promise", ISubmittableResult>,
+  address: string
+) => {
+  const info = await tx.paymentInfo(address);
+  return info.partialFee.toString();
 };
