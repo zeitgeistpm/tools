@@ -533,10 +533,12 @@ export default class Models {
   async filterMarkets(
     {
       statuses,
+      tags,
       creator,
       oracle,
     }: {
-      statuses: MarketStatusText[];
+      statuses?: MarketStatusText[];
+      tags?: string[];
       creator?: string;
       oracle?: string;
     },
@@ -553,6 +555,7 @@ export default class Models {
     const query = gql`
       query marketPage(
         $statuses: [String!]
+        $tags: [String!]
         $pageSize: Int!
         $offset: Int!
         $orderByQuery: [MarketOrderByInput!]
@@ -562,6 +565,7 @@ export default class Models {
         markets(
           where: {
             status_in: $statuses
+            tags_containsAll: $tags
             creator_eq: $creator
             oracle_eq: $oracle
           }
@@ -586,7 +590,15 @@ export default class Models {
       orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
     const data = await this.graphQLClient.request<{
       markets: MarketQueryData[];
-    }>(query, { statuses, pageSize, offset, orderByQuery, creator, oracle });
+    }>(query, {
+      statuses,
+      tags,
+      pageSize,
+      offset,
+      orderByQuery,
+      creator,
+      oracle,
+    });
 
     const { markets: queriedMarkets } = data;
 

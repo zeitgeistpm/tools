@@ -789,7 +789,14 @@ program
     "Endpoint of the graphql query node",
     "https://processor.zeitgeist.pm/graphql"
   )
-  .option("--statuses <strings...>", "Statuses of markets to display", "Active")
+  .option(
+    "--statuses [strings...]",
+    "Statuses of markets to display. By default shows all statuses."
+  )
+  .option(
+    "--tags [strings...]",
+    "Filter markets by supplied tags. By default shows all tags."
+  )
   .option("--page-number <number>", "Page number of market results", "1")
   .option("--page-size <number>", "Page size for the results", "100")
   .option(
@@ -812,6 +819,7 @@ program
       graphQlEndpoint,
       endpoint,
       statuses,
+      tags,
       pageNumber,
       pageSize,
       ordering,
@@ -821,7 +829,8 @@ program
     }: {
       graphQlEndpoint: string;
       endpoint: string;
-      statuses: string | string[];
+      statuses?: string | string[];
+      tags?: string | string[];
       pageNumber: string;
       pageSize: string;
       ordering: string;
@@ -832,8 +841,12 @@ program
       if (typeof statuses === "string") {
         statuses = [statuses];
       }
+      if (typeof tags === "string") {
+        tags = [tags];
+      }
       catchErrorsAndExit(queryFilteredMarkets, {
         statuses,
+        tags,
         graphQlEndpoint,
         endpoint,
         pageNumber: Number(pageNumber),
