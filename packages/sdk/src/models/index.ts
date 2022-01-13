@@ -2,7 +2,7 @@ import { ApiPromise } from "@polkadot/api";
 import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { hexToNumber } from "@polkadot/util";
-import { getEstimatedFee, unsubOrWarns } from "../util";
+import { estimatedFee, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
@@ -126,8 +126,9 @@ export default class Models {
     weights: string[],
     keep: string[],
     metadata: DecodedMarketMetadata,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const ipfs = new IPFS();
 
@@ -152,10 +153,13 @@ export default class Models {
       keep
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
-
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
     return new Promise(async (resolve) => {
       const _callback = (
         result: ISubmittableResult,
@@ -232,8 +236,9 @@ export default class Models {
     mdm: MarketDisputeMechanism,
     scoringRule = "CPMM",
     metadata: DecodedMarketMetadata,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const ipfs = new IPFS();
     const categories = metadata.categories;
@@ -256,9 +261,13 @@ export default class Models {
       scoringRule
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     return new Promise(async (resolve) => {
       const _callback = (
@@ -331,8 +340,9 @@ export default class Models {
     bounds = [0, 100],
     mdm: MarketDisputeMechanism,
     scoringRule = "CPMM",
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const ipfs = new IPFS();
 
@@ -356,9 +366,13 @@ export default class Models {
       scoringRule
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     return new Promise(async (resolve) => {
       const _callback = (
@@ -896,8 +910,9 @@ export default class Models {
     dest: string,
     currencyId: CurrencyIdOf,
     amount: number,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string | boolean> => {
     const _callback = (
       result: ISubmittableResult,
@@ -924,9 +939,13 @@ export default class Models {
 
     const tx = this.api.tx.currency.transfer(dest, currencyId, amount);
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {

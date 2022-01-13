@@ -4,7 +4,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { KeyringPairOrExtSigner, AssetId, poolJoinOpts } from "../types";
 import {
   AssetIdFromString,
-  getEstimatedFee,
+  estimatedFee,
   isExtSigner,
   unsubOrWarns,
 } from "../util";
@@ -130,7 +130,7 @@ export default class Swap {
   //   signer: KeyringPairOrExtSigner,
   //   assets: string[],
   //   weights?: string[],
-  //   callback?: (result: ISubmittableResult, _unsub: () => void) => void
+  //   callbackOrPaymentInfo: (((result: ISubmittableResult, _unsub: () => void) => void) | boolean) = false
   // ): Promise<string> => {
   //     if (assets.length !== weights.length) {
   //       throw new Error("Relative weights were supplied, but they do not cover all assets.");
@@ -151,14 +151,15 @@ export default class Swap {
    * @param signer The actual signer provider to sign the transaction.
    * @param poolAmountOut The amount of LP shares for this pool that should be minted to the provider.
    * @param maxAmountsIn List of asset upper bounds. The values are maximum limit for the assets.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   joinPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountOut: string,
     maxAmountsIn: string[],
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string | boolean> => {
     const tx = this.api.tx.swaps.poolJoin(
       this.poolId,
@@ -166,9 +167,13 @@ export default class Swap {
       maxAmountsIn
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -220,15 +225,16 @@ export default class Swap {
    * @param assetIn Asset entering the pool.
    * @param assetAmount Asset amount that is entering the pool.
    * @param minPoolAmount The calculated amount for the pool must be equal or greater than the given value.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   poolJoinWithExactAssetAmount = async (
     signer: KeyringPairOrExtSigner,
     assetIn: any,
     assetAmount: any,
     minPoolAmount: any,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string | boolean> => {
     // Create the transaction type and supply it with the arguments.
     const tx = this.api.tx.swaps.poolJoinWithExactAssetAmount(
@@ -238,9 +244,13 @@ export default class Swap {
       minPoolAmount
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     // Define the default callback if none is provided by the invoker of this function.
     const _callback = (
@@ -292,13 +302,14 @@ export default class Swap {
    * @param opts To be provided with `asset`, `bounds.assetAmount`, `bounds.poolMin` for MinPool
    * and with `asset`, `bounds.poolAmount`, `bounds.AssetMin` for MaxAsset
    * and with `bounds.poolAmount`, `bounds.AssetMin` for `sdk.models.swaps.joinPool`.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   joinPoolMultifunc = async (
     signer: KeyringPairOrExtSigner,
     opts: poolJoinOpts,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string | boolean> => {
     const _callback = (
       result: ISubmittableResult,
@@ -383,9 +394,13 @@ export default class Swap {
         poolId, bounds = { assetAmount, poolMin } \n`);
     }
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     return new Promise(async (resolve) => {
       if (isExtSigner(signer)) {
@@ -413,14 +428,15 @@ export default class Swap {
    * @param signer The actual signer provider to sign the transaction.
    * @param poolAmountIn The amount of LP shares of this pool being burned based on the retrieved assets.
    * @param minAmountsOut List of asset lower bounds. The values are minimum limit for the assets.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   exitPool = async (
     signer: KeyringPairOrExtSigner,
     poolAmountIn: string,
     minAmountsOut: string[],
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string | boolean> => {
     const tx = this.api.tx.swaps.poolExit(
       this.poolId,
@@ -428,9 +444,13 @@ export default class Swap {
       minAmountsOut
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -485,7 +505,7 @@ export default class Swap {
    * @param assetOut Asset leaving the pool.
    * @param minAmountOut Minimum asset amount that can leave the pool.
    * @param maxPrice Market price must be equal or less than the provided value.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   swapExactAmountIn = async (
     signer: KeyringPairOrExtSigner,
@@ -494,8 +514,9 @@ export default class Swap {
     assetOut: string,
     minAmountOut: string,
     maxPrice: string,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string | boolean> => {
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
@@ -506,9 +527,13 @@ export default class Swap {
       maxPrice
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -563,7 +588,7 @@ export default class Swap {
    * @param assetOut Asset leaving the pool.
    * @param assetAmountOut Amount that will be transferred from the pool to the provider.
    * @param maxPrice Market price must be equal or less than the provided value.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   swapExactAmountOut = async (
     signer: KeyringPairOrExtSigner,
@@ -572,8 +597,9 @@ export default class Swap {
     assetOut: string,
     assetAmountOut: string,
     maxPrice: string,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string | boolean> => {
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
@@ -584,9 +610,13 @@ export default class Swap {
       maxPrice
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,

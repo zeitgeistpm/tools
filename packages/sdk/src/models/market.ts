@@ -17,7 +17,7 @@ import {
   ScoringRule,
   MarketDisputeMechanism,
 } from "../types";
-import { getEstimatedFee, isExtSigner, unsubOrWarns } from "../util";
+import { estimatedFee, isExtSigner, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
@@ -217,14 +217,15 @@ class Market {
    * Creates swap pool for this market via `api.tx.predictionMarkets.deploySwapPoolForMarket(marketId, weights)`.
    * @param signer The actual signer provider to sign the transaction.
    * @param weights List of lengths for each asset.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    * @throws Error if swap pool already exists for the market.
    */
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
     weights: string[],
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId) {
@@ -236,9 +237,13 @@ class Market {
       weights
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -341,22 +346,27 @@ class Market {
    * Note: This is the only way to create new shares.
    * @param signer The actual signer provider to sign the transaction.
    * @param amount The amount of each share.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   async buyCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const tx = this.api.tx.predictionMarkets.buyCompleteSet(
       this.marketId,
       amount
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -402,22 +412,27 @@ class Market {
    * Sells/Destroys a complete set of outcome shares for the market.
    * @param signer The actual signer provider to sign the transaction.
    * @param amount The amount of each share.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   async sellCompleteSet(
     signer: KeyringPairOrExtSigner,
     amount: number,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const tx = this.api.tx.predictionMarkets.sellCompleteSet(
       this.marketId,
       amount
     );
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -463,18 +478,24 @@ class Market {
    * Reports an outcome for the market.
    * @param signer The actual signer provider to sign the transaction.
    * @param outcome The outcome of the market
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   async reportOutcome(
     signer: KeyringPairOrExtSigner,
     outcome: OutcomeReport,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const tx = this.api.tx.predictionMarkets.report(this.marketId, outcome);
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -522,18 +543,24 @@ class Market {
    * Submits a disputed outcome for the market.
    * @param signer The actual signer provider to sign the transaction.
    * @param outcome The outcome of the market
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   async dispute(
     signer: KeyringPairOrExtSigner,
     outcome: OutcomeReport,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const tx = this.api.tx.predictionMarkets.dispute(this.marketId, outcome);
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -581,17 +608,23 @@ class Market {
    * Redeems the winning shares for the market.
    * @param signer The actual signer provider to sign the transaction.
    * @param outcome The outcome of the market
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   async redeemShares(
     signer: KeyringPairOrExtSigner,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string | boolean> {
     const tx = this.api.tx.predictionMarkets.redeemShares(this.marketId);
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -638,17 +671,23 @@ class Market {
   /**
    * Approves the `Proposed` market that is waiting for approval from the advisory committee.
    * @param signer The actual signer provider to sign the transaction.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   async approve(
     signer: KeyringPairOrExtSigner,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const tx = this.api.tx.predictionMarkets.approveMarket(this.marketId);
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -697,17 +736,23 @@ class Market {
   /**
    * Rejects the `Proposed` market that is waiting for approval from the advisory committee.
    * @param signer The actual signer provider to sign the transaction.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   async reject(
     signer: KeyringPairOrExtSigner,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const tx = this.api.tx.predictionMarkets.rejectMarket(this.marketId);
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,
@@ -756,18 +801,23 @@ class Market {
   /**
    * Allows the proposer of the market that is currently in a `Proposed` state to cancel the market proposal.
    * @param signer The actual signer provider to sign the transaction.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   async cancelAdvised(
     signer: KeyringPairOrExtSigner,
-    paymentInfo: boolean,
-    callback?: (result: ISubmittableResult, _unsub: () => void) => void
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
   ): Promise<string> {
     const tx = this.api.tx.predictionMarkets.cancelPendingMarket(this.marketId);
 
-    if (paymentInfo) {
-      return getEstimatedFee(tx, signer.address);
+    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
     }
+    const callback =
+      typeof callbackOrPaymentInfo !== "boolean"
+        ? callbackOrPaymentInfo
+        : undefined;
 
     const _callback = (
       result: ISubmittableResult,

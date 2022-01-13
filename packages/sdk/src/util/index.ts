@@ -103,7 +103,7 @@ export const AssetIdFromString = (stringAsset: string | AssetId): AssetId => {
   );
 };
 
-export const getEstimatedFee = async (
+export const estimatedFee = async (
   tx: SubmittableExtrinsic<"promise", ISubmittableResult>,
   address: string
 ) => {
