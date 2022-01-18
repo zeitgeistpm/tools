@@ -480,6 +480,7 @@ export default class Models {
       categories: data.categories,
       description: data.description,
       tags: data.tags ?? [],
+      img: data.img,
     };
 
     const marketTypeAsType = this.api.createType("MarketType", marketType);
