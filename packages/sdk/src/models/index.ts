@@ -62,8 +62,12 @@ export default class Models {
   async getAllMarketIds(): Promise<number[]> {
     if (this.graphQLClient != null) {
       const query = gql`
-        {
-          markets {
+        query marketIds($limit: Int!) {
+          markets(
+            where: { slug_contains: "" }
+            orderBy: marketId_ASC
+            limit: $limit
+          ) {
             marketId
           }
         }
@@ -71,7 +75,7 @@ export default class Models {
 
       const data = await this.graphQLClient.request<{
         markets: { marketId: number }[];
-      }>(query);
+      }>(query, { limit: Math.pow(2, 31) - 1 });
       return data.markets.map((i) => i.marketId);
     }
 
@@ -517,7 +521,7 @@ export default class Models {
   private async queryMarket(marketId: MarketId): Promise<Market> {
     const query = gql`
       query marketData($marketId: Int!) {
-        markets(where: { marketId_eq: $marketId }) {
+        markets(where: { marketId_eq: $marketId, slug_contains: "" }) {
           ...MarketDetails
         }
       }
@@ -571,6 +575,7 @@ export default class Models {
             tags_containsAll: $tags
             creator_eq: $creator
             oracle_eq: $oracle
+            slug_contains: ""
           }
           limit: $pageSize
           offset: $offset
