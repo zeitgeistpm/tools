@@ -244,6 +244,7 @@ export type MarketIdOf = MarketId;
 export type MarketStatusText =
   | "Proposed"
   | "Active"
+  | "Ended"
   | "Reported"
   | "Disputed"
   | "Resolved";
