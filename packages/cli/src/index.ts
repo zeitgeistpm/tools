@@ -797,6 +797,11 @@ program
     "--tags [strings...]",
     "Filter markets by supplied tags. By default shows all tags."
   )
+  .option("--slug [string]", "Get markets that contain this text in a slug")
+  .option(
+    "--question [string]",
+    "Get markets that contain this text in a question"
+  )
   .option("--page-number <number>", "Page number of market results", "1")
   .option("--page-size <number>", "Page size for the results", "100")
   .option(
@@ -820,6 +825,8 @@ program
       endpoint,
       statuses,
       tags,
+      slug,
+      question,
       pageNumber,
       pageSize,
       ordering,
@@ -831,6 +838,8 @@ program
       endpoint: string;
       statuses?: string | string[];
       tags?: string | string[];
+      slug?: string;
+      question?: string;
       pageNumber: string;
       pageSize: string;
       ordering: string;
@@ -847,6 +856,8 @@ program
       catchErrorsAndExit(queryFilteredMarkets, {
         statuses,
         tags,
+        slug,
+        question,
         graphQlEndpoint,
         endpoint,
         pageNumber: Number(pageNumber),

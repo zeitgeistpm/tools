@@ -534,6 +534,12 @@ export default class Models {
 
     const queriedMarketData = data.markets[0];
 
+    const now = (await this.api.query.timestamp.now()).toNumber();
+
+    if (queriedMarketData.end < BigInt(now)) {
+      queriedMarketData.status = "Ended";
+    }
+
     return this.constructMarketFromQueryData(queriedMarketData);
   }
 
@@ -541,11 +547,15 @@ export default class Models {
     {
       statuses,
       tags,
+      slug = "",
+      question,
       creator,
       oracle,
     }: {
       statuses?: MarketStatusText[];
       tags?: string[];
+      slug?: string;
+      question?: string;
       creator?: string;
       oracle?: string;
     },
@@ -555,28 +565,47 @@ export default class Models {
       pageSize: number;
       pageNumber: number;
     } = { ordering: "desc", orderBy: "newest", pageSize: 10, pageNumber: 1 }
-  ): Promise<Market[]> {
+  ): Promise<{ result: Market[]; count: number }> {
     if (this.graphQLClient == null) {
       throw Error("(getMarketsWithStatuses) cannot use without graphQLClient.");
     }
-    const query = gql`
+    const containsEnded = statuses?.includes("Ended") ?? false;
+    const containsActive = statuses?.includes("Active") ?? false;
+
+    if (containsEnded) {
+      statuses = statuses.filter((s) => s !== "Ended");
+      if (!containsActive) {
+        statuses.push("Active");
+      }
+    }
+
+    const wherePart = `where: {
+      status_in: $statuses
+      tags_containsAll: $tags
+      creator_eq: $creator
+      oracle_eq: $oracle
+      slug_contains: $slug
+      question_contains: $question
+      end_gt: $lt_end
+      end_lt: $gt_end
+    }`;
+
+    const marketsQuery = gql`
       query marketPage(
         $statuses: [String!]
         $tags: [String!]
+        $slug: String
+        $question: String
         $pageSize: Int!
         $offset: Int!
         $orderByQuery: [MarketOrderByInput!]
         $creator: String
         $oracle: String
+        $lt_end: BigInt
+        $gt_end: BigInt
       ) {
         markets(
-          where: {
-            status_in: $statuses
-            tags_containsAll: $tags
-            creator_eq: $creator
-            oracle_eq: $oracle
-            slug_contains: ""
-          }
+          ${wherePart}
           limit: $pageSize
           offset: $offset
           orderBy: $orderByQuery
@@ -585,6 +614,27 @@ export default class Models {
         }
       }
       ${FRAGMENT_MARKET_DETAILS}
+    `;
+
+    const totalCountQuery = gql`
+      query totalCount(
+        $statuses: [String!]
+        $tags: [String!]
+        $slug: String
+        $question: String
+        $orderByQuery: [MarketOrderByInput!]
+        $creator: String
+        $oracle: String
+        $lt_end: BigInt
+        $gt_end: BigInt
+      ) {
+        marketsConnection(
+          ${wherePart}
+          orderBy: $orderByQuery
+        ) {
+          totalCount
+        }
+      }
     `;
 
     const { pageSize, pageNumber, ordering, orderBy } = paginationOptions;
@@ -596,21 +646,56 @@ export default class Models {
     }
     const orderByQuery =
       orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
-    const data = await this.graphQLClient.request<{
+
+    const timestamp = (await this.api.query.timestamp.now()).toNumber();
+
+    const marketsData = await this.graphQLClient.request<{
       markets: MarketQueryData[];
-    }>(query, {
+    }>(marketsQuery, {
       statuses,
       tags,
+      slug,
+      question,
       pageSize,
       offset,
       orderByQuery,
       creator,
       oracle,
+      lt_end: !containsEnded && containsActive ? timestamp : undefined,
+      gt_end: containsEnded && !containsActive ? timestamp : undefined,
     });
 
-    const { markets: queriedMarkets } = data;
+    const { markets: queriedMarkets } = marketsData;
 
-    return queriedMarkets.map((m) => this.constructMarketFromQueryData(m));
+    const totalCountData = await this.graphQLClient.request<{
+      marketsConnection: {
+        totalCount: number;
+      };
+    }>(totalCountQuery, {
+      statuses,
+      tags,
+      slug,
+      question,
+      orderByQuery,
+      creator,
+      oracle,
+      lt_end: !containsEnded && containsActive ? timestamp : undefined,
+      gt_end: containsEnded && !containsActive ? timestamp : undefined,
+    });
+
+    const { totalCount: count } = totalCountData.marketsConnection;
+
+    for (const market of queriedMarkets) {
+      if (market.end < BigInt(timestamp)) {
+        market.status = "Ended";
+      }
+    }
+
+    const result = queriedMarkets.map((m) =>
+      this.constructMarketFromQueryData(m)
+    );
+
+    return { result, count };
   }
 
   /**
