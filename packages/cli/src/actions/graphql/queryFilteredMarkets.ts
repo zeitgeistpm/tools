@@ -18,6 +18,7 @@ type Options = {
   pageSize: number;
   creator?: string;
   oracle?: string;
+  liquidityOnly?: boolean;
 };
 
 const queryFilteredMarkets = async (opts: Options): Promise<void> => {
@@ -34,12 +35,13 @@ const queryFilteredMarkets = async (opts: Options): Promise<void> => {
     pageSize,
     creator,
     oracle,
+    liquidityOnly,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint, { graphQlEndpoint });
 
   const { result, count } = await sdk.models.filterMarkets(
-    { statuses, creator, oracle, tags, slug, question },
+    { statuses, creator, oracle, tags, slug, question, liquidityOnly },
     {
       ordering,
       orderBy,

@@ -791,16 +791,20 @@ program
   )
   .option(
     "--statuses [strings...]",
-    "Statuses of markets to display. By default shows all statuses."
+    "Statuses of markets to display. By default shows all statuses"
   )
   .option(
     "--tags [strings...]",
-    "Filter markets by supplied tags. By default shows all tags."
+    "Filter markets by supplied tags. By default shows all tags"
   )
   .option("--slug [string]", "Get markets that contain this text in a slug")
   .option(
     "--question [string]",
     "Get markets that contain this text in a question"
+  )
+  .option(
+    "--no-liquidity",
+    "Show markets without liquidity in results. By default only markets with liquidity are shown"
   )
   .option("--page-number <number>", "Page number of market results", "1")
   .option("--page-size <number>", "Page size for the results", "100")
@@ -833,6 +837,7 @@ program
       orderBy,
       creator,
       oracle,
+      liquidity,
     }: {
       graphQlEndpoint: string;
       endpoint: string;
@@ -846,6 +851,7 @@ program
       orderBy: string;
       creator?: string;
       oracle?: string;
+      liquidity: boolean;
     }) => {
       if (typeof statuses === "string") {
         statuses = [statuses];
@@ -866,6 +872,7 @@ program
         orderBy,
         creator,
         oracle,
+        liquidityOnly: liquidity,
       });
     }
   );
