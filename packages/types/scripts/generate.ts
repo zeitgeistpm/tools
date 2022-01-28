@@ -2,8 +2,6 @@
 // @ts-nocheck
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-import { Metadata } from '@polkadot/types';
-import { TypeRegistry } from '@polkadot/types/create';
 import { generateInterfaceTypes } from '@polkadot/typegen/generate/interfaceRegistry';
 import { generateTsDef } from '@polkadot/typegen/generate/tsDef';
 // import {
@@ -12,29 +10,10 @@ import { generateTsDef } from '@polkadot/typegen/generate/tsDef';
 //   generateDefaultTx,
 //   generateDefaultRpc
 // } from '@polkadot/typegen/generate';
-import { registerDefinitions } from '@polkadot/typegen/util';
-import metaHex from '../src/metadata/static-latest';
+// import metaHex from '../src/metadata/static-latest';
 
 import * as defaultDefinitions from '@polkadot/types/interfaces/definitions';
 import * as zgDefinitions from '../src/interfaces/definitions';
-
-// Only keep our own modules to avoid confllicts with the one provided by polkadot.js
-// TODO: make an issue on polkadot.js
-function filterModules(names: string[], defs: any): string {
-  const registry = new TypeRegistry();
-  registerDefinitions(registry, defs);
-
-  const metadata = new Metadata(registry, metaHex);
-
-  // hack https://github.com/polkadot-js/api/issues/2687#issuecomment-705342442
-  metadata.asLatest.toJSON();
-
-  const filtered = metadata.toJSON() as any;
-
-  filtered.metadata.v13.modules = filtered.metadata.v13.modules.filter(({ name }: any) => names.includes(name));
-
-  return new Metadata(registry, filtered).toHex();
-}
 
 // // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { ...substrateDefinitions } = defaultDefinitions;
@@ -43,15 +22,6 @@ const definitions = {
   '@polkadot/types/interfaces': substrateDefinitions,
   '@zeitgeistpm/types/interfaces': zgDefinitions
 } as any;
-
-const metadata = filterModules(
-  [
-    'Orderbook',
-    'PredictionMarkets',
-    'Swaps'
-  ],
-  definitions
-);
 
 generateTsDef(definitions, 'packages/types/src/interfaces', '@zeitgeistpm/types/interfaces');
 generateInterfaceTypes(definitions, 'packages/types/src/interfaces/augment-types.ts');

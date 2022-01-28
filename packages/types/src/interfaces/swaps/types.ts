@@ -1,7 +1,7 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { BTreeMap, Enum, Option, Struct, Vec, u128 } from '@polkadot/types';
+import type { BTreeMap, Enum, Option, Struct, Vec, u128 } from '@polkadot/types-codec';
 import type { AccountId, Balance } from '@polkadot/types/interfaces/runtime';
 import type { Asset } from '@zeitgeistpm/types/interfaces/index';
 import type { MarketId, MarketPeriod, ScoringRule } from '@zeitgeistpm/types/interfaces/predictionMarkets';
