@@ -102,7 +102,7 @@ const derbyIndex = async () => {
       allKeys.map(async (key) => {
         const pubkey = key.toString().slice(-64);
         const address = encodeAddress("0x" + pubkey);
-        const data = await sdk.api.query.system.account(address);
+        const data = await sdk.api.query.system.account(address) as any;
         return [address.toString(), data.data.free.toString()];
       })
     );

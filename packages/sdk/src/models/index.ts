@@ -587,7 +587,7 @@ export default class Models {
 
     const queriedMarketData = data.markets[0];
 
-    const now = (await this.api.query.timestamp.now()).toNumber();
+    const now = (await this.api.query.timestamp.now() as any).toNumber();
 
     if (queriedMarketData.end < BigInt(now)) {
       queriedMarketData.status = "Ended";
@@ -703,7 +703,7 @@ export default class Models {
     const orderByQuery =
       orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
 
-    const timestamp = (await this.api.query.timestamp.now()).toNumber();
+    const timestamp = (await this.api.query.timestamp.now() as any).toNumber();
 
     const marketsData = await this.graphQLClient.request<{
       markets: MarketQueryData[];
