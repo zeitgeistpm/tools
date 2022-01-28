@@ -68,6 +68,9 @@ class Market {
   /** The image for the market. */
   img?: string;
 
+  /** Liquidty pool id. */
+  poolId?: number;
+
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
 
@@ -178,6 +181,9 @@ class Market {
    * Returns null if no swap pool is available for the market
    */
   getPoolId = async (): Promise<number | null> => {
+    if (this.poolId) {
+      return this.poolId;
+    }
     return (
       await this.api.query.marketCommons.marketPool(this.marketId)
     ).toHuman() as number;

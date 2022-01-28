@@ -515,6 +515,9 @@ export default class Models {
     };
 
     const market = new Market(marketId, basicMarketData, metadata, this.api);
+    if (data.poolId != null) {
+      market.poolId = data.poolId;
+    }
     return market;
   }
 
@@ -551,6 +554,7 @@ export default class Models {
       question,
       creator,
       oracle,
+      liquidityOnly = true,
     }: {
       statuses?: MarketStatusText[];
       tags?: string[];
@@ -558,6 +562,7 @@ export default class Models {
       question?: string;
       creator?: string;
       oracle?: string;
+      liquidityOnly?: boolean;
     },
     paginationOptions: {
       ordering: MarketsOrdering;
@@ -588,6 +593,7 @@ export default class Models {
       question_contains: $question
       end_gt: $lt_end
       end_lt: $gt_end
+      poolId_gte: $minPoolId
     }`;
 
     const marketsQuery = gql`
@@ -603,6 +609,7 @@ export default class Models {
         $oracle: String
         $lt_end: BigInt
         $gt_end: BigInt
+        $minPoolId: Int
       ) {
         markets(
           ${wherePart}
@@ -622,15 +629,14 @@ export default class Models {
         $tags: [String!]
         $slug: String
         $question: String
-        $orderByQuery: [MarketOrderByInput!]
         $creator: String
         $oracle: String
         $lt_end: BigInt
         $gt_end: BigInt
+        $minPoolId: Int
       ) {
         marketsConnection(
           ${wherePart}
-          orderBy: $orderByQuery
         ) {
           totalCount
         }
@@ -663,6 +669,7 @@ export default class Models {
       oracle,
       lt_end: !containsEnded && containsActive ? timestamp : undefined,
       gt_end: containsEnded && !containsActive ? timestamp : undefined,
+      minPoolId: liquidityOnly ? 0 : undefined,
     });
 
     const { markets: queriedMarkets } = marketsData;
@@ -676,11 +683,11 @@ export default class Models {
       tags,
       slug,
       question,
-      orderByQuery,
       creator,
       oracle,
       lt_end: !containsEnded && containsActive ? timestamp : undefined,
       gt_end: containsEnded && !containsActive ? timestamp : undefined,
+      minPoolId: liquidityOnly ? 0 : undefined,
     });
 
     const { totalCount: count } = totalCountData.marketsConnection;
