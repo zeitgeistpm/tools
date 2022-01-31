@@ -36,6 +36,7 @@ import viewSwap from "./actions/viewSwap";
 import queryAllMarketIds from "./actions/graphql/queryAllMarketIds";
 import queryMarket from "./actions/graphql/queryMarket";
 import queryFilteredMarkets from "./actions/graphql/queryFilteredMarkets";
+import queryAllActiveAssets from "./actions/graphql/queryAllActiveAssets";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -874,6 +875,30 @@ program
         oracle,
         liquidityOnly: liquidity,
       });
+    }
+  );
+
+program
+  .command("queryAllActiveAssets")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--graphQlEndpoint <string>",
+    "Endpoint of the graphql query node",
+    "https://processor.zeitgeist.pm/graphql"
+  )
+  .action(
+    ({
+      endpoint,
+      graphQlEndpoint,
+    }: {
+      graphQlEndpoint: string;
+      endpoint: string;
+    }) => {
+      catchErrorsAndExit(queryAllActiveAssets, { graphQlEndpoint, endpoint });
     }
   );
 
