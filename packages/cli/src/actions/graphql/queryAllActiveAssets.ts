@@ -12,7 +12,7 @@ const queryAllActiveAssets = async (opts: Options): Promise<void> => {
 
   const res = await sdk.models.queryAllActiveAssets();
 
-  console.log(res);
+  console.log(JSON.stringify(res, undefined, 4));
 };
 
 export default queryAllActiveAssets;
