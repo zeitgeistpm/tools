@@ -176,7 +176,7 @@ export default class Models {
         if (status.isInBlock) {
           console.log(`Transaction included at blockHash ${status.asInBlock}`);
           events.forEach(({ phase, event: { data, method, section } }) => {
-            //console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
 
             if (method == "MarketCreated") {
               unsubOrWarns(_unsub);
@@ -187,9 +187,9 @@ export default class Models {
             if (method == "PoolCreate") {
               unsubOrWarns(_unsub);
               console.log(
-                `Canonical pool for market deployed - pool ID: ${data[0]["pool_id"]}`
+                `Canonical pool for market deployed - pool ID: ${data[0]["poolId"]}`
               );
-              _resolve(data[0]["pool_id"]);
+              _resolve(data[0]["poolId"]);
             }
             if (method == "ExtrinsicFailed") {
               unsubOrWarns(_unsub);
@@ -452,7 +452,9 @@ export default class Models {
         }
       }
     `;
-    const timestamp = (await this.api.query.timestamp.now()).toNumber();
+    const timestamp = parseInt(
+      (await this.api.query.timestamp.now()).toString()
+    );
 
     const data = await this.graphQLClient.request<{
       markets: { outcomeAssets: string[]; marketId: number; poolId: number }[];
@@ -551,17 +553,17 @@ export default class Models {
       end: data.end,
       creation: data.creation,
       creator: data.creator,
-      creator_fee: 0,
-      scoring_rule: data.scoringRule,
+      creatorFee: 0,
+      scoringRule: data.scoringRule,
       oracle: data.oracle,
       status: data.status,
       outcomeAssets,
-      market_type: marketTypeAsType,
+      marketType: marketTypeAsType,
       mdm: this.api.createType("MarketDisputeMechanism", mdm).toJSON(),
       report: marketReport,
       period: this.api.createType("MarketPeriod", marketPeriod).toJSON(),
       //@ts-ignore
-      resolved_outcome: data.resolvedOutcome,
+      resolvedOutcome: data.resolvedOutcome,
     };
 
     const market = new Market(marketId, basicMarketData, metadata, this.api);
@@ -587,7 +589,7 @@ export default class Models {
 
     const queriedMarketData = data.markets[0];
 
-    const now = (await this.api.query.timestamp.now()).toNumber();
+    const now = parseInt((await this.api.query.timestamp.now()).toString());
 
     if (queriedMarketData.end < BigInt(now)) {
       queriedMarketData.status = "Ended";
@@ -703,7 +705,9 @@ export default class Models {
     const orderByQuery =
       orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
 
-    const timestamp = (await this.api.query.timestamp.now()).toNumber();
+    const timestamp = parseInt(
+      (await this.api.query.timestamp.now()).toString()
+    );
 
     const marketsData = await this.graphQLClient.request<{
       markets: MarketQueryData[];
@@ -796,12 +800,12 @@ export default class Models {
 
     basicMarketData.outcomeAssets = this.createAssetsForMarket(
       marketId,
-      market.market_type
+      market.marketType
     );
 
     basicMarketData.report = market.report.isSome ? market.report.value : null;
-    basicMarketData.resolved_outcome = market.resolved_outcome.isSome
-      ? market.resolved_outcome.value.toNumber()
+    basicMarketData.resolvedOutcome = market.resolvedOutcome.isSome
+      ? market.resolvedOutcome.value.toNumber()
       : null;
 
     return new Market(

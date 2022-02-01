@@ -1,9 +1,9 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { Enum, Option, Struct, U8aFixed, Vec, i128, u128, u16, u32, u64 } from '@polkadot/types';
+import type { Enum, Option, Struct, U8aFixed, Vec, i128, u128, u16, u32, u64 } from '@polkadot/types-codec';
+import type { ITuple } from '@polkadot/types-codec/types';
 import type { AccountId, AccountId32, Balance, MultiAddress, Perbill, Percent } from '@polkadot/types/interfaces/runtime';
-import type { ITuple } from '@polkadot/types/types';
 import type { MarketId } from '@zeitgeistpm/types/interfaces/predictionMarkets';
 
 /** @name Address */
@@ -48,10 +48,10 @@ export interface Collator2 extends Struct {
   readonly id: AccountId;
   readonly bond: Balance;
   readonly nominators: Vec<AccountId>;
-  readonly top_nominators: Vec<Bond>;
-  readonly bottom_nominators: Vec<Bond>;
-  readonly total_counted: Balance;
-  readonly total_backing: Balance;
+  readonly topNominators: Vec<Bond>;
+  readonly bottomNominators: Vec<Bond>;
+  readonly totalCounted: Balance;
+  readonly totalBacking: Balance;
   readonly state: CollatorStatus;
 }
 
@@ -90,8 +90,8 @@ export interface DelegatorStatus extends Enum {
 
 /** @name EmaConfig */
 export interface EmaConfig extends Struct {
-  readonly ema_period: Timespan;
-  readonly ema_period_estimate_after: Option<Timespan>;
+  readonly emaPeriod: Timespan;
+  readonly emaPeriodEstimateAfter: Option<Timespan>;
   readonly smoothing: u128;
 }
 
@@ -100,18 +100,18 @@ export interface EmaMarketVolume extends Struct {
   readonly config: EmaConfig;
   readonly ema: u128;
   readonly multiplier: u128;
-  readonly last_time: UnixTimestamp;
+  readonly lastTime: UnixTimestamp;
   readonly state: MarketVolumeState;
-  readonly start_time: UnixTimestamp;
-  readonly volumes_per_period: u128;
+  readonly startTime: UnixTimestamp;
+  readonly volumesPerPeriod: u128;
 }
 
 /** @name ExitQ */
 export interface ExitQ extends Struct {
   readonly candidates: Vec<AccountId>;
-  readonly nominators_leaving: Vec<AccountId>;
-  readonly candidate_schedule: Vec<ITuple<[AccountId, RoundIndex]>>;
-  readonly nominator_schedule: Vec<ITuple<[AccountId, Option<AccountId>, RoundIndex]>>;
+  readonly nominatorsLeaving: Vec<AccountId>;
+  readonly candidateSchedule: Vec<ITuple<[AccountId, RoundIndex]>>;
+  readonly nominatorSchedule: Vec<ITuple<[AccountId, Option<AccountId>, RoundIndex]>>;
 }
 
 /** @name FeeSigmoid */
@@ -124,8 +124,8 @@ export interface FeeSigmoidConfig extends Struct {
   readonly m: i128;
   readonly p: i128;
   readonly n: i128;
-  readonly initial_fee: i128;
-  readonly min_revenue: i128;
+  readonly initialFee: i128;
+  readonly minRevenue: i128;
 }
 
 /** @name Index */
@@ -170,8 +170,8 @@ export interface Nominator2 extends Struct {
   readonly delegations: Vec<Bond>;
   readonly revocations: Vec<AccountId>;
   readonly total: Balance;
-  readonly scheduled_revocations_count: u32;
-  readonly scheduled_revocations_total: Balance;
+  readonly scheduledRevocationsCount: u32;
+  readonly scheduledRevocationsTotal: Balance;
   readonly status: DelegatorStatus;
 }
 
@@ -188,10 +188,10 @@ export interface OrderedSet extends Vec<Bond> {}
 
 /** @name OwnedValuesParams */
 export interface OwnedValuesParams extends Struct {
-  readonly participated_blocks: BlockNumber;
-  readonly perpetual_incentives: Balance;
-  readonly total_incentives: Balance;
-  readonly total_shares: Balance;
+  readonly participatedBlocks: BlockNumber;
+  readonly perpetualIncentives: Balance;
+  readonly totalIncentives: Balance;
+  readonly totalShares: Balance;
 }
 
 /** @name ParachainBondConfig */
@@ -219,22 +219,22 @@ export interface RelayChainAccountId extends AccountId32 {}
 
 /** @name RewardInfo */
 export interface RewardInfo extends Struct {
-  readonly total_reward: Balance;
-  readonly claimed_reward: Balance;
+  readonly totalReward: Balance;
+  readonly claimedReward: Balance;
 }
 
 /** @name Rikiddo */
 export interface Rikiddo extends Struct {
   readonly config: RikiddoConfig;
   readonly fees: FeeSigmoid;
-  readonly ma_short: EmaMarketVolume;
-  readonly ma_long: EmaMarketVolume;
+  readonly maShort: EmaMarketVolume;
+  readonly maLong: EmaMarketVolume;
 }
 
 /** @name RikiddoConfig */
 export interface RikiddoConfig extends Struct {
-  readonly initial_fee: i128;
-  readonly log2_e: i128;
+  readonly initialFee: i128;
+  readonly log2E: i128;
 }
 
 /** @name RoundIndex */

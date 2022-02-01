@@ -89,8 +89,8 @@ export const MockApi = {
     swaps: {
       pools: (poolId) => ({
         assets: ['1', '2'],
-        swap_fee: 0,
-        total_weight: 0,
+        swapFee: 0,
+        totalWeight: 0,
         weights: [0,0],
         shareId: () => 0,
         accountId: () => 0,

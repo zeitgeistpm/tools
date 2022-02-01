@@ -63,7 +63,7 @@ class Market {
   /** Market tags */
   public tags: string[];
 
-  public confidential_id?: string;
+  public confidentialId?: string;
 
   /** The image for the market. */
   img?: string;
@@ -84,14 +84,14 @@ class Market {
     ({
       creator: this.creator,
       creation: this.creation,
-      creator_fee: this.creatorFee,
+      creatorFee: this.creatorFee,
       oracle: this.oracle,
       period: this.period,
-      scoring_rule: this.scoringRule,
-      market_type: this.marketType,
+      scoringRule: this.scoringRule,
+      marketType: this.marketType,
       status: this.status,
       report: this.report,
-      resolved_outcome: this.resolvedOutcome,
+      resolvedOutcome: this.resolvedOutcome,
       mdm: this.mdm,
       outcomeAssets: this.outcomeAssets,
       end: this.end,
@@ -103,7 +103,7 @@ class Market {
       description: this.description,
       categories: this.categories,
       tags: this.tags,
-      confidential_id: this.confidential_id,
+      confidentialId: this.confidentialId,
       img: this.img,
     } = decodedMetadata);
 
@@ -167,11 +167,11 @@ class Market {
       return this.period.timestamp[1];
     }
 
-    const now = (await this.api.query.timestamp.now()).toNumber();
+    const now = parseInt((await this.api.query.timestamp.now()).toString());
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
     const diffInMs =
-      this.api.consts.timestamp.minimumPeriod.toNumber() *
+      parseInt(this.api.consts.timestamp.minimumPeriod.toString()) *
       (this.period.block[1] - blockNum);
     return now + diffInMs;
   }

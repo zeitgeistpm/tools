@@ -1,23 +1,23 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { Bytes, Enum, Option, Struct, u128, u16, u8 } from '@polkadot/types';
+import type { Bytes, Enum, Option, Struct, u128, u16, u8 } from '@polkadot/types-codec';
+import type { ITuple } from '@polkadot/types-codec/types';
 import type { AccountId, BlockNumber, Moment } from '@polkadot/types/interfaces/runtime';
-import type { ITuple } from '@polkadot/types/types';
 
 /** @name Market */
 export interface Market extends Struct {
   readonly creator: AccountId;
   readonly creation: MarketCreation;
-  readonly creator_fee: u8;
+  readonly creatorFee: u8;
   readonly oracle: AccountId;
   readonly metadata: Bytes;
-  readonly market_type: MarketType;
+  readonly marketType: MarketType;
   readonly period: MarketPeriod;
-  readonly scoring_rule: ScoringRule;
+  readonly scoringRule: ScoringRule;
   readonly status: MarketStatus;
   readonly report: Option<Report>;
-  readonly resolved_outcome: Option<OutcomeReport>;
+  readonly resolvedOutcome: Option<OutcomeReport>;
   readonly mdm: MarketDisputeMechanism;
 }
 
