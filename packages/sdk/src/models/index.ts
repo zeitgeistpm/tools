@@ -176,7 +176,7 @@ export default class Models {
         if (status.isInBlock) {
           console.log(`Transaction included at blockHash ${status.asInBlock}`);
           events.forEach(({ phase, event: { data, method, section } }) => {
-            //console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
 
             if (method == "MarketCreated") {
               unsubOrWarns(_unsub);
@@ -281,7 +281,7 @@ export default class Models {
         _unsub: () => void
       ) => {
         const { events, status } = result;
-
+        
         if (status.isInBlock) {
           console.log(`Transaction included at blockHash ${status.asInBlock}`);
 
@@ -587,7 +587,7 @@ export default class Models {
 
     const queriedMarketData = data.markets[0];
 
-    const now = (await this.api.query.timestamp.now() as any).toNumber();
+    const now = (await this.api.query.timestamp.now()) as any as number;
 
     if (queriedMarketData.end < BigInt(now)) {
       queriedMarketData.status = "Ended";
@@ -703,7 +703,7 @@ export default class Models {
     const orderByQuery =
       orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
 
-    const timestamp = (await this.api.query.timestamp.now() as any).toNumber();
+    const timestamp = (await this.api.query.timestamp.now()) as any as number;
 
     const marketsData = await this.graphQLClient.request<{
       markets: MarketQueryData[];

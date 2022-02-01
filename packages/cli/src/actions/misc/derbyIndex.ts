@@ -2,7 +2,7 @@ import SDK from "@zeitgeistpm/sdk";
 import fs from "fs";
 import { Asset } from "../../../../types/dist/interfaces";
 import { encodeAddress } from "@polkadot/util-crypto";
-
+import { AccountInfo } from "@polkadot/types/interfaces/system";
 /**
  * Rewards are determined by the following participations:
  * 1) Getting a token from the faucet - 0.1 points
@@ -102,7 +102,9 @@ const derbyIndex = async () => {
       allKeys.map(async (key) => {
         const pubkey = key.toString().slice(-64);
         const address = encodeAddress("0x" + pubkey);
-        const data = await sdk.api.query.system.account(address) as any;
+        const data = (await sdk.api.query.system.account(
+          address
+        )) as AccountInfo;
         return [address.toString(), data.data.free.toString()];
       })
     );
