@@ -11,50 +11,85 @@ type ErrorTablePopulated = {
   };
 };
 
-export default class ErrorTable {
-  private data: ErrorTablePopulated;
+type PalletTablePopulated = {
+  [key: number]: number;
+};
 
-  static async generate(api: ApiPromise): Promise<ErrorTablePopulated> {
+export default class ErrorTable {
+  private errors: ErrorTablePopulated;
+  private pallets: PalletTablePopulated;
+
+  static async getPallets(api: ApiPromise): Promise<PalletTablePopulated> {
+    const metadata = await api.rpc.state.getMetadata();
+    const inner = metadata.get("metadata");
+    const palletTable = {};
+
+    //@ts-ignore
+    for (const pallet of inner.toJSON().v14.pallets) {
+      if (pallet.errors) {
+        const {
+          index,
+          errors: { type },
+        } = pallet;
+        palletTable[index] = type;
+      }
+    }
+    return palletTable;
+  }
+
+  static async getErrors(api: ApiPromise): Promise<ErrorTablePopulated> {
     const metadata = await api.rpc.state.getMetadata();
     const inner = metadata.get("metadata");
     const errorTable = {};
 
     //@ts-ignore
-    for (const module of inner.toJSON().v13.modules) {
-      const { errors, index } = module;
-      errorTable[index] = {};
-      // skip any that don't have errors
-      if (!errors.length) {
-        continue;
+    for (const module of inner.toJSON().v14.lookup.types) {
+      if (module.type.path.includes("Error") && module.type.def.variant) {
+        const {
+          type: {
+            def: {
+              variant: { variants: errors },
+            },
+          },
+          id: index,
+        } = module;
+        errorTable[index] = {};
+        (errors as Array<{ name: string; docs: Array<string> }>).forEach(
+          (error, errorIndex) => {
+            const { name: errorName, docs } = error;
+            errorTable[index][errorIndex] = {
+              errorName,
+              documentation: docs.join(" ").trim(),
+            };
+          }
+        );
       }
-      (errors as Array<{ name: string; documentation: string }>).forEach(
-        (error, errorIndex) => {
-          const { name: errorName, documentation } = error;
-          errorTable[index][errorIndex] = { errorName, documentation };
-        }
-      );
     }
-
     return errorTable;
   }
 
   static async populate(api: ApiPromise): Promise<ErrorTable> {
-    const errorTableData = await ErrorTable.generate(api);
-    return new ErrorTable(errorTableData);
+    const errorTableData = await ErrorTable.getErrors(api);
+    const palletTableData = await ErrorTable.getPallets(api);
+    return new ErrorTable(errorTableData, palletTableData);
   }
 
-  constructor(errorTableData: ErrorTablePopulated) {
-    this.data = errorTableData;
+  constructor(
+    errorTableData: ErrorTablePopulated,
+    palletTableData: PalletTablePopulated
+  ) {
+    this.errors = errorTableData;
+    this.pallets = palletTableData;
   }
 
   getEntry(palletIndex: number, errorIndex: number): ErrorTableEntry | null {
-    if (!this.data[palletIndex]) {
+    if (!this.pallets[palletIndex]) {
       return null;
     }
-    if (!this.data[palletIndex][errorIndex]) {
+    const key = this.pallets[palletIndex];
+    if (!this.errors[key][errorIndex]) {
       return null;
     }
-
-    return this.data[palletIndex][errorIndex];
+    return this.errors[key][errorIndex];
   }
 }
