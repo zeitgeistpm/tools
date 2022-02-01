@@ -19,6 +19,7 @@ import {
   MarketsOrdering,
   MarketsOrderBy,
   MarketTypeOf,
+  AssetId,
 } from "../types";
 import { changeEndianness, isExtSigner } from "../util";
 
@@ -424,6 +425,55 @@ export default class Models {
         );
       }
     });
+  }
+
+  async queryAllActiveAssets(): Promise<
+    {
+      marketId: number;
+      poolId: number;
+      assetId: AssetId;
+    }[]
+  > {
+    const query = gql`
+      query markets($timestamp: BigInt, $limit: Int!) {
+        markets(
+          where: {
+            slug_contains: ""
+            status_eq: "Active"
+            end_gt: $timestamp
+            poolId_gte: 0
+          }
+          limit: $limit
+          orderBy: marketId_ASC
+        ) {
+          marketId
+          poolId
+          outcomeAssets
+        }
+      }
+    `;
+    const timestamp = (await this.api.query.timestamp.now()).toNumber();
+
+    const data = await this.graphQLClient.request<{
+      markets: { outcomeAssets: string[]; marketId: number; poolId: number }[];
+    }>(query, { limit: Math.pow(2, 31) - 1, timestamp });
+
+    const { markets } = data;
+
+    const res = [];
+
+    for (const market of markets) {
+      const assetStrings = market.outcomeAssets;
+      for (const assetStr of assetStrings) {
+        const assetJson = JSON.parse(assetStr);
+        res.push({
+          marketId: market.marketId,
+          poolId: market.poolId,
+          assetId: assetJson,
+        });
+      }
+    }
+    return res;
   }
 
   private createAssetsForMarket(
