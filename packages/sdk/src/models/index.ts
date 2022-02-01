@@ -636,21 +636,51 @@ export default class Models {
       }
     }
 
+    let activeStatuses: string[] | undefined = [];
+
+    if (containsActive || containsEnded) {
+      activeStatuses.push("Active");
+    }
+
+    if (statuses?.includes("Proposed")) {
+      activeStatuses.push("Proposed");
+    }
+
+    const restStatuses = statuses?.filter((s) => s !== "Active") ?? [];
+
+    if (activeStatuses.length === 0 && restStatuses.length === 0) {
+      activeStatuses = undefined;
+    }
+
     const wherePart = `where: {
-      status_in: $statuses
-      tags_containsAll: $tags
-      creator_eq: $creator
-      oracle_eq: $oracle
-      slug_contains: $slug
-      question_contains: $question
-      end_gt: $lt_end
-      end_lt: $gt_end
-      poolId_gte: $minPoolId
+      OR: [
+        {
+          status_in: $activeStatuses
+          tags_containsAll: $tags
+          creator_eq: $creator
+          oracle_eq: $oracle
+          slug_contains: $slug
+          question_contains: $question
+          end_gt: $lt_end
+          end_lt: $gt_end
+          poolId_gte: $minPoolId
+        },
+        {
+          status_in: $restStatuses
+          tags_containsAll: $tags
+          creator_eq: $creator
+          oracle_eq: $oracle
+          slug_contains: $slug
+          question_contains: $question
+          poolId_gte: $minPoolId
+        }
+      ]
     }`;
 
     const marketsQuery = gql`
       query marketPage(
-        $statuses: [String!]
+        $activeStatuses: [String!]
+        $restStatuses: [String!]
         $tags: [String!]
         $slug: String
         $question: String
@@ -677,7 +707,8 @@ export default class Models {
 
     const totalCountQuery = gql`
       query totalCount(
-        $statuses: [String!]
+        $activeStatuses: [String!]
+        $restStatuses: [String!]
         $tags: [String!]
         $slug: String
         $question: String
@@ -712,7 +743,8 @@ export default class Models {
     const marketsData = await this.graphQLClient.request<{
       markets: MarketQueryData[];
     }>(marketsQuery, {
-      statuses,
+      activeStatuses,
+      restStatuses,
       tags,
       slug,
       question,
@@ -733,7 +765,8 @@ export default class Models {
         totalCount: number;
       };
     }>(totalCountQuery, {
-      statuses,
+      activeStatuses,
+      restStatuses,
       tags,
       slug,
       question,
@@ -747,7 +780,7 @@ export default class Models {
     const { totalCount: count } = totalCountData.marketsConnection;
 
     for (const market of queriedMarkets) {
-      if (market.end < BigInt(timestamp)) {
+      if (market.status === "Active" && market.end < BigInt(timestamp)) {
         market.status = "Ended";
       }
     }
