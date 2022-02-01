@@ -452,7 +452,9 @@ export default class Models {
         }
       }
     `;
-    const timestamp = (await this.api.query.timestamp.now()).toNumber();
+    const timestamp = parseInt(
+      (await this.api.query.timestamp.now()).toString()
+    );
 
     const data = await this.graphQLClient.request<{
       markets: { outcomeAssets: string[]; marketId: number; poolId: number }[];
