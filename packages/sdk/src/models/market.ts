@@ -167,11 +167,11 @@ class Market {
       return this.period.timestamp[1];
     }
 
-    const now = (await this.api.query.timestamp.now()) as any as number;
+    const now = parseInt((await this.api.query.timestamp.now()).toString());
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
     const diffInMs =
-      (this.api.consts.timestamp.minimumPeriod as any as number) *
+      parseInt(this.api.consts.timestamp.minimumPeriod.toString()) *
       (this.period.block[1] - blockNum);
     return now + diffInMs;
   }
