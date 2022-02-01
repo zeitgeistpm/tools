@@ -5,7 +5,6 @@ import { hexToNumber } from "@polkadot/util";
 import { estimatedFee, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
-import { MarketPeriod as MPeriod } from "@zeitgeistpm/types/dist/interfaces";
 
 import {
   MarketPeriod,
@@ -148,7 +147,7 @@ export default class Models {
 
     const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
       oracle,
-      period as unknown as MPeriod,
+      period,
       multihash,
       creationType,
       marketType,
@@ -188,9 +187,9 @@ export default class Models {
             if (method == "PoolCreate") {
               unsubOrWarns(_unsub);
               console.log(
-                `Canonical pool for market deployed - pool ID: ${data[0]["pool_id"]}`
+                `Canonical pool for market deployed - pool ID: ${data[0]["poolId"]}`
               );
-              _resolve(data[0]["pool_id"]);
+              _resolve(data[0]["poolId"]);
             }
             if (method == "ExtrinsicFailed") {
               unsubOrWarns(_unsub);
@@ -552,8 +551,8 @@ export default class Models {
       end: data.end,
       creation: data.creation,
       creator: data.creator,
-      creator_fee: 0,
-      scoring_rule: data.scoringRule,
+      creatorFee: 0,
+      scoringRule: data.scoringRule,
       oracle: data.oracle,
       status: data.status,
       outcomeAssets,

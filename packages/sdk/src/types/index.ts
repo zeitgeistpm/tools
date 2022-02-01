@@ -124,7 +124,7 @@ export type ExtendedMarketResponse = {
 export type FilteredMarketResponse = {
   creator?: string;
   creation?: MarketCreation;
-  creator_fee?: number;
+  creatorFee?: number;
   oracle?: string;
   period?: MarketPeriod;
   metadata?: string;
