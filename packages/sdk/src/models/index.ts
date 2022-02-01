@@ -5,6 +5,7 @@ import { hexToNumber } from "@polkadot/util";
 import { estimatedFee, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
+import { MarketPeriod as MPeriod } from "@zeitgeistpm/types/dist/interfaces";
 
 import {
   MarketPeriod,
@@ -147,7 +148,7 @@ export default class Models {
 
     const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
       oracle,
-      period,
+      period as unknown as MPeriod,
       multihash,
       creationType,
       marketType,
@@ -556,12 +557,12 @@ export default class Models {
       oracle: data.oracle,
       status: data.status,
       outcomeAssets,
-      market_type: marketTypeAsType,
+      marketType: marketTypeAsType,
       mdm: this.api.createType("MarketDisputeMechanism", mdm).toJSON(),
       report: marketReport,
       period: this.api.createType("MarketPeriod", marketPeriod).toJSON(),
       //@ts-ignore
-      resolved_outcome: data.resolvedOutcome,
+      resolvedOutcome: data.resolvedOutcome,
     };
 
     const market = new Market(marketId, basicMarketData, metadata, this.api);
@@ -796,12 +797,12 @@ export default class Models {
 
     basicMarketData.outcomeAssets = this.createAssetsForMarket(
       marketId,
-      market.market_type
+      market.marketType
     );
 
     basicMarketData.report = market.report.isSome ? market.report.value : null;
-    basicMarketData.resolved_outcome = market.resolved_outcome.isSome
-      ? market.resolved_outcome.value.toNumber()
+    basicMarketData.resolvedOutcome = market.resolvedOutcome.isSome
+      ? market.resolvedOutcome.value.toNumber()
       : null;
 
     return new Market(

@@ -36,12 +36,12 @@ export default class Swap {
   private api: ApiPromise;
 
   constructor(poolId: number, details: Pool, api: ApiPromise) {
-    const { assets, pool_status, swap_fee, total_weight, weights } = details;
+    const { assets, poolStatus, swapFee, totalWeight, weights } = details;
 
     this.assets = assets;
-    this.status = pool_status.toString();
-    this.swapFee = swap_fee.toString();
-    this.totalWeight = total_weight.toString();
+    this.status = poolStatus.toString();
+    this.swapFee = swapFee.toString();
+    this.totalWeight = totalWeight.toString();
     this.weights = weights;
 
     this.poolId = poolId;

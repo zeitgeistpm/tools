@@ -18,7 +18,7 @@ export type DecodedMarketMetadata = {
   // An identifier is placed in this field to denote what key the client should
   // use. E.g. this field might contain "us-gov:22313" to denote a decryption
   // key attached to this identity will decrypt the data.
-  confidential_id?: string;
+  confidentialId?: string;
   // The image for the market.
   img?: string;
 };
@@ -83,15 +83,15 @@ export type ScalarOutcome = {
 export type MarketResponse = {
   creator: string;
   creation: MarketCreation;
-  creator_fee: number;
+  creatorFee: number;
   oracle: string;
   metadata?: string;
-  market_type: MarketType;
+  marketType: MarketType;
   period: MarketPeriod;
-  scoring_rule: ScoringRule;
+  scoringRule: ScoringRule;
   status: string;
   report: Report | null;
-  resolved_outcome: OutcomeReport | null;
+  resolvedOutcome: OutcomeReport | null;
   mdm: MarketDisputeMechanism;
   outcomeAssets: Asset[];
   end: BigInt;
@@ -101,16 +101,16 @@ export type MarketResponse = {
 export type ExtendedMarketResponse = {
   creator: string;
   creation: MarketCreation;
-  creator_fee: number;
+  creatorFee: number;
   oracle: string;
   period: MarketPeriod;
-  scoring_rule: ScoringRule;
+  scoringRule: ScoringRule;
   metadata: string;
-  market_type: MarketType;
+  marketType: MarketType;
   status: string;
   report: Report | null;
   categories: string[] | null;
-  resolved_outcome: OutcomeReport | null;
+  resolvedOutcome: OutcomeReport | null;
   mdm: MarketDisputeMechanism;
   // new ones
   marketId: number;
@@ -128,11 +128,11 @@ export type FilteredMarketResponse = {
   oracle?: string;
   period?: MarketPeriod;
   metadata?: string;
-  market_type?: string;
+  marketType?: string;
   status?: string;
   report?: Report | null;
   categories?: number | null;
-  resolved_outcome?: OutcomeReport | null;
+  resolvedOutcome?: OutcomeReport | null;
   // new ones
   marketId?: number;
   title?: string;
@@ -172,8 +172,8 @@ export type MarketDispute = {
 
 export type PoolResponse = {
   assets: string[] | AssetId[];
-  swap_fee: number;
-  total_weight: number;
+  swapFee: number;
+  totalWeight: number;
   weights: any; // { string => number } TODO how to do repr this in TS?
 };
 
