@@ -281,7 +281,7 @@ export default class Models {
         _unsub: () => void
       ) => {
         const { events, status } = result;
-        
+
         if (status.isInBlock) {
           console.log(`Transaction included at blockHash ${status.asInBlock}`);
 
