@@ -9,15 +9,15 @@ import type { AccountId, BlockNumber, Moment } from '@polkadot/types/interfaces/
 export interface Market extends Struct {
   readonly creator: AccountId;
   readonly creation: MarketCreation;
-  readonly creator_fee: u8;
+  readonly creatorFee: u8;
   readonly oracle: AccountId;
   readonly metadata: Bytes;
-  readonly market_type: MarketType;
+  readonly marketType: MarketType;
   readonly period: MarketPeriod;
-  readonly scoring_rule: ScoringRule;
+  readonly scoringRule: ScoringRule;
   readonly status: MarketStatus;
   readonly report: Option<Report>;
-  readonly resolved_outcome: Option<OutcomeReport>;
+  readonly resolvedOutcome: Option<OutcomeReport>;
   readonly mdm: MarketDisputeMechanism;
 }
 
