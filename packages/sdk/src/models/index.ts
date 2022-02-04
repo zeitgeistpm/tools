@@ -1,7 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { hexToNumber } from "@polkadot/util";
 import { estimatedFee, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
@@ -21,7 +20,7 @@ import {
   MarketTypeOf,
   AssetId,
 } from "../types";
-import { changeEndianness, isExtSigner } from "../util";
+import { isExtSigner } from "../util";
 
 import { FRAGMENT_MARKET_DETAILS, MarketQueryData } from "./graphql/market";
 
@@ -42,6 +41,8 @@ export default class Models {
   private errorTable: ErrorTable;
   private graphQLClient?: GraphQLClient;
 
+  private marketIds: number[];
+
   MAX_RPC_REQUESTS: number;
 
   constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options = {}) {
@@ -61,35 +62,24 @@ export default class Models {
    * @returns The `marketId` of all markets.
    */
   async getAllMarketIds(): Promise<number[]> {
-    if (this.graphQLClient != null) {
-      const query = gql`
-        query marketIds($limit: Int!) {
-          markets(
-            where: { slug_contains: "" }
-            orderBy: marketId_ASC
-            limit: $limit
-          ) {
-            marketId
-          }
-        }
-      `;
-
-      const data = await this.graphQLClient.request<{
-        markets: { marketId: number }[];
-      }>(query, { limit: Math.pow(2, 31) - 1 });
-      return data.markets.map((i) => i.marketId);
+    if (this.marketIds) {
+      return this.marketIds;
     }
+    const entries = await this.api.query.marketCommons.markets.entries();
 
-    const keys =
-      this.api["config"] !== "mock"
-        ? await this.api.query.marketCommons.markets.keys()
-        : await this.api.query.marketCommons.marketIds.keys();
+    const ids = entries.map(
+      ([
+        {
+          args: [val],
+        },
+      ]) => {
+        return Number(val.toHuman());
+      }
+    );
 
-    return keys.map((key) => {
-      const idStr = "0x" + changeEndianness(key.toString().slice(-32));
-      const id = hexToNumber(idStr);
-      return id;
-    });
+    ids.sort((a, b) => a - b);
+
+    return ids;
   }
 
   /**
@@ -429,24 +419,37 @@ export default class Models {
 
   async queryAllActiveAssets(): Promise<
     {
+      baseWeight: number;
+      weight: number;
       marketId: number;
       poolId: number;
       assetId: AssetId;
+      slug: string;
+      swapFee: string;
+      categories: { ticker: string; name: string; color: string };
     }[]
   > {
     const query = gql`
-      query markets($timestamp: BigInt, $limit: Int!) {
+      query markets($timestamp: BigInt, $limit: Int!, $marketIds: [Int!]) {
         markets(
           where: {
             slug_contains: ""
             status_eq: "Active"
             end_gt: $timestamp
             poolId_gte: 0
+            marketId_in: $marketIds
           }
           limit: $limit
-          orderBy: marketId_ASC
+          orderBy: marketId_DESC
         ) {
           marketId
+          slug
+          categories {
+            name
+            ticker
+            color
+            img
+          }
           poolId
           outcomeAssets
         }
@@ -456,9 +459,17 @@ export default class Models {
       (await this.api.query.timestamp.now()).toString()
     );
 
+    const marketIds = await this.getAllMarketIds();
+
     const data = await this.graphQLClient.request<{
-      markets: { outcomeAssets: string[]; marketId: number; poolId: number }[];
-    }>(query, { limit: Math.pow(2, 31) - 1, timestamp });
+      markets: {
+        outcomeAssets: string[];
+        marketId: number;
+        poolId: number;
+        slug: string;
+        categories: { ticker: string; name: string; color: string };
+      }[];
+    }>(query, { limit: Math.pow(2, 31) - 1, timestamp, marketIds });
 
     const { markets } = data;
 
@@ -466,12 +477,25 @@ export default class Models {
 
     for (const market of markets) {
       const assetStrings = market.outcomeAssets;
-      for (const assetStr of assetStrings) {
+      const pool = (await this.api.query.swaps.pools(
+        market.poolId
+      )) as Option<Pool>;
+      const poolUnwrapped = pool.unwrap();
+      const weights = poolUnwrapped.weights.toJSON();
+      const swapFee = poolUnwrapped.swapFee.toString();
+      const baseWeight = weights["Ztg"];
+      for (const [idx, assetStr] of Array.from(assetStrings.entries())) {
         const assetJson = JSON.parse(assetStr);
+        const weight = weights[assetStr];
         res.push({
+          baseWeight,
+          weight,
           marketId: market.marketId,
           poolId: market.poolId,
           assetId: assetJson,
+          categories: market.categories[idx],
+          slug: market.slug,
+          swapFee,
         });
       }
     }
@@ -636,21 +660,55 @@ export default class Models {
       }
     }
 
+    let activeStatuses: string[] | undefined = [];
+
+    if (containsActive || containsEnded) {
+      activeStatuses.push("Active");
+    }
+
+    if (statuses?.includes("Proposed")) {
+      activeStatuses.push("Proposed");
+    }
+
+    const restStatuses = statuses?.filter((s) => s !== "Active") ?? [];
+
+    if (activeStatuses.length === 0 && restStatuses.length === 0) {
+      activeStatuses = undefined;
+    }
+
+    const marketIds = await this.getAllMarketIds();
+
     const wherePart = `where: {
-      status_in: $statuses
-      tags_containsAll: $tags
-      creator_eq: $creator
-      oracle_eq: $oracle
-      slug_contains: $slug
-      question_contains: $question
-      end_gt: $lt_end
-      end_lt: $gt_end
-      poolId_gte: $minPoolId
+      OR: [
+        {
+          status_in: $activeStatuses
+          tags_containsAll: $tags
+          creator_eq: $creator
+          oracle_eq: $oracle
+          slug_contains: $slug
+          question_contains: $question
+          end_gt: $lt_end
+          end_lt: $gt_end
+          poolId_gte: $minPoolId
+          marketId_in: $marketIds
+        },
+        {
+          status_in: $restStatuses
+          tags_containsAll: $tags
+          creator_eq: $creator
+          oracle_eq: $oracle
+          slug_contains: $slug
+          question_contains: $question
+          poolId_gte: $minPoolId
+          marketId_in: $marketIds
+        }
+      ]
     }`;
 
     const marketsQuery = gql`
       query marketPage(
-        $statuses: [String!]
+        $activeStatuses: [String!]
+        $restStatuses: [String!]
         $tags: [String!]
         $slug: String
         $question: String
@@ -662,6 +720,7 @@ export default class Models {
         $lt_end: BigInt
         $gt_end: BigInt
         $minPoolId: Int
+        $marketIds: [Int!]
       ) {
         markets(
           ${wherePart}
@@ -677,7 +736,8 @@ export default class Models {
 
     const totalCountQuery = gql`
       query totalCount(
-        $statuses: [String!]
+        $activeStatuses: [String!]
+        $restStatuses: [String!]
         $tags: [String!]
         $slug: String
         $question: String
@@ -686,6 +746,7 @@ export default class Models {
         $lt_end: BigInt
         $gt_end: BigInt
         $minPoolId: Int
+        $marketIds: [Int!]
       ) {
         marketsConnection(
           ${wherePart}
@@ -712,7 +773,8 @@ export default class Models {
     const marketsData = await this.graphQLClient.request<{
       markets: MarketQueryData[];
     }>(marketsQuery, {
-      statuses,
+      activeStatuses,
+      restStatuses,
       tags,
       slug,
       question,
@@ -724,6 +786,7 @@ export default class Models {
       lt_end: !containsEnded && containsActive ? timestamp : undefined,
       gt_end: containsEnded && !containsActive ? timestamp : undefined,
       minPoolId: liquidityOnly ? 0 : undefined,
+      marketIds,
     });
 
     const { markets: queriedMarkets } = marketsData;
@@ -733,7 +796,8 @@ export default class Models {
         totalCount: number;
       };
     }>(totalCountQuery, {
-      statuses,
+      activeStatuses,
+      restStatuses,
       tags,
       slug,
       question,
@@ -742,12 +806,13 @@ export default class Models {
       lt_end: !containsEnded && containsActive ? timestamp : undefined,
       gt_end: containsEnded && !containsActive ? timestamp : undefined,
       minPoolId: liquidityOnly ? 0 : undefined,
+      marketIds,
     });
 
     const { totalCount: count } = totalCountData.marketsConnection;
 
     for (const market of queriedMarkets) {
-      if (market.end < BigInt(timestamp)) {
+      if (market.status === "Active" && market.end < BigInt(timestamp)) {
         market.status = "Ended";
       }
     }
