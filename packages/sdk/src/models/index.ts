@@ -597,7 +597,7 @@ export default class Models {
     return market;
   }
 
-  private async queryMarket(marketId: MarketId): Promise<Market> {
+  private async queryMarket(marketId: MarketId): Promise<Market | undefined> {
     const query = gql`
       query marketData($marketId: Int!) {
         markets(where: { marketId_eq: $marketId, slug_contains: "" }) {
@@ -612,6 +612,10 @@ export default class Models {
     }>(query, { marketId });
 
     const queriedMarketData = data.markets[0];
+
+    if (!queriedMarketData) {
+      return;
+    }
 
     const now = parseInt((await this.api.query.timestamp.now()).toString());
 
