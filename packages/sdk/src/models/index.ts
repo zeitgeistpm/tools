@@ -14,11 +14,11 @@ import {
   DecodedMarketMetadata,
   MarketDisputeMechanism,
   CurrencyIdOf,
-  MarketStatusText,
   MarketsOrdering,
   MarketsOrderBy,
   MarketTypeOf,
   AssetId,
+  MarketsFilteringOptions,
 } from "../types";
 import { isExtSigner } from "../util";
 
@@ -417,6 +417,10 @@ export default class Models {
     });
   }
 
+  /**
+   * Queries all active assets from subsquid indexer.
+   * @returns data needed for token trading
+   */
   async queryAllActiveAssets(): Promise<
     {
       baseWeight: number;
@@ -597,7 +601,12 @@ export default class Models {
     return market;
   }
 
-  private async queryMarket(marketId: MarketId): Promise<Market | undefined> {
+  /**
+   *
+   * @param marketId market identifier
+   * @returns [[Market]] for specified identifier
+   */
+  async queryMarket(marketId: MarketId): Promise<Market | undefined> {
     const query = gql`
       query marketData($marketId: Int!) {
         markets(where: { marketId_eq: $marketId, slug_contains: "" }) {
@@ -626,6 +635,128 @@ export default class Models {
     return this.constructMarketFromQueryData(queriedMarketData);
   }
 
+  /**
+   * Queries count of markets for specified filter options.
+   * @param param0 filtering options
+   * @returns count of markets for specified filters
+   */
+  async queryMarketsCount({
+    statuses,
+    tags,
+    slug = "",
+    question,
+    creator,
+    oracle,
+    liquidityOnly = true,
+  }: MarketsFilteringOptions) {
+    const marketIds = await this.getAllMarketIds();
+    const containsEnded = statuses?.includes("Ended") ?? false;
+    const containsActive = statuses?.includes("Active") ?? false;
+
+    if (containsEnded) {
+      statuses = statuses.filter((s) => s !== "Ended");
+      if (!containsActive) {
+        statuses.push("Active");
+      }
+    }
+
+    let activeStatuses: string[] | undefined = [];
+
+    if (containsActive || containsEnded) {
+      activeStatuses.push("Active");
+    }
+
+    if (statuses?.includes("Proposed")) {
+      activeStatuses.push("Proposed");
+    }
+
+    const restStatuses = statuses?.filter((s) => s !== "Active") ?? [];
+
+    if (activeStatuses.length === 0 && restStatuses.length === 0) {
+      activeStatuses = undefined;
+    }
+
+    const wherePart = `where: {
+      OR: [
+        {
+          status_in: $activeStatuses
+          tags_containsAll: $tags
+          creator_eq: $creator
+          oracle_eq: $oracle
+          slug_contains: $slug
+          question_contains: $question
+          end_gt: $lt_end
+          end_lt: $gt_end
+          poolId_gte: $minPoolId
+          marketId_in: $marketIds
+        },
+        {
+          status_in: $restStatuses
+          tags_containsAll: $tags
+          creator_eq: $creator
+          oracle_eq: $oracle
+          slug_contains: $slug
+          question_contains: $question
+          poolId_gte: $minPoolId
+          marketId_in: $marketIds
+        }
+      ]
+    }`;
+
+    const totalCountQuery = gql`
+      query totalCount(
+        $activeStatuses: [String!]
+        $restStatuses: [String!]
+        $tags: [String!]
+        $slug: String
+        $question: String
+        $creator: String
+        $oracle: String
+        $lt_end: BigInt
+        $gt_end: BigInt
+        $minPoolId: Int
+        $marketIds: [Int!]
+      ) {
+        marketsConnection(
+          ${wherePart}
+        ) {
+          totalCount
+        }
+      }
+    `;
+
+    const timestamp = parseInt(
+      (await this.api.query.timestamp.now()).toString()
+    );
+
+    const totalCountData = await this.graphQLClient.request<{
+      marketsConnection: {
+        totalCount: number;
+      };
+    }>(totalCountQuery, {
+      activeStatuses,
+      restStatuses,
+      tags,
+      slug,
+      question,
+      creator,
+      oracle,
+      lt_end: !containsEnded && containsActive ? timestamp : undefined,
+      gt_end: containsEnded && !containsActive ? timestamp : undefined,
+      minPoolId: liquidityOnly ? 0 : undefined,
+      marketIds,
+    });
+    const { totalCount } = totalCountData.marketsConnection;
+
+    return totalCount;
+  }
+
+  /**
+   * Queries subsquid indexer for market data with pagination.
+   * @param param0 filtering options
+   * @param paginationOptions pagination options
+   * @returns collection of markets and total count for specified options
+   */
   async filterMarkets(
     {
       statuses,
@@ -635,15 +766,7 @@ export default class Models {
       creator,
       oracle,
       liquidityOnly = true,
-    }: {
-      statuses?: MarketStatusText[];
-      tags?: string[];
-      slug?: string;
-      question?: string;
-      creator?: string;
-      oracle?: string;
-      liquidityOnly?: boolean;
-    },
+    }: MarketsFilteringOptions,
     paginationOptions: {
       ordering: MarketsOrdering;
       orderBy: MarketsOrderBy;
@@ -833,9 +956,6 @@ export default class Models {
    * @param marketId The unique identifier for the market you want to fetch.
    */
   async fetchMarketData(marketId: MarketId): Promise<Market> {
-    if (this.graphQLClient != null) {
-      return this.queryMarket(marketId);
-    }
     const marketRaw = await this.api.query.marketCommons.markets(marketId);
 
     const marketJson = marketRaw.toJSON() as never as MarketResponse;

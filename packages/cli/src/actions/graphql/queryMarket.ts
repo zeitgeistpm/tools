@@ -11,7 +11,7 @@ const queryMarket = async (opts: Options): Promise<void> => {
 
   const sdk = await SDK.initialize(endpoint, { graphQlEndpoint });
 
-  const res = await sdk.models.fetchMarketData(marketId);
+  const res = await sdk.models.queryMarket(marketId);
 
   console.log(res.toJSONString());
 };
