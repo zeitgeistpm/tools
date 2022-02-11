@@ -37,6 +37,7 @@ import queryAllMarketIds from "./actions/graphql/queryAllMarketIds";
 import queryMarket from "./actions/graphql/queryMarket";
 import queryFilteredMarkets from "./actions/graphql/queryFilteredMarkets";
 import queryAllActiveAssets from "./actions/graphql/queryAllActiveAssets";
+import queryMarketsCountForTag from "./actions/graphql/queryMarketsCountForTag";
 
 /** Wrapper function to catch errors and exit. */
 const catchErrorsAndExit = async (fn: any, opts: any) => {
@@ -899,6 +900,40 @@ program
       endpoint: string;
     }) => {
       catchErrorsAndExit(queryAllActiveAssets, { graphQlEndpoint, endpoint });
+    }
+  );
+
+program
+  .command("queryMarketsCountForTag")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--graphQlEndpoint <string>",
+    "Endpoint of the graphql query node",
+    "https://processor.zeitgeist.pm/graphql"
+  )
+  .option(
+    "--tag [string]",
+    "Filter markets by supplied tags. By default shows all tags"
+  )
+  .action(
+    ({
+      graphQlEndpoint,
+      endpoint,
+      tag,
+    }: {
+      graphQlEndpoint: string;
+      endpoint: string;
+      tag: string;
+    }) => {
+      catchErrorsAndExit(queryMarketsCountForTag, {
+        tag,
+        graphQlEndpoint,
+        endpoint,
+      });
     }
   );
 
