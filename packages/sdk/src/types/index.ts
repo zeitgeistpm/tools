@@ -256,8 +256,7 @@ export type MarketsOrderBy = "newest" | "end";
 export type MarketsFilteringOptions = {
   statuses?: MarketStatusText[];
   tags?: string[];
-  slug?: string;
-  question?: string;
+  searchText?: string;
   creator?: string;
   oracle?: string;
   liquidityOnly?: boolean;

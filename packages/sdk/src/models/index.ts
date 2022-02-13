@@ -643,8 +643,7 @@ export default class Models {
   async queryMarketsCount({
     statuses,
     tags,
-    slug = "",
-    question,
+    searchText = "",
     creator,
     oracle,
     liquidityOnly = true,
@@ -683,8 +682,7 @@ export default class Models {
           tags_containsAll: $tags
           creator_eq: $creator
           oracle_eq: $oracle
-          slug_contains: $slug
-          question_contains: $question
+          OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
           end_gt: $lt_end
           end_lt: $gt_end
           poolId_gte: $minPoolId
@@ -695,8 +693,7 @@ export default class Models {
           tags_containsAll: $tags
           creator_eq: $creator
           oracle_eq: $oracle
-          slug_contains: $slug
-          question_contains: $question
+          OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
           poolId_gte: $minPoolId
           marketId_in: $marketIds
         }
@@ -708,8 +705,7 @@ export default class Models {
         $activeStatuses: [String!]
         $restStatuses: [String!]
         $tags: [String!]
-        $slug: String
-        $question: String
+        $searchText: String
         $creator: String
         $oracle: String
         $lt_end: BigInt
@@ -737,8 +733,7 @@ export default class Models {
       activeStatuses,
       restStatuses,
       tags,
-      slug,
-      question,
+      searchText,
       creator,
       oracle,
       lt_end: !containsEnded && containsActive ? timestamp : undefined,
@@ -761,8 +756,7 @@ export default class Models {
     {
       statuses,
       tags,
-      slug = "",
-      question,
+      searchText = "",
       creator,
       oracle,
       liquidityOnly = true,
@@ -812,8 +806,7 @@ export default class Models {
           tags_containsAll: $tags
           creator_eq: $creator
           oracle_eq: $oracle
-          slug_contains: $slug
-          question_contains: $question
+          OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
           end_gt: $lt_end
           end_lt: $gt_end
           poolId_gte: $minPoolId
@@ -824,8 +817,7 @@ export default class Models {
           tags_containsAll: $tags
           creator_eq: $creator
           oracle_eq: $oracle
-          slug_contains: $slug
-          question_contains: $question
+          OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
           poolId_gte: $minPoolId
           marketId_in: $marketIds
         }
@@ -837,8 +829,7 @@ export default class Models {
         $activeStatuses: [String!]
         $restStatuses: [String!]
         $tags: [String!]
-        $slug: String
-        $question: String
+        $searchText: String
         $pageSize: Int!
         $offset: Int!
         $orderByQuery: [MarketOrderByInput!]
@@ -866,8 +857,7 @@ export default class Models {
         $activeStatuses: [String!]
         $restStatuses: [String!]
         $tags: [String!]
-        $slug: String
-        $question: String
+        $searchText: String
         $creator: String
         $oracle: String
         $lt_end: BigInt
@@ -903,8 +893,7 @@ export default class Models {
       activeStatuses,
       restStatuses,
       tags,
-      slug,
-      question,
+      searchText,
       pageSize,
       offset,
       orderByQuery,
@@ -926,8 +915,7 @@ export default class Models {
       activeStatuses,
       restStatuses,
       tags,
-      slug,
-      question,
+      searchText,
       creator,
       oracle,
       lt_end: !containsEnded && containsActive ? timestamp : undefined,
