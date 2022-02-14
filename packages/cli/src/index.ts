@@ -799,10 +799,9 @@ program
     "--tags [strings...]",
     "Filter markets by supplied tags. By default shows all tags"
   )
-  .option("--slug [string]", "Get markets that contain this text in a slug")
   .option(
-    "--question [string]",
-    "Get markets that contain this text in a question"
+    "--search-text [string]",
+    "Show markets containing this text in slug or question"
   )
   .option(
     "--no-liquidity",
@@ -831,8 +830,7 @@ program
       endpoint,
       statuses,
       tags,
-      slug,
-      question,
+      searchText,
       pageNumber,
       pageSize,
       ordering,
@@ -845,8 +843,7 @@ program
       endpoint: string;
       statuses?: string | string[];
       tags?: string | string[];
-      slug?: string;
-      question?: string;
+      searchText?: string;
       pageNumber: string;
       pageSize: string;
       ordering: string;
@@ -864,8 +861,7 @@ program
       catchErrorsAndExit(queryFilteredMarkets, {
         statuses,
         tags,
-        slug,
-        question,
+        searchText,
         graphQlEndpoint,
         endpoint,
         pageNumber: Number(pageNumber),
@@ -916,7 +912,7 @@ program
     "https://processor.zeitgeist.pm/graphql"
   )
   .option(
-    "--tag [string]",
+    "--tag <string>",
     "Filter markets by supplied tags. By default shows all tags"
   )
   .action(

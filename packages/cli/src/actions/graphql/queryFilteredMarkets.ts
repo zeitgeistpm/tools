@@ -9,8 +9,7 @@ type Options = {
   endpoint: string;
   graphQlEndpoint: string;
   statuses: MarketStatusText[];
-  slug: string;
-  question: string;
+  searchText: string;
   tags: string[];
   ordering: MarketsOrdering;
   orderBy: MarketsOrderBy;
@@ -27,8 +26,7 @@ const queryFilteredMarkets = async (opts: Options): Promise<void> => {
     graphQlEndpoint,
     statuses,
     tags,
-    slug,
-    question,
+    searchText,
     ordering,
     orderBy,
     pageNumber,
@@ -41,7 +39,7 @@ const queryFilteredMarkets = async (opts: Options): Promise<void> => {
   const sdk = await SDK.initialize(endpoint, { graphQlEndpoint });
 
   const { result, count } = await sdk.models.filterMarkets(
-    { statuses, creator, oracle, tags, slug, question, liquidityOnly },
+    { statuses, creator, oracle, tags, searchText, liquidityOnly },
     {
       ordering,
       orderBy,
