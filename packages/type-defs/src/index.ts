@@ -1,7 +1,8 @@
+export { default as court } from "./court";
 export { default as orderbook } from "./orderbook";
 export { default as predictionMarkets } from "./predictionMarkets";
+export { default as rikkido } from "./rikkido";
 export { default as swaps } from "./swaps";
-export { default as court } from "./court";
 
 export const index = {
   rpc: {},
@@ -67,35 +68,11 @@ export const index = {
         Leaving: "RoundIndex",
       },
     },
-    EmaConfig: {
-      emaPeriod: "Timespan",
-      emaPeriodEstimateAfter: "Option<Timespan>",
-      smoothing: "u128",
-    },
-    EmaMarketVolume: {
-      config: "EmaConfig",
-      ema: "u128",
-      multiplier: "u128",
-      lastTime: "UnixTimestamp",
-      state: "MarketVolumeState",
-      startTime: "UnixTimestamp",
-      volumesPerPeriod: "u128",
-    },
     ExitQ: {
       candidates: "Vec<AccountId>",
       nominatorsLeaving: "Vec<AccountId>",
       candidateSchedule: "Vec<(AccountId, RoundIndex)>",
       nominatorSchedule: "Vec<(AccountId, Option<AccountId>, RoundIndex)>",
-    },
-    FeeSigmoid: {
-      config: "FeeSigmoidConfig",
-    },
-    FeeSigmoidConfig: {
-      m: "i128",
-      p: "i128",
-      n: "i128",
-      initialFee: "i128",
-      minRevenue: "i128",
     },
     Index: "u64",
     InflationInfo: {
@@ -105,9 +82,6 @@ export const index = {
     },
     Lookup: "MultiAddress",
     MarketIdOf: "u128",
-    MarketVolumeState: {
-      _enum: ["Uninitialized", "DataCollectionStarted", "DataCollected"],
-    },
     MaxRuntimeUsize: "u64",
     Moment: "u64",
     MultiHash: {
@@ -155,16 +129,6 @@ export const index = {
       totalReward: "Balance",
       claimedReward: "Balance",
     },
-    Rikiddo: {
-      config: "RikiddoConfig",
-      fees: "FeeSigmoid",
-      maShort: "EmaMarketVolume",
-      maLong: "EmaMarketVolume",
-    },
-    RikiddoConfig: {
-      initialFee: "i128",
-      log2E: "i128",
-    },
     RoundIndex: "u32",
     RoundInfo: {
       current: "RoundIndex",
@@ -174,16 +138,6 @@ export const index = {
     ScalarPosition: {
       _enum: ["Long", "Short"],
     },
-    Timespan: {
-      _enum: {
-        Seconds: "u32",
-        Minutes: "u32",
-        Hours: "u32",
-        Days: "u16",
-        Weeks: "u16",
-      },
-    },
-    UnixTimestamp: "u64",
     VestingBlockNumber: "u32",
   },
 };
