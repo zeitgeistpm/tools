@@ -261,3 +261,24 @@ export type MarketsFilteringOptions = {
   oracle?: string;
   liquidityOnly?: boolean;
 };
+
+export type MarketsPaginationOptions = {
+  ordering: MarketsOrdering;
+  orderBy: MarketsOrderBy;
+  pageSize: number;
+  pageNumber: number;
+};
+
+export type ActiveAssetsResponse = {
+  baseWeight: number;
+  weight: number;
+  marketId: number;
+  poolAccount: string;
+  poolId: number;
+  assetId: AssetId;
+  marketSlug: string;
+  swapFee: string;
+  metadata: { ticker: string; name: string; color: string };
+  qty: string;
+  price: number;
+}[];

@@ -877,6 +877,9 @@ program
 
 program
   .command("queryAllActiveAssets")
+  .description(
+    "Display all tradeable assets information. For pagination, both --page-number and --page-size options must be supplied."
+  )
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -887,15 +890,33 @@ program
     "Endpoint of the graphql query node",
     "https://processor.zeitgeist.pm/graphql"
   )
+  .option(
+    "--market-slug <string>",
+    "Include only assets form markets containing text in slug"
+  )
+  .option("--page-number <number>", "Page number for paginating results", "1")
+  .option("--page-size <number>", "Page size for paginating results.")
   .action(
     ({
       endpoint,
       graphQlEndpoint,
+      marketSlug,
+      pageNumber,
+      pageSize,
     }: {
       graphQlEndpoint: string;
       endpoint: string;
+      marketSlug?: string;
+      pageNumber?: number;
+      pageSize?: number;
     }) => {
-      catchErrorsAndExit(queryAllActiveAssets, { graphQlEndpoint, endpoint });
+      catchErrorsAndExit(queryAllActiveAssets, {
+        graphQlEndpoint,
+        endpoint,
+        marketSlug,
+        pageNumber: Number(pageNumber),
+        pageSize: Number(pageSize),
+      });
     }
   );
 

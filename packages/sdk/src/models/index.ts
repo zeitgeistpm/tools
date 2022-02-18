@@ -14,11 +14,10 @@ import {
   DecodedMarketMetadata,
   MarketDisputeMechanism,
   CurrencyIdOf,
-  MarketsOrdering,
-  MarketsOrderBy,
   MarketTypeOf,
-  AssetId,
   MarketsFilteringOptions,
+  MarketsPaginationOptions,
+  ActiveAssetsResponse,
 } from "../types";
 import { isExtSigner } from "../util";
 
@@ -28,6 +27,7 @@ import Market from "./market";
 import Swap from "./swaps";
 import ErrorTable from "../errorTable";
 import IPFS from "../storage/ipfs";
+import { PaginationOptions } from "@polkadot/api/types";
 
 export { Market, Swap };
 
@@ -419,32 +419,32 @@ export default class Models {
 
   /**
    * Queries all active assets from subsquid indexer.
-   * @returns data needed for token trading
+   * @param marketSlugText Filter assets by market slug
+   * @param pagination Options for pagination
+   * @returns Data needed for token trading
    */
-  async queryAllActiveAssets(): Promise<
-    {
-      baseWeight: number;
-      weight: number;
-      marketId: number;
-      poolId: number;
-      assetId: AssetId;
-      slug: string;
-      swapFee: string;
-      categories: { ticker: string; name: string; color: string };
-    }[]
-  > {
+  async queryAllActiveAssets(
+    marketSlugText = "",
+    pagination?: { pageNumber: number; pageSize: number }
+  ): Promise<ActiveAssetsResponse> {
+    const maxLimit = Math.pow(2, 31) - 1;
     const query = gql`
-      query markets($timestamp: BigInt, $limit: Int!, $marketIds: [Int!]) {
+      query markets(
+        $timestamp: BigInt
+        $marketIds: [Int!]
+        $marketSlugText: String
+        $maxLimit: Int!
+      ) {
         markets(
           where: {
-            slug_contains: ""
+            slug_contains: $marketSlugText
             status_eq: "Active"
             end_gt: $timestamp
             poolId_gte: 0
             marketId_in: $marketIds
           }
-          limit: $limit
           orderBy: marketId_DESC
+          limit: $maxLimit
         ) {
           marketId
           slug
@@ -459,6 +459,7 @@ export default class Models {
         }
       }
     `;
+
     const timestamp = parseInt(
       (await this.api.query.timestamp.now()).toString()
     );
@@ -473,36 +474,113 @@ export default class Models {
         slug: string;
         categories: { ticker: string; name: string; color: string };
       }[];
-    }>(query, { limit: Math.pow(2, 31) - 1, timestamp, marketIds });
+    }>(query, {
+      timestamp,
+      marketIds,
+      marketSlugText,
+      maxLimit,
+    });
 
     const { markets } = data;
 
-    const res = [];
+    const poolIds = markets.map((m) => m.poolId);
 
-    for (const market of markets) {
-      const assetStrings = market.outcomeAssets;
-      const pool = (await this.api.query.swaps.pools(
-        market.poolId
-      )) as Option<Pool>;
-      const poolUnwrapped = pool.unwrap();
-      const weights = poolUnwrapped.weights.toJSON();
-      const swapFee = poolUnwrapped.swapFee.toString();
-      const baseWeight = weights["Ztg"];
-      for (const [idx, assetStr] of Array.from(assetStrings.entries())) {
-        const assetJson = JSON.parse(assetStr);
-        const weight = weights[assetStr];
-        res.push({
-          baseWeight,
-          weight,
-          marketId: market.marketId,
-          poolId: market.poolId,
-          assetId: assetJson,
-          categories: market.categories[idx],
-          slug: market.slug,
-          swapFee,
-        });
-      }
+    const numPools = poolIds.length;
+
+    if (numPools === 0) {
+      return [];
     }
+
+    const queryPools = gql`
+      query poolsAssets(
+        $poolIds: [Int!]
+        $numPools: Int!
+        $pageSize: Int!
+        $offset: Int!
+      ) {
+        pools(where: { poolId_in: $poolIds }, limit: $numPools) {
+          weights {
+            assetId
+            len
+          }
+          swapFee
+          poolId
+          accountId
+        }
+        assets(
+          where: { poolId_in: $poolIds }
+          limit: $pageSize
+          offset: $offset
+          orderBy: poolId_DESC
+        ) {
+          assetId
+          poolId
+          price
+          qty
+        }
+      }
+    `;
+
+    const pageSize = pagination?.pageSize ?? maxLimit;
+    const offset = pagination ? (pagination.pageNumber - 1) * pageSize : 0;
+
+    const poolsData = await this.graphQLClient.request<{
+      pools: {
+        weights: {
+          assetId: string;
+          len: string;
+        }[];
+        swapFee: string;
+        poolId: number;
+        accountId: string;
+      }[];
+      assets: {
+        assetId: string;
+        price: number;
+        qty: string;
+        poolId: number;
+      }[];
+    }>(queryPools, {
+      poolIds,
+      numPools,
+      pageSize,
+      offset,
+    });
+
+    const { pools, assets } = poolsData;
+
+    const res: ActiveAssetsResponse = [];
+
+    for (const asset of assets) {
+      const assetStr = asset.assetId;
+      const assetJson = JSON.parse(assetStr);
+      const poolId = asset.poolId;
+      const market = markets.find((m) => m.poolId === poolId);
+      const pool = pools.find((p) => p.poolId === poolId);
+      const { accountId: poolAccount } = pool;
+      const catIdx = market.outcomeAssets.findIndex(
+        (asset) => asset === assetStr
+      );
+      const metadata = market.categories[catIdx];
+      const marketSlug = market.slug;
+      const { weights, swapFee } = pool;
+      const baseWeight = Number(weights.find((w) => w.assetId === "Ztg").len);
+      const weight = Number(weights.find((w) => w.assetId === assetStr).len);
+      res.push({
+        baseWeight,
+        weight,
+        marketId: market.marketId,
+        poolAccount,
+        poolId,
+        assetId: assetJson,
+        metadata,
+        marketSlug,
+        swapFee,
+        qty: asset.qty,
+        price: asset.price,
+      });
+    }
+
     return res;
   }
 
@@ -761,12 +839,12 @@ export default class Models {
       oracle,
       liquidityOnly = true,
     }: MarketsFilteringOptions,
-    paginationOptions: {
-      ordering: MarketsOrdering;
-      orderBy: MarketsOrderBy;
-      pageSize: number;
-      pageNumber: number;
-    } = { ordering: "desc", orderBy: "newest", pageSize: 10, pageNumber: 1 }
+    paginationOptions: MarketsPaginationOptions = {
+      ordering: "desc",
+      orderBy: "newest",
+      pageSize: 10,
+      pageNumber: 1,
+    }
   ): Promise<{ result: Market[]; count: number }> {
     if (this.graphQLClient == null) {
       throw Error("(getMarketsWithStatuses) cannot use without graphQLClient.");
