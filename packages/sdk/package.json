@@ -1,6 +1,6 @@
 {
   "name": "@zeitgeistpm/sdk",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Zeitgeist network javascript library.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,8 +21,8 @@
     "@polkadot/keyring": "^8.3.3",
     "@polkadot/util": "^8.3.3",
     "@polkadot/util-crypto": "^8.3.3",
-    "@zeitgeistpm/type-defs": "^0.4.0",
-    "@zeitgeistpm/types": "^0.4.0",
+    "@zeitgeistpm/type-defs": "^0.4.5",
+    "@zeitgeistpm/types": "^0.4.5",
     "commander": "^7.2.0",
     "graphql": "15.x",
     "graphql-request": "^3.6.1",
