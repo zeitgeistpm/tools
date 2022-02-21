@@ -1,9 +1,8 @@
 import SDK, { util } from "@zeitgeistpm/sdk";
+import { DecodedMarketMetadata } from "@zeitgeistpm/sdk/dist/types";
 
 type Options = {
   endpoint: string;
-  title: string;
-  description: string;
   oracle: string;
   period: string;
   bounds?: number[];
@@ -13,12 +12,11 @@ type Options = {
   authorized: string;
   court: boolean;
   cpmm: boolean;
+  metadata: DecodedMarketMetadata;
 };
 
 const createScalarMarket = async (opts: Options): Promise<void> => {
   const {
-    title,
-    description,
     oracle,
     period,
     bounds,
@@ -29,6 +27,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     authorized,
     court,
     cpmm,
+    metadata,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -55,14 +54,13 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
 
   const marketId = await sdk.models.createScalarMarket(
     signer,
-    title,
-    description,
     oracle,
     marketPeriod,
     advised ? "Advised" : "Permissionless",
-    bounds ? bounds : [0, 100],
     mdm,
     cpmm ? "CPMM" : "RikiddoSigmoidFeeMarketEma",
+    metadata,
+    bounds ? bounds : [0, 100],
     false
   );
 
