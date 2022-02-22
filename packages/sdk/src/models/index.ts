@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { estimatedFee, unsubOrWarns } from "../util";
+import { AssetIdFromString, estimatedFee, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 
@@ -582,6 +582,70 @@ export default class Models {
     }
 
     return res;
+  }
+
+  // TODO!: at here
+  async filterPools(query?: { offset?: number; limit?: number }) {
+    const { api, graphQLClient } = this;
+    const poolsResponse = await graphQLClient.request(
+      gql`
+        query PoolsList($offset: Int!, $limit: Int!) {
+          pools(offset: $offset, limit: $limit) {
+            poolId
+            baseAsset
+            marketId
+            poolStatus
+            scoringRule
+            swapFee
+            totalSubsidy
+            totalWeight
+            weights {
+              assetId
+              len
+            }
+          }
+        }
+      `,
+      {
+        offset: query?.offset || 0,
+        limit: query?.limit || 5,
+      }
+    );
+
+    const assetsResponse = await graphQLClient.request(
+      gql`
+        query Assets($poolIds: [Int!]) {
+          assets(where: { poolId_in: $poolIds }) {
+            id
+            poolId
+            price
+            qty
+          }
+        }
+      `,
+      {
+        poolIds: poolsResponse.pools.map((p) => p.poolId),
+      }
+    );
+
+    console.log(assetsResponse);
+
+    const pools = await Promise.all(
+      poolsResponse.pools.map(async (pool) => {
+        const assets = assetsResponse.assets.filter(
+          (asset) => asset.poolId === pool.poolId
+        );
+        // const assets = pool.weights.map((weight) => {
+        //   return api.createType("Asset", AssetIdFromString(weight.assetId));
+        // });
+        // const liquidity = assets.reduce((total, asset) => {
+        //   return total + asset.amount * asset.price;
+        // }, 0);
+        //return { assets, liquidity };
+      })
+    );
+
+    console.log(pools);
   }
 
   private createAssetsForMarket(
