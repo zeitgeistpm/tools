@@ -72,6 +72,10 @@ export default class SDK {
     return new SDK(mockedAPI);
   }
 
+  get graphQlEnabled() {
+    return this.graphQLClient != null;
+  }
+
   constructor(
     public api: ApiPromise,
     public errorTable?: ErrorTable,
