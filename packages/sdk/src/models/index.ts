@@ -647,6 +647,7 @@ export default class Models {
             totalSubsidy
             totalWeight
             volume
+            ztgQty
             weights {
               assetId
               len
