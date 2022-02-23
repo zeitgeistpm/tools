@@ -584,14 +584,62 @@ export default class Models {
     return res;
   }
 
+  async getAccountBalances(addresses: string[]) {
+    const { graphQLClient } = this;
+    const balancesResponse = await graphQLClient.request(
+      gql`
+        query PoolBalances($addresses: [String!]) {
+          accountBalances(where: { account: { wallet_in: $addresses } }) {
+            accountId
+            assetId
+            balance
+            account {
+              id
+              wallet
+            }
+          }
+        }
+      `,
+      {
+        addresses,
+      }
+    );
+
+    return balancesResponse.accountBalances;
+  }
+
+  async getAssetsForPools(poolIds: number[]) {
+    const { graphQLClient } = this;
+    const assetsResponse = await graphQLClient.request(
+      gql`
+        query Assets($poolIds: [Int!]) {
+          assets(where: { poolId_in: $poolIds }) {
+            id
+            poolId
+            price
+            qty
+          }
+        }
+      `,
+      {
+        poolIds,
+      }
+    );
+
+    return assetsResponse.assets;
+  }
+
   // TODO!: at here
-  async filterPools(query?: { offset?: number; limit?: number }) {
-    const { api, graphQLClient } = this;
-    const poolsResponse = await graphQLClient.request(
+  async filterPools(query?: {
+    offset?: number;
+    limit?: number;
+  }): Promise<Swap[]> {
+    const poolsResponse = await this.graphQLClient.request(
       gql`
         query PoolsList($offset: Int!, $limit: Int!) {
           pools(offset: $offset, limit: $limit) {
             poolId
+            accountId
             baseAsset
             marketId
             poolStatus
@@ -599,6 +647,7 @@ export default class Models {
             swapFee
             totalSubsidy
             totalWeight
+            volume
             weights {
               assetId
               len
@@ -612,40 +661,32 @@ export default class Models {
       }
     );
 
-    const assetsResponse = await graphQLClient.request(
-      gql`
-        query Assets($poolIds: [Int!]) {
-          assets(where: { poolId_in: $poolIds }) {
-            id
-            poolId
-            price
-            qty
-          }
-        }
-      `,
-      {
-        poolIds: poolsResponse.pools.map((p) => p.poolId),
-      }
-    );
+    const poolIds = poolsResponse.pools.map((p) => p.poolId);
+    const poolAccountIds = poolsResponse.pools.map((p) => p.accountId);
 
-    console.log(assetsResponse);
+    const rawAssets = await this.getAssetsForPools(poolIds);
+    const rawBalances = await this.getAccountBalances(poolAccountIds);
 
-    const pools = await Promise.all(
+    const pools: Pool[] = await Promise.all(
       poolsResponse.pools.map(async (pool) => {
-        const assets = assetsResponse.assets.filter(
+        const assets = rawAssets.filter(
           (asset) => asset.poolId === pool.poolId
         );
-        // const assets = pool.weights.map((weight) => {
-        //   return api.createType("Asset", AssetIdFromString(weight.assetId));
-        // });
-        // const liquidity = assets.reduce((total, asset) => {
-        //   return total + asset.amount * asset.price;
-        // }, 0);
-        //return { assets, liquidity };
+
+        const balances = rawBalances.filter(
+          (balance) => balance.account.wallet === pool.accountId
+        );
+
+        return {
+          assets,
+          balances,
+        };
       })
     );
 
-    console.log(pools);
+    console.log(JSON.stringify(pools, undefined, 4));
+
+    return [];
   }
 
   private createAssetsForMarket(
