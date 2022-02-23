@@ -608,12 +608,17 @@ export default class Models {
     return balancesResponse.accountBalances;
   }
 
-  async getAssetsForPools(poolIds: number[]) {
+  async getAssetsForPools(
+    poolIds: number[]
+  ): Promise<
+    { poolId: number; price: number; qty: string; assetId: string }[]
+  > {
     const { graphQLClient } = this;
     const assetsResponse = await graphQLClient.request(
       gql`
         query Assets($poolIds: [Int!]) {
           assets(where: { poolId_in: $poolIds }) {
+            assetId
             id
             poolId
             price
@@ -629,11 +634,8 @@ export default class Models {
     return assetsResponse.assets;
   }
 
-  async filterPools(query?: {
-    offset?: number;
-    limit?: number;
-  }): Promise<Swap[]> {
-    const poolsResponse = await this.graphQLClient.request(
+  async filterPools(query?: { offset?: number; limit?: number }) {
+    const poolsResponse: { pools: any[] } = await this.graphQLClient.request(
       gql`
         query PoolsList($offset: Int!, $limit: Int!) {
           pools(offset: $offset, limit: $limit) {
@@ -662,33 +664,29 @@ export default class Models {
     );
 
     const poolIds = poolsResponse.pools.map((p) => p.poolId);
-    const poolAccountIds = poolsResponse.pools.map((p) => p.accountId);
 
-    const [assetsForFetchedPools, balancesForFetchedPools] = await Promise.all([
-      this.getAssetsForPools(poolIds),
-      this.getAccountBalances(poolAccountIds),
-    ]);
+    const assetsForFetchedPools = await this.getAssetsForPools(poolIds);
 
-    const pools: Pool[] = await Promise.all(
-      poolsResponse.pools.map(async (pool) => {
-        const assets = assetsForFetchedPools.filter(
-          (asset) => asset.poolId === pool.poolId
-        );
+    const pools = poolsResponse.pools.map(async (pool) => {
+      const assets = assetsForFetchedPools.filter(
+        (asset) => asset.poolId === pool.poolId
+      );
 
-        const balances = balancesForFetchedPools.filter(
-          (balance) => balance.account.wallet === pool.accountId
-        );
+      const liquidity: bigint = assets.reduce(
+        (total, asset) => total + BigInt(asset.price) * BigInt(asset.qty),
+        BigInt(0)
+      );
 
-        return {
-          assets,
-          balances,
-        };
-      })
-    );
+      return {
+        ...pool,
+        assets,
+        liquidity,
+      };
+    });
 
     console.log(JSON.stringify(pools, undefined, 4));
 
-    return [];
+    return pools;
   }
 
   private createAssetsForMarket(
