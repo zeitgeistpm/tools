@@ -629,7 +629,6 @@ export default class Models {
     return assetsResponse.assets;
   }
 
-  // TODO!: at here
   async filterPools(query?: {
     offset?: number;
     limit?: number;
