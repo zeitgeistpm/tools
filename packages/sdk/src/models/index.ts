@@ -663,10 +663,10 @@ export default class Models {
     const poolIds = poolsResponse.pools.map((p) => p.poolId);
     const poolAccountIds = poolsResponse.pools.map((p) => p.accountId);
 
-    const assetsForFetchedPools = await this.getAssetsForPools(poolIds);
-    const balancesForFetchedPools = await this.getAccountBalances(
-      poolAccountIds
-    );
+    const [assetsForFetchedPools, balancesForFetchedPools] = await Promise.all([
+      this.getAssetsForPools(poolIds),
+      this.getAccountBalances(poolAccountIds),
+    ]);
 
     const pools: Pool[] = await Promise.all(
       poolsResponse.pools.map(async (pool) => {
