@@ -1,5 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
-import { GraphQLClient } from "graphql-request";
+import { GraphQLClient, request, gql } from "graphql-request";
 
 import ErrorTable from "./errorTable";
 import Models from "./models";
@@ -12,6 +12,24 @@ export * as util from "./util";
 type InitOptions = {
   logEndpointInitTime?: boolean;
   graphQlEndpoint?: string;
+};
+
+export const pingGqlEndpoint = async (endpoint: string) => {
+  try {
+    await request(
+      endpoint,
+      gql`
+        query PingQuery {
+          markets(limit: 1) {
+            id
+          }
+        }
+      `
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
 
 export default class SDK {
@@ -56,7 +74,12 @@ export default class SDK {
       let graphQLClient: GraphQLClient;
 
       if (graphQlEndpoint != null) {
-        graphQLClient = new GraphQLClient(graphQlEndpoint, {});
+        const active = await pingGqlEndpoint(graphQlEndpoint);
+        if (!active) {
+          console.warn("Graph Ql is unavailable, graphql features disabled.");
+        } else {
+          graphQLClient = new GraphQLClient(graphQlEndpoint, {});
+        }
       }
 
       const eTable = await ErrorTable.populate(api);
