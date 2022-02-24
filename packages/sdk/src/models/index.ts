@@ -326,14 +326,13 @@ export default class Models {
    */
   async createScalarMarket(
     signer: KeyringPairOrExtSigner,
-    title: string,
-    description: string,
     oracle: string,
     period: MarketPeriod,
     creationType = "Advised",
-    bounds = [0, 100],
     mdm: MarketDisputeMechanism,
     scoringRule = "CPMM",
+    metadata: DecodedMarketMetadata,
+    bounds: number[],
     callbackOrPaymentInfo:
       | ((result: ISubmittableResult, _unsub: () => void) => void)
       | boolean = false
@@ -342,9 +341,7 @@ export default class Models {
 
     const cid = await ipfs.add(
       JSON.stringify({
-        title,
-        description,
-        bounds,
+        ...metadata,
       })
     );
 
