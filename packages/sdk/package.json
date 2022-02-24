@@ -24,6 +24,7 @@
     "@zeitgeistpm/type-defs": "^0.4.5",
     "@zeitgeistpm/types": "^0.4.5",
     "commander": "^7.2.0",
+    "decimal.js": "^10.3.1",
     "graphql": "15.x",
     "graphql-request": "^3.6.1",
     "ipfs-http-client": "^49.0.4",
@@ -31,6 +32,7 @@
     "uint8arrays": "^2.1.4"
   },
   "devDependencies": {
+    "@types/decimal.js": "^7.4.0",
     "@types/jest": "^26.0.16",
     "jest": "^26.6.3",
     "ts-jest": "^26.4.4",
