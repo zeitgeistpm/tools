@@ -20,8 +20,7 @@ import {
   MarketsPaginationOptions,
   ActiveAssetsResponse,
   FilteredPoolsListResponse,
-  AssetId,
-  FilteredPoolsList,
+  FilteredPoolsListItem,
 } from "../types";
 import { isExtSigner } from "../util";
 
@@ -675,7 +674,7 @@ export default class Models {
       offset: 0,
       limit: 5,
     }
-  ): Promise<FilteredPoolsList> {
+  ): Promise<FilteredPoolsListItem[]> {
     const marketIds = await this.getAllMarketIds();
 
     const query = {
@@ -770,7 +769,7 @@ export default class Models {
       })
       .filter((pool) => pool !== null);
 
-    return { pools };
+    return pools;
   }
 
   private createAssetsForMarket(

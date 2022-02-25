@@ -109,10 +109,6 @@ export type FilteredPoolsListItem = {
   marketSlug: string;
 };
 
-export type FilteredPoolsList = {
-  pools: FilteredPoolsListItem[];
-};
-
 // The market type as returned by the API call to `predictionMarkets.markets`.
 export type MarketResponse = {
   creator: string;
