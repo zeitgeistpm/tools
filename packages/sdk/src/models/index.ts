@@ -726,7 +726,9 @@ export default class Models {
           (market) => market.marketId === pool.marketId
         );
 
-        if (!marketDataForPool.categories) return null;
+        if (!marketDataForPool.categories) {
+          return null;
+        }
 
         const assets = pool.weights.map((weight) => {
           const assetId = AssetIdFromString(weight.assetId);
