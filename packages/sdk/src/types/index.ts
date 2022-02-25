@@ -89,7 +89,7 @@ export type FilteredPoolsListResponse = {
   }[];
 };
 
-export type FilteredPools = {
+export type FilteredPoolsListItem = {
   assets: {
     assetId: AssetId;
     percentage: number;
@@ -107,7 +107,11 @@ export type FilteredPools = {
   weights: { assetId: string; len: number }[];
   marketId: number;
   marketSlug: string;
-}[];
+};
+
+export type FilteredPoolsList = {
+  pools: FilteredPoolsListItem[];
+};
 
 // The market type as returned by the API call to `predictionMarkets.markets`.
 export type MarketResponse = {

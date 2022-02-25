@@ -21,7 +21,7 @@ import {
   ActiveAssetsResponse,
   FilteredPoolsListResponse,
   AssetId,
-  FilteredPools,
+  FilteredPoolsList,
 } from "../types";
 import { isExtSigner } from "../util";
 
@@ -669,14 +669,21 @@ export default class Models {
     return assetsResponse.assets;
   }
 
-  async filterPools(query?: {
-    offset?: number;
-    limit?: number;
-  }): Promise<FilteredPools> {
+  async filterPools(
+    queryOptions = {
+      offset: 0,
+      limit: 5,
+    }
+  ): Promise<FilteredPoolsList> {
     const marketIds = await this.getAllMarketIds();
 
-    const poolsResponse: FilteredPoolsListResponse =
-      await this.graphQLClient.request(
+    const query = {
+      ...queryOptions,
+      marketIds,
+    };
+
+    const poolsResponse =
+      await this.graphQLClient.request<FilteredPoolsListResponse>(
         gql`
           query PoolsList($offset: Int!, $limit: Int!, $marketIds: [Int!]) {
             pools(
@@ -703,11 +710,7 @@ export default class Models {
             }
           }
         `,
-        {
-          offset: query?.offset || 0,
-          limit: query?.limit || 5,
-          marketIds,
-        }
+        query
       );
 
     const [assetsForFetchedPools, marketDataForFetchedPools] =
@@ -764,7 +767,7 @@ export default class Models {
       })
       .filter((pool) => pool !== null);
 
-    return pools;
+    return { pools };
   }
 
   private createAssetsForMarket(
