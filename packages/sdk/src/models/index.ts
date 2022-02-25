@@ -31,7 +31,6 @@ import Market from "./market";
 import Swap from "./swaps";
 import ErrorTable from "../errorTable";
 import IPFS from "../storage/ipfs";
-import { PaginationOptions } from "@polkadot/api/types";
 
 export { Market, Swap };
 
@@ -331,14 +330,13 @@ export default class Models {
    */
   async createScalarMarket(
     signer: KeyringPairOrExtSigner,
-    title: string,
-    description: string,
     oracle: string,
     period: MarketPeriod,
     creationType = "Advised",
-    bounds = [0, 100],
     mdm: MarketDisputeMechanism,
     scoringRule = "CPMM",
+    metadata: DecodedMarketMetadata,
+    bounds: number[],
     callbackOrPaymentInfo:
       | ((result: ISubmittableResult, _unsub: () => void) => void)
       | boolean = false
@@ -347,9 +345,7 @@ export default class Models {
 
     const cid = await ipfs.add(
       JSON.stringify({
-        title,
-        description,
-        bounds,
+        ...metadata,
       })
     );
 
@@ -431,6 +427,11 @@ export default class Models {
     marketSlugText = "",
     pagination?: { pageNumber: number; pageSize: number }
   ): Promise<ActiveAssetsResponse> {
+    if (!this.graphQLClient) {
+      throw Error(
+        "sdk.queryAllActiveAssets - no graphql client - method unavailable"
+      );
+    }
     const maxLimit = Math.pow(2, 31) - 1;
     const query = gql`
       query markets(
@@ -871,6 +872,9 @@ export default class Models {
    * @returns [[Market]] for specified identifier
    */
   async queryMarket(marketId: MarketId): Promise<Market | undefined> {
+    if (!this.graphQLClient) {
+      return this.fetchMarketData(marketId);
+    }
     const query = gql`
       query marketData($marketId: Int!) {
         markets(where: { marketId_eq: $marketId, slug_contains: "" }) {
@@ -911,8 +915,12 @@ export default class Models {
     creator,
     oracle,
     liquidityOnly = true,
-  }: MarketsFilteringOptions) {
+  }: MarketsFilteringOptions): Promise<number> {
+    if (!this.graphQLClient) {
+      return this.getMarketCount();
+    }
     const marketIds = await this.getAllMarketIds();
+
     const containsEnded = statuses?.includes("Ended") ?? false;
     const containsActive = statuses?.includes("Active") ?? false;
 
@@ -1033,7 +1041,9 @@ export default class Models {
     }
   ): Promise<{ result: Market[]; count: number }> {
     if (this.graphQLClient == null) {
-      throw Error("(getMarketsWithStatuses) cannot use without graphQLClient.");
+      const result = await this.getAllMarkets();
+      const count = result.length;
+      return { result, count };
     }
     const containsEnded = statuses?.includes("Ended") ?? false;
     const containsActive = statuses?.includes("Active") ?? false;
