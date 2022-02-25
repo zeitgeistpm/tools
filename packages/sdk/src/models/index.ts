@@ -1,9 +1,10 @@
 import { ApiPromise } from "@polkadot/api";
 import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { estimatedFee, unsubOrWarns } from "../util";
+import { AssetIdFromString, estimatedFee, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
+import Decimal from "decimal.js";
 
 import {
   MarketPeriod,
@@ -18,6 +19,8 @@ import {
   MarketsFilteringOptions,
   MarketsPaginationOptions,
   ActiveAssetsResponse,
+  FilteredPoolsListResponse,
+  FilteredPoolsListItem,
 } from "../types";
 import { isExtSigner } from "../util";
 
@@ -583,6 +586,190 @@ export default class Models {
     }
 
     return res;
+  }
+
+  async getAccountBalances(addresses: string[]) {
+    const { graphQLClient } = this;
+    const balancesResponse = await graphQLClient.request(
+      gql`
+        query PoolBalances($addresses: [String!]) {
+          accountBalances(where: { account: { wallet_in: $addresses } }) {
+            accountId
+            assetId
+            balance
+            account {
+              id
+              wallet
+            }
+          }
+        }
+      `,
+      {
+        addresses,
+      }
+    );
+
+    return balancesResponse.accountBalances;
+  }
+
+  async getMarketDataForPoolsList(pools: FilteredPoolsListResponse["pools"]) {
+    const categoriesResponse: {
+      markets: {
+        marketId: number;
+        slug: string;
+        categories: {
+          ticker: string;
+          name: string;
+          img?: string;
+          color: string;
+        }[];
+      }[];
+    } = await this.graphQLClient.request(
+      gql`
+        query MarketCategories($marketIds: [Int!]) {
+          markets(where: { marketId_in: $marketIds }) {
+            marketId
+            slug
+            categories {
+              ticker
+              name
+              img
+              color
+            }
+          }
+        }
+      `,
+      {
+        marketIds: pools.map((pool) => pool.marketId),
+      }
+    );
+    return categoriesResponse.markets;
+  }
+
+  async getAssetsForPoolsList(pools: FilteredPoolsListResponse["pools"]) {
+    const assetsResponse: {
+      assets: { poolId: number; price: number; qty: string; assetId: string }[];
+    } = await this.graphQLClient.request(
+      gql`
+        query Assets($poolIds: [Int!]) {
+          assets(where: { poolId_in: $poolIds }) {
+            assetId
+            id
+            poolId
+            price
+            qty
+          }
+        }
+      `,
+      {
+        poolIds: pools.map((pool) => pool.poolId),
+      }
+    );
+
+    return assetsResponse.assets;
+  }
+
+  async filterPools(
+    queryOptions = {
+      offset: 0,
+      limit: 5,
+    }
+  ): Promise<FilteredPoolsListItem[]> {
+    const marketIds = await this.getAllMarketIds();
+
+    const query = {
+      ...queryOptions,
+      marketIds,
+    };
+
+    const poolsResponse =
+      await this.graphQLClient.request<FilteredPoolsListResponse>(
+        gql`
+          query PoolsList($offset: Int!, $limit: Int!, $marketIds: [Int!]) {
+            pools(
+              offset: $offset
+              limit: $limit
+              where: { marketId_in: $marketIds }
+            ) {
+              poolId
+              accountId
+              baseAsset
+              marketId
+              poolStatus
+              scoringRule
+              swapFee
+              totalSubsidy
+              totalWeight
+              volume
+              ztgQty
+              marketId
+              weights {
+                assetId
+                len
+              }
+            }
+          }
+        `,
+        query
+      );
+
+    const [assetsForFetchedPools, marketDataForFetchedPools] =
+      await Promise.all([
+        this.getAssetsForPoolsList(poolsResponse.pools),
+        this.getMarketDataForPoolsList(poolsResponse.pools),
+      ]);
+
+    const pools = poolsResponse.pools
+      .map((pool) => {
+        const marketDataForPool = marketDataForFetchedPools.find(
+          (market) => market.marketId === pool.marketId
+        );
+
+        if (!marketDataForPool.categories) {
+          return null;
+        }
+
+        const assets = pool.weights.map((weight) => {
+          const assetId = AssetIdFromString(weight.assetId);
+          const percentage = Math.round(
+            (Number(weight.len) / Number(pool.totalWeight)) * 100
+          );
+          const asset = assetsForFetchedPools.find(
+            (asset) => asset.poolId === pool.poolId
+          );
+          const category =
+            "categoricalOutcome" in assetId
+              ? marketDataForPool.categories[assetId.categoricalOutcome[1]]
+              : "ztg";
+          return {
+            ...asset,
+            assetId,
+            percentage,
+            category,
+          };
+        });
+
+        const liquidity = assets
+          .reduce((total, asset) => {
+            if (!asset.price || !asset.qty) {
+              return new Decimal(0);
+            }
+            return total.add(
+              new Decimal(asset.price).mul(new Decimal(asset.qty))
+            );
+          }, new Decimal(0))
+          .toNumber();
+
+        return {
+          ...pool,
+          assets,
+          marketSlug: marketDataForPool.slug,
+          liquidity,
+        };
+      })
+      .filter((pool) => pool !== null);
+
+    return pools;
   }
 
   private createAssetsForMarket(
@@ -1167,10 +1354,7 @@ export default class Models {
    * @returns The data stored in a particular block.
    */
   async getBlockData(blockHash?: any): Promise<any> {
-    console.log(blockHash.toString());
-
     const data = await this.api.rpc.chain.getBlock(blockHash);
-    console.log(data);
     return data;
   }
 

@@ -79,6 +79,36 @@ export type ScalarOutcome = {
   scalarOutcome: scalarOutcomeIndex;
 };
 
+export type FilteredPoolsListResponse = {
+  pools: {
+    poolId: number;
+    account: string;
+    totalWeight: string;
+    weights: { assetId: string; len: number }[];
+    marketId: number;
+  }[];
+};
+
+export type FilteredPoolsListItem = {
+  assets: {
+    assetId: AssetId;
+    percentage: number;
+    category:
+      | string
+      | { ticker: string; name: string; img?: string; color: string };
+    poolId: number;
+    price: number;
+    qty: string;
+  }[];
+  liquidity: number;
+  poolId: number;
+  account: string;
+  totalWeight: string;
+  weights: { assetId: string; len: number }[];
+  marketId: number;
+  marketSlug: string;
+};
+
 // The market type as returned by the API call to `predictionMarkets.markets`.
 export type MarketResponse = {
   creator: string;

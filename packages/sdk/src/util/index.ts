@@ -37,7 +37,8 @@ const tolerantJsonParse = (anything) => {
 
 export const AssetIdFromString = (stringAsset: string | AssetId): AssetId => {
   // asset= ztg
-  if (stringAsset === "ztg") {
+
+  if (typeof stringAsset === "string" && stringAsset.toLowerCase() === "ztg") {
     return { ztg: null };
   }
 

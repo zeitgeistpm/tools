@@ -4,3 +4,4 @@ test
 jest.config.jsdoc
 node_modules
 tsconfig.json
+src/.playground
