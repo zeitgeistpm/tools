@@ -260,6 +260,8 @@ export type MarketsFilteringOptions = {
   creator?: string;
   oracle?: string;
   liquidityOnly?: boolean;
+  // get markets for which supplied account address owns some of the market's assets
+  assetOwner?: string;
 };
 
 export type MarketsPaginationOptions = {

@@ -425,7 +425,7 @@ export default class Models {
   ): Promise<ActiveAssetsResponse> {
     if (!this.graphQLClient) {
       throw Error(
-        "sdk.queryAllActiveAssets - no graphql client - method unavailable"
+        "sdk.models.queryAllActiveAssets - no graphql client - method unavailable"
       );
     }
     const maxLimit = Math.pow(2, 31) - 1;
@@ -729,6 +729,7 @@ export default class Models {
     creator,
     oracle,
     liquidityOnly = true,
+    assetOwner,
   }: MarketsFilteringOptions): Promise<number> {
     if (!this.graphQLClient) {
       return this.getMarketCount();
@@ -761,6 +762,11 @@ export default class Models {
       activeStatuses = undefined;
     }
 
+    let assets: string[];
+    if (assetOwner) {
+      assets = await this.queryAccountAssets(assetOwner);
+    }
+
     const wherePart = `where: {
       OR: [
         {
@@ -773,6 +779,7 @@ export default class Models {
           end_lt: $gt_end
           poolId_gte: $minPoolId
           marketId_in: $marketIds
+          outcomeAssets_containsAny: $assets
         },
         {
           status_in: $restStatuses
@@ -782,6 +789,7 @@ export default class Models {
           OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
           poolId_gte: $minPoolId
           marketId_in: $marketIds
+          outcomeAssets_containsAny: $assets
         }
       ]
     }`;
@@ -798,6 +806,7 @@ export default class Models {
         $gt_end: BigInt
         $minPoolId: Int
         $marketIds: [Int!]
+        $assets: [String!]
       ) {
         marketsConnection(
           ${wherePart}
@@ -826,10 +835,40 @@ export default class Models {
       gt_end: containsEnded && !containsActive ? timestamp : undefined,
       minPoolId: liquidityOnly ? 0 : undefined,
       marketIds,
+      assets,
     });
     const { totalCount } = totalCountData.marketsConnection;
 
     return totalCount;
+  }
+
+  private async queryAccountAssets(accountAddress: string): Promise<string[]> {
+    if (!this.graphQLClient) {
+      throw Error(
+        "sdk.models.queryMarketsByAssets - no graphql client - method unavailable"
+      );
+    }
+    const limit = Math.pow(31, 2) - 1;
+
+    const query1 = gql`
+      query assetsForAccount($limit: Int!, $accountAddress: String!) {
+        accountBalances(
+          where: { account: { wallet_eq: $accountAddress }, balance_gt: 0 }
+          limit: $limit
+        ) {
+          assetId
+        }
+      }
+    `;
+
+    const { accountBalances } = await this.graphQLClient.request<{
+      accountBalances: {
+        assetId: string;
+      }[];
+    }>(query1, { limit, accountAddress });
+
+    const assets = accountBalances.map((i) => i.assetId);
+    return assets;
   }
 
   /**
@@ -846,6 +885,7 @@ export default class Models {
       creator,
       oracle,
       liquidityOnly = true,
+      assetOwner,
     }: MarketsFilteringOptions,
     paginationOptions: MarketsPaginationOptions = {
       ordering: "desc",
@@ -887,6 +927,11 @@ export default class Models {
 
     const marketIds = await this.getAllMarketIds();
 
+    let assets: string[];
+    if (assetOwner) {
+      assets = await this.queryAccountAssets(assetOwner);
+    }
+
     const wherePart = `where: {
       OR: [
         {
@@ -899,6 +944,7 @@ export default class Models {
           end_lt: $gt_end
           poolId_gte: $minPoolId
           marketId_in: $marketIds
+          outcomeAssets_containsAny: $assets
         },
         {
           status_in: $restStatuses
@@ -908,6 +954,7 @@ export default class Models {
           OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
           poolId_gte: $minPoolId
           marketId_in: $marketIds
+          outcomeAssets_containsAny: $assets
         }
       ]
     }`;
@@ -927,6 +974,7 @@ export default class Models {
         $gt_end: BigInt
         $minPoolId: Int
         $marketIds: [Int!]
+        $assets: [String!]
       ) {
         markets(
           ${wherePart}
@@ -952,6 +1000,7 @@ export default class Models {
         $gt_end: BigInt
         $minPoolId: Int
         $marketIds: [Int!]
+        $assets: [String!]
       ) {
         marketsConnection(
           ${wherePart}
@@ -975,9 +1024,7 @@ export default class Models {
       (await this.api.query.timestamp.now()).toString()
     );
 
-    const marketsData = await this.graphQLClient.request<{
-      markets: MarketQueryData[];
-    }>(marketsQuery, {
+    const variables = {
       activeStatuses,
       restStatuses,
       tags,
@@ -991,28 +1038,28 @@ export default class Models {
       gt_end: containsEnded && !containsActive ? timestamp : undefined,
       minPoolId: liquidityOnly ? 0 : undefined,
       marketIds,
-    });
+      assets,
+    };
 
-    const { markets: queriedMarkets } = marketsData;
+    const [marketsData, totalCountData] =
+      await this.graphQLClient.batchRequests<
+        [
+          { data: { markets: MarketQueryData[] } },
+          { data: { marketsConnection: { totalCount: number } } }
+        ]
+      >([
+        {
+          document: marketsQuery,
+          variables,
+        },
+        {
+          document: totalCountQuery,
+          variables,
+        },
+      ]);
 
-    const totalCountData = await this.graphQLClient.request<{
-      marketsConnection: {
-        totalCount: number;
-      };
-    }>(totalCountQuery, {
-      activeStatuses,
-      restStatuses,
-      tags,
-      searchText,
-      creator,
-      oracle,
-      lt_end: !containsEnded && containsActive ? timestamp : undefined,
-      gt_end: containsEnded && !containsActive ? timestamp : undefined,
-      minPoolId: liquidityOnly ? 0 : undefined,
-      marketIds,
-    });
-
-    const { totalCount: count } = totalCountData.marketsConnection;
+    const { totalCount: count } = totalCountData.data.marketsConnection;
+    const queriedMarkets = marketsData.data.markets;
 
     for (const market of queriedMarkets) {
       if (market.status === "Active" && market.end < BigInt(timestamp)) {

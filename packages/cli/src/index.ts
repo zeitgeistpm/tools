@@ -807,13 +807,17 @@ program
     "--no-liquidity",
     "Show markets without liquidity in results. By default only markets with liquidity are shown"
   )
-  .option("--page-number <number>", "Page number of market results", "1")
-  .option("--page-size <number>", "Page size for the results", "100")
   .option(
     "--creator [string]",
     "Filter only markets created by account address"
   )
   .option("--oracle [string]", "Filter only markets created by market oracle")
+  .option(
+    "--asset-owner [string]",
+    "Get market for which supplied account owns any of the market assets"
+  )
+  .option("--page-number <number>", "Page number of market results", "1")
+  .option("--page-size <number>", "Page size for the results", "100")
   .addOption(
     new Option("--ordering <string>", "Ordering of markets")
       .choices(["asc", "desc"])
@@ -838,6 +842,7 @@ program
       creator,
       oracle,
       liquidity,
+      assetOwner,
     }: {
       graphQlEndpoint: string;
       endpoint: string;
@@ -851,6 +856,7 @@ program
       creator?: string;
       oracle?: string;
       liquidity: boolean;
+      assetOwner?: string;
     }) => {
       if (typeof statuses === "string") {
         statuses = [statuses];
@@ -871,6 +877,7 @@ program
         creator,
         oracle,
         liquidityOnly: liquidity,
+        assetOwner,
       });
     }
   );
