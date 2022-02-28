@@ -713,6 +713,10 @@ export default class Models {
         query
       );
 
+    if (!poolsResponse.pools.length) {
+      return [];
+    }
+
     const [assetsForFetchedPools, marketDataForFetchedPools] =
       await Promise.all([
         this.getAssetsForPoolsList(poolsResponse.pools),
