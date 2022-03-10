@@ -1265,6 +1265,33 @@ export default class Models {
     return { result, count };
   }
 
+  async getAssetPriceHistory(marketId: number, assetId: number) {
+    const combinedId = `[${marketId},${assetId}]`;
+
+    const query = gql`
+      query PriceHistory($combinedId: String) {
+        historicalAssets(
+          where: { assetId_contains: $combinedId }
+          orderBy: blockNumber_DESC
+        ) {
+          price
+          timestamp
+        }
+      }
+    `;
+
+    const response = await this.graphQLClient.request<{
+      historicalAssets: {
+        price: number;
+        timestamp: string;
+      }[];
+    }>(query, {
+      combinedId,
+    });
+
+    return response.historicalAssets;
+  }
+
   /**
    * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
    * @param marketId The unique identifier for the market you want to fetch.
