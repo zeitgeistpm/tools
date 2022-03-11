@@ -1292,6 +1292,82 @@ export default class Models {
     return response.historicalAssets;
   }
 
+  async getNearestPriceByBlock(
+    marketId: number,
+    assetId: number,
+    blockNumber: number
+  ) {
+    const combinedId = `[${marketId},${assetId}]`;
+    // get the nearest price either the side of the given block and return the closet one
+    const upperQuery = gql`
+      query PriceAbove($combinedId: String, $blockNumber: Int) {
+        historicalAssets(
+          where: {
+            assetId_contains: $combinedId
+            blockNumber_gte: $blockNumber
+          }
+          limit: 1
+          orderBy: blockNumber_ASC
+        ) {
+          timestamp
+          price
+          blockNumber
+        }
+      }
+    `;
+
+    const lowerQuery = gql`
+      query PriceAbove($combinedId: String, $blockNumber: Int) {
+        historicalAssets(
+          where: {
+            assetId_contains: $combinedId
+            blockNumber_lte: $blockNumber
+          }
+          limit: 1
+          orderBy: blockNumber_DESC
+        ) {
+          timestamp
+          price
+          blockNumber
+        }
+      }
+    `;
+
+    const [upperRes, lowerRes] = await Promise.all([
+      this.graphQLClient.request<{
+        historicalAssets: {
+          price: number;
+          timestamp: string;
+          blockNumber: number;
+        }[];
+      }>(upperQuery, {
+        combinedId,
+        blockNumber,
+      }),
+      this.graphQLClient.request<{
+        historicalAssets: {
+          price: number;
+          timestamp: string;
+          blockNumber: number;
+        }[];
+      }>(lowerQuery, {
+        combinedId,
+        blockNumber,
+      }),
+    ]);
+
+    const upperBlockDiff =
+      upperRes.historicalAssets[0].blockNumber - blockNumber;
+    const lowerBlockDiff =
+      blockNumber - lowerRes.historicalAssets[0].blockNumber;
+
+    if (upperBlockDiff > lowerBlockDiff) {
+      return lowerRes.historicalAssets[0].price;
+    } else {
+      return upperRes.historicalAssets[0].price;
+    }
+  }
+
   /**
    * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
    * @param marketId The unique identifier for the market you want to fetch.
