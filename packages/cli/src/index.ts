@@ -805,7 +805,7 @@ program
   )
   .option(
     "--no-liquidity",
-    "Show markets without liquidity in results. By default only markets with liquidity are shown"
+    "Also, show markets without liquidity in results. By default only markets with liquidity are shown"
   )
   .option(
     "--creator [string]",
