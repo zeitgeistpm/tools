@@ -73,7 +73,7 @@ export default class Models {
     }
     const entries = await this.api.query.marketCommons.markets.entries();
 
-    let ids = entries.map(
+    const ids = entries.map(
       ([
         {
           args: [val],
@@ -526,7 +526,7 @@ export default class Models {
     `;
 
     let pageSize: number;
-    let offset: number = 0;
+    let offset = 0;
     if (pagination) {
       pageSize = pagination.pageSize;
       offset = (pagination.pageNumber - 1) * pageSize;
