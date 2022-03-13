@@ -21,6 +21,9 @@ import {
   ActiveAssetsResponse,
   FilteredPoolsListResponse,
   FilteredPoolsListItem,
+  MarketStatusText,
+  MarketsOrderBy,
+  MarketsOrdering,
 } from "../types";
 import { isExtSigner } from "../util";
 
@@ -30,6 +33,7 @@ import Market from "./market";
 import Swap from "./swaps";
 import ErrorTable from "../errorTable";
 import IPFS from "../storage/ipfs";
+import { LargeNumberLike } from "crypto";
 
 export { Market, Swap };
 
@@ -431,13 +435,11 @@ export default class Models {
         "sdk.models.queryAllActiveAssets - no graphql client - method unavailable"
       );
     }
-    const maxLimit = Math.pow(2, 31) - 1;
     const query = gql`
       query markets(
         $timestamp: BigInt
         $marketIds: [Int!]
         $marketSlugText: String
-        $maxLimit: Int!
       ) {
         markets(
           where: {
@@ -448,7 +450,6 @@ export default class Models {
             marketId_in: $marketIds
           }
           orderBy: marketId_DESC
-          limit: $maxLimit
         ) {
           marketId
           slug
@@ -482,7 +483,6 @@ export default class Models {
       timestamp,
       marketIds,
       marketSlugText,
-      maxLimit,
     });
 
     const { markets } = data;
@@ -499,7 +499,7 @@ export default class Models {
       query poolsAssets(
         $poolIds: [Int!]
         $numPools: Int!
-        $pageSize: Int!
+        $pageSize: Int
         $offset: Int!
       ) {
         pools(where: { poolId_in: $poolIds }, limit: $numPools) {
@@ -525,8 +525,12 @@ export default class Models {
       }
     `;
 
-    const pageSize = pagination?.pageSize ?? maxLimit;
-    const offset = pagination ? (pagination.pageNumber - 1) * pageSize : 0;
+    let pageSize: number;
+    let offset = 0;
+    if (pagination) {
+      pageSize = pagination.pageSize;
+      offset = (pagination.pageNumber - 1) * pageSize;
+    }
 
     const poolsData = await this.graphQLClient.request<{
       pools: {
@@ -815,7 +819,7 @@ export default class Models {
         continue;
       }
       if (typeof val === "string") {
-        marketPeriod[p] = JSON.parse(val);
+        marketPeriod[p] = JSON.parse(`[${val}]`);
       }
     }
 
@@ -908,267 +912,118 @@ export default class Models {
     return this.constructMarketFromQueryData(queriedMarketData);
   }
 
-  /**
-   * Queries count of markets for specified filter options.
-   * @param param0 filtering options
-   * @returns count of markets for specified filters
-   */
-  async queryMarketsCount({
-    statuses,
-    tags,
-    searchText = "",
-    creator,
-    oracle,
-    liquidityOnly = true,
-    assetOwner,
-  }: MarketsFilteringOptions): Promise<number> {
-    if (!this.graphQLClient) {
-      return this.getMarketCount();
-    }
-    const marketIds = await this.getAllMarketIds();
+  private constructQueriesForMarketsFiltering(
+    filteringOptions: MarketsFilteringOptions,
+    countOnly = false
+  ): {
+    queries: string[];
+    containsActive: boolean;
+    containsEnded: boolean;
+    statuses: MarketStatusText[];
+  } {
+    // need this since `status_in` needs [String!] type which is `undefined` or non-empty array of strings
+    // `statuses` variable is returned and used in queries as a variable
+    let statuses = filteringOptions.statuses ?? [
+      "Proposed",
+      "Active",
+      "Ended",
+      "Disputed",
+      "Reported",
+      "Resolved",
+    ];
+    const { searchText } = filteringOptions;
 
-    const containsEnded = statuses?.includes("Ended") ?? false;
-    const containsActive = statuses?.includes("Active") ?? false;
+    // since Ended is not actual stored status, if active status is specified in parameters,
+    // it needs to be handled in a separate `where` clause
+    const containsEnded = statuses.includes("Ended") ?? false;
+    const containsActive = statuses.includes("Active") ?? false;
 
-    if (containsEnded) {
-      statuses = statuses.filter((s) => s !== "Ended");
-      if (!containsActive) {
-        statuses.push("Active");
-      }
-    }
+    statuses = statuses.filter((s) => s !== "Ended" && s !== "Active");
 
-    let activeStatuses: string[] | undefined = [];
-
-    if (containsActive || containsEnded) {
-      activeStatuses.push("Active");
-    }
-
-    if (statuses?.includes("Proposed")) {
-      activeStatuses.push("Proposed");
-    }
-
-    const restStatuses = statuses?.filter((s) => s !== "Active") ?? [];
-
-    if (activeStatuses.length === 0 && restStatuses.length === 0) {
-      activeStatuses = undefined;
-    }
-
-    let assets: string[];
-    if (assetOwner) {
-      assets = await this.queryAccountAssets(assetOwner);
-    }
-
-    const wherePart = `where: {
-      OR: [
-        {
-          status_in: $activeStatuses
-          tags_containsAll: $tags
-          creator_eq: $creator
-          oracle_eq: $oracle
-          OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
-          end_gt: $lt_end
-          end_lt: $gt_end
-          poolId_gte: $minPoolId
-          marketId_in: $marketIds
-          outcomeAssets_containsAny: $assets
-        },
-        {
-          status_in: $restStatuses
-          tags_containsAll: $tags
-          creator_eq: $creator
-          oracle_eq: $oracle
-          OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
-          poolId_gte: $minPoolId
-          marketId_in: $marketIds
-          outcomeAssets_containsAny: $assets
-        }
-      ]
+    const whereSearchText = `slug_contains: ${
+      searchText == null
+        ? '""'
+        : "$searchText, OR: { question_contains: $searchText },"
     }`;
 
-    const totalCountQuery = gql`
-      query totalCount(
-        $activeStatuses: [String!]
-        $restStatuses: [String!]
+    const whereNoActive = `{
+      status_in: $statuses
+      ${whereSearchText}
+      tags_containsAll: $tags
+      creator_eq: $creator
+      oracle_eq: $oracle
+      poolId_gte: $minPoolId
+      marketId_in: $marketIds
+      outcomeAssets_containsAny: $assets
+    }`;
+
+    const whereActive = `{
+      status_eq: "Active"
+      ${whereSearchText}
+      tags_containsAll: $tags
+      creator_eq: $creator
+      oracle_eq: $oracle
+      end_gt: $end_gt
+      end_lt: $end_lt
+      poolId_gte: $minPoolId
+      marketId_in: $marketIds
+      outcomeAssets_containsAny: $assets
+    }`;
+
+    let where = `where: { OR: [`;
+
+    if (statuses.length > 0) {
+      where = `${where} ${whereNoActive}`;
+    }
+    const searchActive = containsActive || containsEnded;
+    if (searchActive) {
+      where = `${where}, ${whereActive}`;
+    }
+
+    where = `${where} ] }`;
+
+    const countQuery = gql`
+      query TotalMarketsCount(
+        ${statuses.length > 0 ? "$statuses: [String!]" : ""}
         $tags: [String!]
-        $searchText: String
+        ${searchText == null ? "" : "$searchText: String!"}
         $creator: String
         $oracle: String
-        $lt_end: BigInt
-        $gt_end: BigInt
+        ${searchActive ? "$end_gt: BigInt, $end_lt: BigInt," : ""}
         $minPoolId: Int
         $marketIds: [Int!]
         $assets: [String!]
       ) {
         marketsConnection(
-          ${wherePart}
+          ${where}
+          orderBy: id_ASC
         ) {
           totalCount
         }
       }
     `;
 
-    const timestamp = parseInt(
-      (await this.api.query.timestamp.now()).toString()
-    );
-
-    const totalCountData = await this.graphQLClient.request<{
-      marketsConnection: {
-        totalCount: number;
-      };
-    }>(totalCountQuery, {
-      activeStatuses,
-      restStatuses,
-      tags,
-      searchText,
-      creator,
-      oracle,
-      lt_end: !containsEnded && containsActive ? timestamp : undefined,
-      gt_end: containsEnded && !containsActive ? timestamp : undefined,
-      minPoolId: liquidityOnly ? 0 : undefined,
-      marketIds,
-      assets,
-    });
-    const { totalCount } = totalCountData.marketsConnection;
-
-    return totalCount;
-  }
-
-  private async queryAccountAssets(accountAddress: string): Promise<string[]> {
-    if (!this.graphQLClient) {
-      throw Error(
-        "sdk.models.queryMarketsByAssets - no graphql client - method unavailable"
-      );
-    }
-    const limit = Math.pow(31, 2) - 1;
-
-    const query1 = gql`
-      query assetsForAccount($limit: Int!, $accountAddress: String!) {
-        accountBalances(
-          where: { account: { wallet_eq: $accountAddress }, balance_gt: 0 }
-          limit: $limit
-        ) {
-          assetId
-        }
-      }
-    `;
-
-    const { accountBalances } = await this.graphQLClient.request<{
-      accountBalances: {
-        assetId: string;
-      }[];
-    }>(query1, { limit, accountAddress });
-
-    const assets = accountBalances.map((i) => i.assetId);
-    return assets;
-  }
-
-  /**
-   * Queries subsquid indexer for market data with pagination.
-   * @param param0 filtering options
-   * @param paginationOptions pagination options
-   * @returns collection of markets and total count for specified options
-   */
-  async filterMarkets(
-    {
-      statuses,
-      tags,
-      searchText = "",
-      creator,
-      oracle,
-      liquidityOnly = true,
-      assetOwner,
-    }: MarketsFilteringOptions,
-    paginationOptions: MarketsPaginationOptions = {
-      ordering: "desc",
-      orderBy: "newest",
-      pageSize: 10,
-      pageNumber: 1,
-    }
-  ): Promise<{ result: Market[]; count: number }> {
-    if (this.graphQLClient == null) {
-      const result = await this.getAllMarkets();
-      const count = result.length;
-      return { result, count };
-    }
-    const containsEnded = statuses?.includes("Ended") ?? false;
-    const containsActive = statuses?.includes("Active") ?? false;
-
-    if (containsEnded) {
-      statuses = statuses.filter((s) => s !== "Ended");
-      if (!containsActive) {
-        statuses.push("Active");
-      }
+    if (countOnly) {
+      return { statuses, containsActive, containsEnded, queries: [countQuery] };
     }
 
-    let activeStatuses: string[] | undefined = [];
-
-    if (containsActive || containsEnded) {
-      activeStatuses.push("Active");
-    }
-
-    if (statuses?.includes("Proposed")) {
-      activeStatuses.push("Proposed");
-    }
-
-    const restStatuses = statuses?.filter((s) => s !== "Active") ?? [];
-
-    if (activeStatuses.length === 0 && restStatuses.length === 0) {
-      activeStatuses = undefined;
-    }
-
-    const marketIds = await this.getAllMarketIds();
-
-    let assets: string[];
-    if (assetOwner) {
-      assets = await this.queryAccountAssets(assetOwner);
-    }
-
-    const wherePart = `where: {
-      OR: [
-        {
-          status_in: $activeStatuses
-          tags_containsAll: $tags
-          creator_eq: $creator
-          oracle_eq: $oracle
-          OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
-          end_gt: $lt_end
-          end_lt: $gt_end
-          poolId_gte: $minPoolId
-          marketId_in: $marketIds
-          outcomeAssets_containsAny: $assets
-        },
-        {
-          status_in: $restStatuses
-          tags_containsAll: $tags
-          creator_eq: $creator
-          oracle_eq: $oracle
-          OR: [{ slug_contains: $searchText }, { question_contains: $searchText }]
-          poolId_gte: $minPoolId
-          marketId_in: $marketIds
-          outcomeAssets_containsAny: $assets
-        }
-      ]
-    }`;
-
-    const marketsQuery = gql`
-      query marketPage(
-        $activeStatuses: [String!]
-        $restStatuses: [String!]
+    const filterQuery = gql`
+      query MarketPage(
+        ${statuses.length > 0 ? "$statuses: [String!]" : ""}
         $tags: [String!]
-        $searchText: String
-        $pageSize: Int!
+        ${searchText == null ? "" : "$searchText: String!"}
+        $pageSize: Int
         $offset: Int!
         $orderByQuery: [MarketOrderByInput!]
         $creator: String
         $oracle: String
-        $lt_end: BigInt
-        $gt_end: BigInt
+        ${searchActive ? "$end_gt: BigInt, $end_lt: BigInt," : ""}
         $minPoolId: Int
         $marketIds: [Int!]
         $assets: [String!]
       ) {
         markets(
-          ${wherePart}
+          ${where}
           limit: $pageSize
           offset: $offset
           orderBy: $orderByQuery
@@ -1179,31 +1034,97 @@ export default class Models {
       ${FRAGMENT_MARKET_DETAILS}
     `;
 
-    const totalCountQuery = gql`
-      query totalCount(
-        $activeStatuses: [String!]
-        $restStatuses: [String!]
-        $tags: [String!]
-        $searchText: String
-        $creator: String
-        $oracle: String
-        $lt_end: BigInt
-        $gt_end: BigInt
-        $minPoolId: Int
-        $marketIds: [Int!]
-        $assets: [String!]
-      ) {
-        marketsConnection(
-          ${wherePart}
+    return {
+      statuses,
+      containsActive,
+      containsEnded,
+      queries: [countQuery, filterQuery],
+    };
+  }
+
+  /**
+   * Queries count of markets for specified filter options.
+   * @param param0 filtering options
+   * @returns count of markets for specified filters
+   */
+  async queryMarketsCount(
+    filteringOptions: MarketsFilteringOptions
+  ): Promise<number> {
+    if (!this.graphQLClient) {
+      return this.getMarketCount();
+    }
+    const { count: totalCount } = await this.queryMarketPage(
+      filteringOptions,
+      {}
+    );
+
+    return totalCount;
+  }
+
+  private async queryAccountAssets(accountAddress: string): Promise<string[]> {
+    if (!this.graphQLClient) {
+      throw Error(
+        "sdk.models.queryMarketsByAssets - no graphql client - method unavailable"
+      );
+    }
+
+    const query1 = gql`
+      query assetsForAccount($limit: Int!, $accountAddress: String!) {
+        accountBalances(
+          where: { account: { wallet_eq: $accountAddress }, balance_gt: 0 }
         ) {
-          totalCount
+          assetId
         }
       }
     `;
 
-    const { pageSize, pageNumber, ordering, orderBy } = paginationOptions;
+    const { accountBalances } = await this.graphQLClient.request<{
+      accountBalances: {
+        assetId: string;
+      }[];
+    }>(query1, { accountAddress });
 
-    const offset = (pageNumber - 1) * pageSize;
+    const assets = accountBalances.map((i) => i.assetId);
+    return assets;
+  }
+
+  private async queryMarketPage(
+    filteringOptions: MarketsFilteringOptions,
+    paginationOptions: Partial<MarketsPaginationOptions>,
+    countOnly = false
+  ): Promise<{ result: Market[] | null; count: number }> {
+    const { tags, searchText, creator, oracle, assetOwner } = filteringOptions;
+    const liquidityOnly = filteringOptions.liquidityOnly ?? true;
+
+    const marketIds = await this.getAllMarketIds();
+
+    const { statuses, containsActive, containsEnded, queries } =
+      this.constructQueriesForMarketsFiltering(filteringOptions, countOnly);
+
+    const [totalCountQuery, marketsQuery] = queries;
+
+    // console.log("QUERIES-------------------");
+    // console.log(totalCountQuery, marketsQuery);
+
+    let assets: string[];
+    if (assetOwner) {
+      assets = await this.queryAccountAssets(assetOwner);
+    }
+
+    let pageSize: number;
+    let pageNumber: number;
+    let ordering: MarketsOrdering;
+    let orderBy: MarketsOrderBy;
+
+    if (paginationOptions) {
+      ({ pageSize, pageNumber, ordering, orderBy } = paginationOptions);
+    }
+
+    ordering = ordering ?? "asc";
+    orderBy = orderBy ?? "newest";
+    pageNumber = pageNumber ?? 1;
+
+    const offset = pageSize ? (pageNumber - 1) * pageSize : 0;
     let orderingStr = ordering.toUpperCase();
     if (orderBy === "newest") {
       orderingStr = ordering === "asc" ? "DESC" : "ASC";
@@ -1216,8 +1137,7 @@ export default class Models {
     );
 
     const variables = {
-      activeStatuses,
-      restStatuses,
+      statuses,
       tags,
       searchText,
       pageSize,
@@ -1225,32 +1145,29 @@ export default class Models {
       orderByQuery,
       creator,
       oracle,
-      lt_end: !containsEnded && containsActive ? timestamp : undefined,
-      gt_end: containsEnded && !containsActive ? timestamp : undefined,
+      end_gt: !containsEnded && containsActive ? timestamp : undefined,
+      end_lt: containsEnded && !containsActive ? timestamp : undefined,
       minPoolId: liquidityOnly ? 0 : undefined,
       marketIds,
       assets,
     };
 
-    const [marketsData, totalCountData] =
-      await this.graphQLClient.batchRequests<
-        [
-          { data: { markets: MarketQueryData[] } },
-          { data: { marketsConnection: { totalCount: number } } }
-        ]
-      >([
-        {
-          document: marketsQuery,
-          variables,
-        },
-        {
-          document: totalCountQuery,
-          variables,
-        },
-      ]);
+    // console.log(JSON.stringify({ ...variables, marketIds: null }, null, 2));
+    const totalCountData = await this.graphQLClient.request<{
+      marketsConnection: { totalCount: number };
+    }>(totalCountQuery, variables);
+    const { totalCount: count } = totalCountData.marketsConnection;
 
-    const { totalCount: count } = totalCountData.data.marketsConnection;
-    const queriedMarkets = marketsData.data.markets;
+    if (countOnly) {
+      return { count, result: null };
+    }
+    const marketsData = await this.graphQLClient.request<{
+      markets: MarketQueryData[];
+    }>(marketsQuery, variables);
+
+    // console.log("markets", JSON.stringify(marketsData, null, 2));
+
+    const queriedMarkets = marketsData.markets;
 
     for (const market of queriedMarkets) {
       if (market.status === "Active" && market.end < BigInt(timestamp)) {
@@ -1258,11 +1175,34 @@ export default class Models {
       }
     }
 
-    const result = queriedMarkets.map((m) =>
-      this.constructMarketFromQueryData(m)
-    );
+    const result = queriedMarkets.map((m) => {
+      return this.constructMarketFromQueryData(m);
+    });
 
     return { result, count };
+  }
+
+  /**
+   * Queries subsquid indexer for market data with pagination.
+   * @param param0 filtering options
+   * @param paginationOptions pagination options
+   * @returns collection of markets and total count for specified options
+   */
+  async filterMarkets(
+    filteringOptions: MarketsFilteringOptions,
+    paginationOptions: MarketsPaginationOptions = {
+      ordering: "desc",
+      orderBy: "newest",
+      pageSize: 10,
+      pageNumber: 1,
+    }
+  ): Promise<{ result: Market[]; count: number }> {
+    if (this.graphQLClient == null) {
+      const result = await this.getAllMarkets();
+      const count = result.length;
+      return { result, count };
+    }
+    return this.queryMarketPage(filteringOptions, paginationOptions);
   }
 
   /**
