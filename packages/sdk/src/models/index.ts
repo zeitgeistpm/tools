@@ -1265,13 +1265,17 @@ export default class Models {
     return { result, count };
   }
 
-  async getAssetPriceHistory(marketId: number, assetId: number) {
+  async getAssetPriceHistory(
+    marketId: number,
+    assetId: number,
+    startTime: string //ISO string format
+  ) {
     const combinedId = `[${marketId},${assetId}]`;
 
     const query = gql`
-      query PriceHistory($combinedId: String) {
+      query PriceHistory($combinedId: String, $startTime: DateTime) {
         historicalAssets(
-          where: { assetId_contains: $combinedId }
+          where: { assetId_contains: $combinedId, timestamp_gte: $startTime }
           orderBy: blockNumber_DESC
         ) {
           price
@@ -1287,6 +1291,7 @@ export default class Models {
       }[];
     }>(query, {
       combinedId,
+      startTime,
     });
 
     return response.historicalAssets;
