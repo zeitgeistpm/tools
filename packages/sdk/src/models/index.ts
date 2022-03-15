@@ -1297,22 +1297,19 @@ export default class Models {
     return response.historicalAssets;
   }
 
-  async getNearestPriceByBlock(
+  async getNearestPriceByDateTime(
     marketId: number,
     assetId: number,
-    blockNumber: number
+    dateTime: string //ISO string format
   ) {
     const combinedId = `[${marketId},${assetId}]`;
     // get the nearest price either the side of the given block and return the closet one
     const upperQuery = gql`
-      query PriceAbove($combinedId: String, $blockNumber: Int) {
+      query PriceAbove($combinedId: String, $dateTime: DateTime) {
         historicalAssets(
-          where: {
-            assetId_contains: $combinedId
-            blockNumber_gte: $blockNumber
-          }
+          where: { assetId_contains: $combinedId, timestamp_gte: $dateTime }
           limit: 1
-          orderBy: blockNumber_ASC
+          orderBy: timestamp_ASC
         ) {
           timestamp
           price
@@ -1322,14 +1319,11 @@ export default class Models {
     `;
 
     const lowerQuery = gql`
-      query PriceAbove($combinedId: String, $blockNumber: Int) {
+      query PriceAbove($combinedId: String, $dateTime: DateTime) {
         historicalAssets(
-          where: {
-            assetId_contains: $combinedId
-            blockNumber_lte: $blockNumber
-          }
+          where: { assetId_contains: $combinedId, timestamp_lte: $dateTime }
           limit: 1
-          orderBy: blockNumber_DESC
+          orderBy: timestamp_DESC
         ) {
           timestamp
           price
@@ -1347,7 +1341,7 @@ export default class Models {
         }[];
       }>(upperQuery, {
         combinedId,
-        blockNumber,
+        dateTime,
       }),
       this.graphQLClient.request<{
         historicalAssets: {
@@ -1357,14 +1351,17 @@ export default class Models {
         }[];
       }>(lowerQuery, {
         combinedId,
-        blockNumber,
+        dateTime,
       }),
     ]);
 
+    const targetUnixTime = new Date(dateTime).getTime();
     const upperBlockDiff =
-      upperRes.historicalAssets[0].blockNumber - blockNumber;
+      new Date(upperRes.historicalAssets[0].timestamp).getTime() -
+      targetUnixTime;
     const lowerBlockDiff =
-      blockNumber - lowerRes.historicalAssets[0].blockNumber;
+      targetUnixTime -
+      new Date(lowerRes.historicalAssets[0].timestamp).getTime();
 
     if (upperBlockDiff > lowerBlockDiff) {
       return lowerRes.historicalAssets[0].price;
