@@ -1193,7 +1193,7 @@ export default class Models {
       query PriceHistory($combinedId: String, $startTime: DateTime) {
         historicalAssets(
           where: { assetId_contains: $combinedId, timestamp_gte: $startTime }
-          orderBy: blockNumber_DESC
+          orderBy: blockNumber_ASC
         ) {
           price
           timestamp
@@ -1212,79 +1212,6 @@ export default class Models {
     });
 
     return response.historicalAssets;
-  }
-
-  async getNearestPriceByDateTime(
-    marketId: number,
-    assetId: number,
-    dateTime: string //ISO string format
-  ) {
-    const combinedId = `[${marketId},${assetId}]`;
-    // get the nearest price either the side of the given block and return the closet one
-    const upperQuery = gql`
-      query PriceAbove($combinedId: String, $dateTime: DateTime) {
-        historicalAssets(
-          where: { assetId_contains: $combinedId, timestamp_gte: $dateTime }
-          limit: 1
-          orderBy: timestamp_ASC
-        ) {
-          timestamp
-          price
-          blockNumber
-        }
-      }
-    `;
-
-    const lowerQuery = gql`
-      query PriceAbove($combinedId: String, $dateTime: DateTime) {
-        historicalAssets(
-          where: { assetId_contains: $combinedId, timestamp_lte: $dateTime }
-          limit: 1
-          orderBy: timestamp_DESC
-        ) {
-          timestamp
-          price
-          blockNumber
-        }
-      }
-    `;
-
-    const [upperRes, lowerRes] = await Promise.all([
-      this.graphQLClient.request<{
-        historicalAssets: {
-          price: number;
-          timestamp: string;
-          blockNumber: number;
-        }[];
-      }>(upperQuery, {
-        combinedId,
-        dateTime,
-      }),
-      this.graphQLClient.request<{
-        historicalAssets: {
-          price: number;
-          timestamp: string;
-          blockNumber: number;
-        }[];
-      }>(lowerQuery, {
-        combinedId,
-        dateTime,
-      }),
-    ]);
-
-    const targetUnixTime = new Date(dateTime).getTime();
-    const upperBlockDiff =
-      new Date(upperRes.historicalAssets[0].timestamp).getTime() -
-      targetUnixTime;
-    const lowerBlockDiff =
-      targetUnixTime -
-      new Date(lowerRes.historicalAssets[0].timestamp).getTime();
-
-    if (upperBlockDiff > lowerBlockDiff) {
-      return lowerRes.historicalAssets[0].price;
-    } else {
-      return upperRes.historicalAssets[0].price;
-    }
   }
 
   /**
