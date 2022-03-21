@@ -782,9 +782,9 @@ export default class Models {
 
   private createAssetsForMarket(
     marketId: MarketId,
-    marketType: MarketType
+    marketType: MarketType | null
   ): Asset[] {
-    return marketType.isCategorical
+    return marketType?.isCategorical
       ? [...Array(marketType.asCategorical.toNumber()).keys()].map((catIdx) => {
           return this.api.createType("Asset", {
             categoricalOutcome: [marketId, catIdx],
@@ -806,7 +806,7 @@ export default class Models {
       if (val == null) {
         continue;
       }
-      if (typeof val === "string") {
+      if (typeof val === "string" && marketType.categorical != null) {
         marketType[type] = Number(val);
       }
     }
@@ -845,7 +845,9 @@ export default class Models {
 
     const outcomeAssets = this.createAssetsForMarket(
       marketId,
-      this.api.createType("MarketType", marketType)
+      marketType.categorical != null
+        ? this.api.createType("MarketType", marketType)
+        : null
     );
 
     const marketReport =
@@ -1184,10 +1186,12 @@ export default class Models {
 
   async getAssetPriceHistory(
     marketId: number,
-    assetId: number,
+    assetId: number | string,
     startTime: string //ISO string format
   ) {
-    const combinedId = `[${marketId},${assetId}]`;
+    const combinedId = `[${marketId},${
+      typeof assetId === "string" ? `"${assetId}"` : assetId
+    }]`;
 
     const query = gql`
       query PriceHistory($combinedId: String, $startTime: DateTime) {
