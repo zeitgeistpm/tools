@@ -1182,6 +1182,38 @@ export default class Models {
     return { result, count };
   }
 
+  async getAssetPriceHistory(
+    marketId: number,
+    assetId: number,
+    startTime: string //ISO string format
+  ) {
+    const combinedId = `[${marketId},${assetId}]`;
+
+    const query = gql`
+      query PriceHistory($combinedId: String, $startTime: DateTime) {
+        historicalAssets(
+          where: { assetId_contains: $combinedId, timestamp_gte: $startTime }
+          orderBy: blockNumber_ASC
+        ) {
+          price
+          timestamp
+        }
+      }
+    `;
+
+    const response = await this.graphQLClient.request<{
+      historicalAssets: {
+        price: number;
+        timestamp: string;
+      }[];
+    }>(query, {
+      combinedId,
+      startTime,
+    });
+
+    return response.historicalAssets;
+  }
+
   /**
    * Queries subsquid indexer for market data with pagination.
    * @param param0 filtering options
