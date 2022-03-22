@@ -33,19 +33,21 @@ import Market from "./market";
 import Swap from "./swaps";
 import ErrorTable from "../errorTable";
 import IPFS from "../storage/ipfs";
-import { LargeNumberLike } from "crypto";
 
 export { Market, Swap };
 
 type Options = {
   MAX_RPC_REQUESTS?: number;
   graphQLClient?: GraphQLClient;
+  ipfsClientUrl?: string;
 };
 
 export default class Models {
   private api: ApiPromise;
   private errorTable: ErrorTable;
   private graphQLClient?: GraphQLClient;
+
+  private ipfsClient: IPFS;
 
   private marketIds: number[];
 
@@ -56,6 +58,8 @@ export default class Models {
     this.errorTable = errorTable;
     this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
     this.graphQLClient = opts.graphQLClient;
+
+    this.ipfsClient = new IPFS(opts.ipfsClientUrl);
   }
 
   getGraphQLClient(): GraphQLClient {
@@ -131,9 +135,7 @@ export default class Models {
       | ((result: ISubmittableResult, _unsub: () => void) => void)
       | boolean = false
   ): Promise<string> {
-    const ipfs = new IPFS();
-
-    const cid = await ipfs.add(
+    const cid = await this.ipfsClient.add(
       JSON.stringify({
         ...metadata,
       })
@@ -241,10 +243,9 @@ export default class Models {
       | ((result: ISubmittableResult, _unsub: () => void) => void)
       | boolean = false
   ): Promise<string> {
-    const ipfs = new IPFS();
     const categories = metadata.categories;
 
-    const cid = await ipfs.add(
+    const cid = await this.ipfsClient.add(
       JSON.stringify({
         ...metadata,
       })
@@ -344,9 +345,7 @@ export default class Models {
       | ((result: ISubmittableResult, _unsub: () => void) => void)
       | boolean = false
   ): Promise<string> {
-    const ipfs = new IPFS();
-
-    const cid = await ipfs.add(
+    const cid = await this.ipfsClient.add(
       JSON.stringify({
         ...metadata,
       })
@@ -1260,8 +1259,7 @@ export default class Models {
 
     try {
       if (metadataString) {
-        const ipfs = new IPFS();
-        const raw = await ipfs.read(metadataString);
+        const raw = await this.ipfsClient.read(metadataString);
 
         const parsed = JSON.parse(raw) as DecodedMarketMetadata;
         metadata = parsed;

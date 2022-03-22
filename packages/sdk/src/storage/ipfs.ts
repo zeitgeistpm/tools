@@ -2,13 +2,13 @@ import { hexToString, u8aToString } from "@polkadot/util";
 import CID from "cids";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
-import { initIpfs } from "../util";
+import ipfsClient from "ipfs-http-client";
 
 export default class IPFS {
-  private client: any;
+  private client: ReturnType<typeof ipfsClient>;
 
-  constructor() {
-    this.client = initIpfs();
+  constructor(ipfsClientUrl = "https://ipfs.zeitgeist.pm") {
+    this.client = ipfsClient({ url: ipfsClientUrl });
   }
 
   async add(content: string, hashAlg = "sha3-384"): Promise<CID> {

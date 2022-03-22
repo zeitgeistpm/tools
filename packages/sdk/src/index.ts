@@ -12,6 +12,7 @@ export * as util from "./util";
 type InitOptions = {
   logEndpointInitTime?: boolean;
   graphQlEndpoint?: string;
+  ipfsClientUrl?: string;
 };
 
 export const pingGqlEndpoint = async (endpoint: string) => {
@@ -56,7 +57,10 @@ export default class SDK {
 
   static async initialize(
     endpoint = "wss://bsr.zeitgeist.pm",
-    opts: InitOptions = { logEndpointInitTime: true }
+    opts: InitOptions = {
+      logEndpointInitTime: true,
+      ipfsClientUrl: "https://ipfs.zeitgeist.pm",
+    }
   ): Promise<SDK> {
     try {
       const start = Date.now();
@@ -70,7 +74,7 @@ export default class SDK {
         console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
       }
 
-      const { graphQlEndpoint } = opts;
+      const { graphQlEndpoint, ipfsClientUrl } = opts;
       let graphQLClient: GraphQLClient;
 
       if (graphQlEndpoint != null) {
@@ -83,7 +87,7 @@ export default class SDK {
       }
 
       const eTable = await ErrorTable.populate(api);
-      const sdk = new SDK(api, eTable, graphQLClient);
+      const sdk = new SDK(api, eTable, graphQLClient, ipfsClientUrl);
 
       return sdk;
     } catch (e) {
@@ -99,13 +103,20 @@ export default class SDK {
     return this.graphQLClient != null;
   }
 
+  /**
+   * @param api Polkadot.js API
+   * @param graphQLClient If sdk is able to connect to this graphql client graphql support is enabled
+   * @param ipfsClientUrl Connect to this ipfs node instead of the default one (https://ipfs.zeitgesit.pm)
+   */
   constructor(
     public api: ApiPromise,
     public errorTable?: ErrorTable,
-    public graphQLClient?: GraphQLClient
+    public graphQLClient?: GraphQLClient,
+    ipfsClientUrl?: string
   ) {
-    this.models = new Models(this.api, errorTable, { graphQLClient });
+    this.models = new Models(this.api, errorTable, {
+      graphQLClient,
+      ipfsClientUrl,
+    });
   }
 }
-
-// Needs an changed line to redeploy version.

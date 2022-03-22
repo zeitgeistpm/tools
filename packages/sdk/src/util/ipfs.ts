@@ -1,8 +1,9 @@
 import ipfsClient from "ipfs-http-client";
 
-/** Creates an IPFS client connected to the Zeitgeist-hosted node. */
-export const initIpfs = () => {
+export const initIpfs = (
+  ipfsClientUrl = "https://ipfs.zeitgeist.pm"
+): ReturnType<typeof ipfsClient> => {
   return ipfsClient({
-    url: "https://ipfs.zeitgeist.pm",
+    url: ipfsClientUrl,
   });
 };
