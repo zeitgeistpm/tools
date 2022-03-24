@@ -841,7 +841,12 @@ export default class Models {
       img: data.img,
     };
 
-    const marketTypeAsType = this.api.createType("MarketType", marketType);
+    const marketTypeAsType =
+      marketType.categorical != null
+        ? this.api.createType("MarketType", marketType)
+        : this.api.createType("MarketType", {
+            scalar: marketType.scalar.split(","),
+          });
 
     const outcomeAssets = this.createAssetsForMarket(
       marketId,
