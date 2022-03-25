@@ -86,8 +86,8 @@ export const AssetIdFromString = (stringAsset: string | AssetId): AssetId => {
       return { poolShare: asset.poolShare };
     }
     if (
-      typeof asset.categoricalOutcome[0] === "number" &&
-      typeof asset.categoricalOutcome[1] === "number"
+      typeof asset.categoricalOutcome?.[0] === "number" &&
+      typeof asset.categoricalOutcome?.[1] === "number"
     ) {
       return { categoricalOutcome: asset.categoricalOutcome.slice(0, 2) };
     }
