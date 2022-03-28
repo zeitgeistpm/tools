@@ -1222,6 +1222,66 @@ export default class Models {
     return response.historicalAssets;
   }
 
+  async getAccountHistoricalValues(address: string, startTime: string) {
+    const query = gql`
+      query AccountHistory($address: String, $startTime: DateTime) {
+        historicalAccountBalances(
+          where: { accountId_eq: $address, timestamp_gte: $startTime }
+          orderBy: timestamp_DESC
+        ) {
+          pvalue
+          timestamp
+        }
+      }
+    `;
+
+    const response = await this.graphQLClient.request<{
+      historicalAccountBalances: {
+        pvalue: number;
+        timestamp: string;
+      }[];
+    }>(query, {
+      address,
+      startTime,
+    });
+
+    const history = response.historicalAccountBalances;
+
+    if (history.length > 0) {
+      return history;
+    } else {
+      // if there no records within the given range we need to go back and find the last record to
+      // find the current price
+      const lastRecordQuery = gql`
+      query LastPriceRecord($address: String, ) {
+        historicalAccountBalances(where: {accountId_eq: $address}, orderBy: timestamp_DESC, limit:1) {
+          pvalue
+          timestamp
+      }
+    `;
+      const lastRecordResponse = await this.graphQLClient.request<{
+        historicalAccountBalances: {
+          pvalue: number;
+          timestamp: string;
+        }[];
+      }>(lastRecordQuery, {
+        address,
+      });
+
+      const lastRecord = lastRecordResponse.historicalAccountBalances;
+
+      if (lastRecord.length > 0) {
+        const lastPrice = lastRecord[0].pvalue;
+        return [
+          { pvalue: lastPrice, timestamp: startTime },
+          { pvalue: lastPrice, timestamp: new Date().toISOString() },
+        ];
+      } else {
+        return [];
+      }
+    }
+  }
+
   /**
    * Queries subsquid indexer for market data with pagination.
    * @param param0 filtering options
