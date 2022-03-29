@@ -1253,12 +1253,17 @@ export default class Models {
       // if there no records within the given range we need to go back and find the last record to
       // find the current price
       const lastRecordQuery = gql`
-      query LastPriceRecord($address: String, ) {
-        historicalAccountBalances(where: {accountId_eq: $address}, orderBy: timestamp_DESC, limit:1) {
-          pvalue
-          timestamp
-      }
-    `;
+        query LastPriceRecord($address: String) {
+          historicalAccountBalances(
+            where: { accountId_eq: $address }
+            orderBy: timestamp_DESC
+            limit: 1
+          ) {
+            pvalue
+            timestamp
+          }
+        }
+      `;
       const lastRecordResponse = await this.graphQLClient.request<{
         historicalAccountBalances: {
           pvalue: number;
