@@ -1203,7 +1203,7 @@ export default class Models {
           where: { assetId_contains: $combinedId, timestamp_gte: $startTime }
           orderBy: blockNumber_ASC
         ) {
-          price
+          newPrice
           timestamp
         }
       }
@@ -1211,7 +1211,7 @@ export default class Models {
 
     const response = await this.graphQLClient.request<{
       historicalAssets: {
-        price: number;
+        newPrice: number;
         timestamp: string;
       }[];
     }>(query, {
