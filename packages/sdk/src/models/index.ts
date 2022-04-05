@@ -109,7 +109,6 @@ export default class Models {
    * @param signer The actual signer provider to sign the transaction.
    * @param oracle The address that will be responsible for reporting the market.
    * @param period Start and end block numbers or unix timestamp of the market.
-   * @param creationType "Permissionless" or "Advised"
    * @param marketType "Categorical" or "Scalar"
    * @param mdm Dispute settlement can be authorized, court or simple_disputes
    * @param metadata Market metadata
@@ -123,7 +122,6 @@ export default class Models {
     signer: KeyringPairOrExtSigner,
     oracle: string,
     period: MarketPeriod,
-    creationType = "Advised",
     marketType: MarketTypeOf,
     mdm: MarketDisputeMechanism,
     amounts: string[],
@@ -147,7 +145,6 @@ export default class Models {
       oracle,
       period,
       multihash,
-      creationType,
       marketType,
       mdm,
       baseAssetAmount,
