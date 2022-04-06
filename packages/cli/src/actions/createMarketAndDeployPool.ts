@@ -12,7 +12,6 @@ type Options = {
   period: string;
   categories?: string[];
   question: string;
-  advised: boolean;
   seed: string;
   timestamp: boolean;
   authorized: string;
@@ -30,7 +29,6 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     oracle,
     period,
     categories,
-    advised,
     endpoint,
     seed,
     question,
@@ -106,7 +104,6 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     signer,
     oracle,
     marketPeriod,
-    advised ? "Advised" : "Permissionless",
     marketType,
     mdm,
     amts,

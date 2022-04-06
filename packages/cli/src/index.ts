@@ -65,11 +65,6 @@ program
     "createMarketAndDeployPool <slug> <description> <oracle> <period> <question>"
   )
   .option(
-    "--advised",
-    "Create Advised market instead of Permissionless market",
-    false
-  )
-  .option(
     "-c --categories [categories...]",
     "A space-separated strings for names of categories for the market"
   )
@@ -120,7 +115,6 @@ program
         endpoint: string;
         seed: string;
         categories: string[];
-        advised: boolean;
         timestamp: boolean;
         authorized: string;
         court: boolean;
