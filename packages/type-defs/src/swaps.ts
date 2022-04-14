@@ -3,7 +3,7 @@ export default {
   types: {
     Pool: {
       assets: "Vec<Asset>",
-      baseAsset: "Option<Asset>",
+      baseAsset: "Asset",
       marketId: "MarketId",
       poolStatus: "PoolStatus",
       scoringRule: "ScoringRule",
