@@ -19,7 +19,6 @@ type Options = {
   amounts: string;
   baseAssetAmount: string;
   weights: string;
-  keep: string;
 };
 
 const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
@@ -38,7 +37,6 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     amounts,
     baseAssetAmount,
     weights,
-    keep,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -98,7 +96,6 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
 
   const amts = amounts.split(",");
   const wts = weights.split(",");
-  const kp = keep.split(",");
 
   const poolId = await sdk.models.createCpmmMarketAndDeployAssets(
     signer,
@@ -109,7 +106,6 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     amts,
     baseAssetAmount,
     wts,
-    kp,
     metadata,
     false
   );

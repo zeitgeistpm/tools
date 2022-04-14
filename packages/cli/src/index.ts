@@ -103,7 +103,6 @@ program
     "A comma-separated list of relative denormalized weights of each asset price",
     ""
   )
-  .option("--keep <keep>", "A comma-separated list of assets to keep", "")
   .action(
     (
       slug: string,
@@ -121,7 +120,6 @@ program
         amounts: string;
         baseAssetAmount: string;
         weights: string;
-        keep: string;
       }
     ) =>
       catchErrorsAndExit(
