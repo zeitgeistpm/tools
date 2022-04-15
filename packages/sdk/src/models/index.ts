@@ -127,7 +127,6 @@ export default class Models {
     amounts: string[],
     baseAssetAmount: string,
     weights: string[],
-    keep: string[],
     metadata: DecodedMarketMetadata,
     callbackOrPaymentInfo:
       | ((result: ISubmittableResult, _unsub: () => void) => void)
@@ -149,8 +148,7 @@ export default class Models {
       mdm,
       baseAssetAmount,
       amounts,
-      weights,
-      keep
+      weights
     );
 
     if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {

@@ -15,7 +15,7 @@ export interface CommonPoolEventParams extends Struct {
 /** @name Pool */
 export interface Pool extends Struct {
   readonly assets: Vec<Asset>;
-  readonly baseAsset: Option<Asset>;
+  readonly baseAsset: Asset;
   readonly marketId: MarketId;
   readonly poolStatus: PoolStatus;
   readonly scoringRule: ScoringRule;

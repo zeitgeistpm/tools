@@ -502,11 +502,15 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       InsufficientShareBalance: AugmentedError<ApiType>;
       /**
+       * Catch-all error for invalid market status
+       **/
+      InvalidMarketStatus: AugmentedError<ApiType>;
+      /**
        * An invalid market type was found.
        **/
       InvalidMarketType: AugmentedError<ApiType>;
       /**
-       * An invalid Hash was included in a multihash parameter
+       * An invalid Hash was included in a multihash parameter.
        **/
       InvalidMultihash: AugmentedError<ApiType>;
       /**
@@ -566,7 +570,7 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       NotEnoughBalance: AugmentedError<ApiType>;
       /**
-       * The number of categories for a categorical market is too low
+       * The number of categories for a categorical market is too low.
        **/
       NotEnoughCategories: AugmentedError<ApiType>;
       /**
@@ -574,7 +578,7 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       NoWinningBalance: AugmentedError<ApiType>;
       /**
-       * Submitted outcome does not match market type
+       * Submitted outcome does not match market type.
        **/
       OutcomeMismatch: AugmentedError<ApiType>;
       /**
@@ -594,9 +598,13 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       SwapPoolExists: AugmentedError<ApiType>;
       /**
-       * Too many categories for a categorical market
+       * Too many categories for a categorical market.
        **/
       TooManyCategories: AugmentedError<ApiType>;
+      /**
+       * An amount was illegally specified as zero.
+       **/
+      ZeroAmount: AugmentedError<ApiType>;
       /**
        * Generic error
        **/
