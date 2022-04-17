@@ -591,13 +591,13 @@ export default class Models {
     const balancesResponse = await graphQLClient.request(
       gql`
         query PoolBalances($addresses: [String!]) {
-          accountBalances(where: { account: { wallet_in: $addresses } }) {
-            accountId
+          accountBalances(where: { account: { accountId_in: $addresses } }) {
+            id
             assetId
             balance
             account {
               id
-              wallet
+              accountId
             }
           }
         }
@@ -655,7 +655,7 @@ export default class Models {
             id
             poolId
             price
-            qty
+            amountInPool
           }
         }
       `,
@@ -700,7 +700,6 @@ export default class Models {
               totalWeight
               volume
               ztgQty
-              marketId
               weights {
                 assetId
                 len
