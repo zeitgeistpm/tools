@@ -1,6 +1,6 @@
 {
   "name": "@zeitgeistpm/types",
-  "version": "0.4.14",
+  "version": "0.5.0",
   "description": "Generated types for the Zeitgeist network.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@polkadot/types": "8.1.1",
-    "@zeitgeistpm/type-defs": "^0.4.14",
+    "@zeitgeistpm/type-defs": "^0.5.0",
     "axios": "^0.21.1"
   },
   "exports": {
