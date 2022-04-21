@@ -514,7 +514,7 @@ export default class Models {
           assetId
           poolId
           price
-          qty
+          amountInPool
         }
       }
     `;
@@ -539,7 +539,7 @@ export default class Models {
       assets: {
         assetId: string;
         price: number;
-        qty: string;
+        amountInPool: string;
         poolId: number;
       }[];
     }>(queryPools, {
@@ -578,7 +578,7 @@ export default class Models {
         metadata,
         marketSlug,
         swapFee,
-        qty: asset.qty,
+        qty: asset.amountInPool,
         price: asset.price,
       });
     }
@@ -646,7 +646,12 @@ export default class Models {
 
   async getAssetsForPoolsList(pools: FilteredPoolsListResponse["pools"]) {
     const assetsResponse: {
-      assets: { poolId: number; price: number; qty: string; assetId: string }[];
+      assets: {
+        poolId: number;
+        price: number;
+        amountInPool: string;
+        assetId: string;
+      }[];
     } = await this.graphQLClient.request(
       gql`
         query Assets($poolIds: [Int!]) {
@@ -752,11 +757,11 @@ export default class Models {
 
         const liquidity = assets
           .reduce((total, asset) => {
-            if (!asset.price || !asset.qty) {
+            if (!asset.price || !asset.amountInPool) {
               return new Decimal(0);
             }
             return total.add(
-              new Decimal(asset.price).mul(new Decimal(asset.qty))
+              new Decimal(asset.price).mul(new Decimal(asset.amountInPool))
             );
           }, new Decimal(0))
           .toNumber();
