@@ -98,7 +98,7 @@ export type FilteredPoolsListItem = {
       | { ticker: string; name: string; img?: string; color: string };
     poolId: number;
     price: number;
-    qty: string;
+    amountInPool: string;
   }[];
   liquidity: number;
   poolId: number;
