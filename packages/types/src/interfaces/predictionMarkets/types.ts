@@ -1,8 +1,7 @@
 // Auto-generated via `yarn polkadot-types-from-defs`, do not edit
 /* eslint-disable */
 
-import type { Bytes, Enum, Option, Struct, u128, u16, u8 } from '@polkadot/types-codec';
-import type { ITuple } from '@polkadot/types-codec/types';
+import type { Bytes, Enum, Option, Range, RangeInclusive, Struct, u128, u16, u8 } from '@polkadot/types-codec';
 import type { AccountId, BlockNumber, Moment } from '@polkadot/types/interfaces/runtime';
 
 /** @name Market */
@@ -50,9 +49,9 @@ export interface MarketId extends u128 {}
 /** @name MarketPeriod */
 export interface MarketPeriod extends Enum {
   readonly isBlock: boolean;
-  readonly asBlock: ITuple<[BlockNumber, BlockNumber]>;
+  readonly asBlock: Range<BlockNumber>;
   readonly isTimestamp: boolean;
-  readonly asTimestamp: ITuple<[Moment, Moment]>;
+  readonly asTimestamp: Range<Moment>;
   readonly type: 'Block' | 'Timestamp';
 }
 
@@ -75,7 +74,7 @@ export interface MarketType extends Enum {
   readonly isCategorical: boolean;
   readonly asCategorical: u16;
   readonly isScalar: boolean;
-  readonly asScalar: ITuple<[u128, u128]>;
+  readonly asScalar: RangeInclusive<u128>;
   readonly type: 'Categorical' | 'Scalar';
 }
 
