@@ -67,21 +67,21 @@ declare module '@polkadot/api-base/types/errors' {
     };
     authorized: {
       /**
-       * An account trying to register an outcome is not tied to any authorized market.
+       * The market unexpectedly has the incorrect dispute mechanism.
        **/
-      AccountIsNotLinkedToAnyAuthorizedMarket: AugmentedError<ApiType>;
+      MarketDoesNotHaveDisputeMechanismAuthorized: AugmentedError<ApiType>;
       /**
-       * On dispute or resolution, someone tried to pass a non-authorized market type
+       * An account attempts to submit a report to an undisputed market.
        **/
-      MarketDoesNotHaveAuthorizedMechanism: AugmentedError<ApiType>;
+      MarketIsNotDisputed: AugmentedError<ApiType>;
       /**
-       * It is not possible to have more than one stored outcome for the same market.
+       * An unauthorized account attempts to submit a report.
        **/
-      MarketsCanNotHaveMoreThanOneAuthorizedAccount: AugmentedError<ApiType>;
+      NotAuthorizedForThisMarket: AugmentedError<ApiType>;
       /**
-       * On resolution, someone tried to pass a unknown account id or market id.
+       * The report does not match the market's type.
        **/
-      UnknownOutcome: AugmentedError<ApiType>;
+      OutcomeMismatch: AugmentedError<ApiType>;
       /**
        * Generic error
        **/
@@ -479,10 +479,6 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       NoMarketHasBeenCreated: AugmentedError<ApiType>;
       /**
-       * Market does not have a report
-       **/
-      NoReport: AugmentedError<ApiType>;
-      /**
        * Generic error
        **/
       [key: string]: AugmentedError<ApiType>;
@@ -564,6 +560,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       InsufficientShareBalance: AugmentedError<ApiType>;
       /**
+       * Market period is faulty (too short, outside of limits)
+       **/
+      InvalidMarketPeriod: AugmentedError<ApiType>;
+      /**
        * Catch-all error for invalid market status
        **/
       InvalidMarketStatus: AugmentedError<ApiType>;
@@ -575,6 +575,10 @@ declare module '@polkadot/api-base/types/errors' {
        * An invalid Hash was included in a multihash parameter.
        **/
       InvalidMultihash: AugmentedError<ApiType>;
+      /**
+       * The outcome range of the scalar market is invalid.
+       **/
+      InvalidOutcomeRange: AugmentedError<ApiType>;
       /**
        * An operation is requested that is unsupported for the given scoring rule.
        **/
@@ -608,10 +612,6 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       MarketIsNotResolved: AugmentedError<ApiType>;
       /**
-       * The market is not reported on.
-       **/
-      MarketNotReported: AugmentedError<ApiType>;
-      /**
        * The point in time when the market becomes active is too late.
        **/
       MarketStartTooLate: AugmentedError<ApiType>;
@@ -643,10 +643,6 @@ declare module '@polkadot/api-base/types/errors' {
        * Submitted outcome does not match market type.
        **/
       OutcomeMismatch: AugmentedError<ApiType>;
-      /**
-       * The outcome being reported is out of range.
-       **/
-      OutcomeOutOfRange: AugmentedError<ApiType>;
       /**
        * The report is not coming from designated oracle.
        **/
@@ -697,6 +693,44 @@ declare module '@polkadot/api-base/types/errors' {
        * Preimage is too large to store on-chain.
        **/
       TooLarge: AugmentedError<ApiType>;
+      /**
+       * Generic error
+       **/
+      [key: string]: AugmentedError<ApiType>;
+    };
+    proxy: {
+      /**
+       * Account is already a proxy.
+       **/
+      Duplicate: AugmentedError<ApiType>;
+      /**
+       * Call may not be made by proxy because it may escalate its privileges.
+       **/
+      NoPermission: AugmentedError<ApiType>;
+      /**
+       * Cannot add self as proxy.
+       **/
+      NoSelfProxy: AugmentedError<ApiType>;
+      /**
+       * Proxy registration not found.
+       **/
+      NotFound: AugmentedError<ApiType>;
+      /**
+       * Sender is not a proxy of the account to be proxied.
+       **/
+      NotProxy: AugmentedError<ApiType>;
+      /**
+       * There are too many proxies registered or too many announcements pending.
+       **/
+      TooMany: AugmentedError<ApiType>;
+      /**
+       * Announcement, if made at all, was made too recently.
+       **/
+      Unannounced: AugmentedError<ApiType>;
+      /**
+       * A call which is incompatible with the proxy type's filter was attempted.
+       **/
+      Unproxyable: AugmentedError<ApiType>;
       /**
        * Generic error
        **/
@@ -814,6 +848,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       InvalidStateTransition: AugmentedError<ApiType>;
       /**
+       * Subsidy amount is too small.
+       **/
+      InvalidSubsidyAmount: AugmentedError<ApiType>;
+      /**
        * Could not create CPMM pool since no weights were supplied.
        **/
       InvalidWeightArgument: AugmentedError<ApiType>;
@@ -892,6 +930,10 @@ declare module '@polkadot/api-base/types/errors' {
        * The outcome asset specified as the winning asset was not found in the pool.
        **/
       WinningAssetNotFound: AugmentedError<ApiType>;
+      /**
+       * Some amount in a transaction equals zero.
+       **/
+      ZeroAmount: AugmentedError<ApiType>;
       /**
        * Generic error
        **/
@@ -1020,6 +1062,7 @@ declare module '@polkadot/api-base/types/errors' {
        * Failed because the maximum locks was exceeded
        **/
       MaxLocksExceeded: AugmentedError<ApiType>;
+      TooManyReserves: AugmentedError<ApiType>;
       /**
        * Generic error
        **/
