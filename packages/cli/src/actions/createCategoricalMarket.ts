@@ -40,25 +40,28 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
   const sdk = await SDK.initialize(endpoint);
 
   const signer = util.signerFromSeed(seed);
-  console.log("Sending transaction from", signer.address);
+  console.log(
+    `\x1b[33m%s\x1b[0m`,
+    `Sending transaction from ${signer.address}\n`
+  );
 
   if (categories && !(categories.length > 1)) {
     if (categories.length === 1) {
-      console.log("Valid: -c Yes No Maybe");
-      console.log("Valid: --categories Yes No Maybe");
-      console.log("Invalid: -categories Yes No Maybe");
-      console.log("(no space) Invalid: --cYes No Maybe");
-      console.log("(too few categories) Invalid: --c Inevitably");
+      console.log(`Valid: -c Yes No Maybe`);
+      console.log(`Valid: --categories Yes No Maybe`);
+      console.log(`Invalid: -categories Yes No Maybe`);
+      console.log(`(no space) Invalid: --cYes No Maybe`);
+      console.log(`(too few categories) Invalid: --c Inevitably`);
       console.log();
-      if (categories[0] === "ategories") {
+      if (categories[0] === `ategories`) {
         console.log(
-          "Did you use the right number of dashes (-c or --categories) ?"
+          `Did you use the right number of dashes (-c or --categories) ?`
         );
         console.log();
       }
     }
     throw new Error(
-      "If specifying categories, at least two must be specified."
+      `If specifying categories, at least two must be specified.`
     );
   }
 
@@ -68,8 +71,8 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
           return { name: cat, ticker: cat.slice(0, 5) };
         })
       : [
-          { name: "Yes", ticker: "YES" },
-          { name: "No", ticker: "NO" },
+          { name: `Yes`, ticker: `YES` },
+          { name: `No`, ticker: `NO` },
         ];
 
   const metadata: DecodedMarketMetadata = {
@@ -80,8 +83,8 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
   };
 
   const marketPeriod = timestamp
-    ? { timestamp: period.split(" ").map((x) => +x) }
-    : { block: period.split(" ").map((x) => +x) };
+    ? { timestamp: period.split(` `).map((x) => +x) }
+    : { block: period.split(` `).map((x) => +x) };
 
   let mdm = null;
   if (authorized) {
@@ -90,21 +93,25 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     mdm = court ? { Court: null } : { SimpleDisputes: null };
   }
 
-  const marketId = await sdk.models.createCategoricalMarket(
+  const marketId = await sdk.models.createMarket(
     signer,
     oracle,
     marketPeriod,
-    advised ? "Advised" : "Permissionless",
-    mdm,
-    cpmm ? "CPMM" : "RikiddoSigmoidFeeMarketEma",
     metadata,
+    advised ? `Advised` : `Permissionless`,
+    { Categorical: categoriesMeta.length },
+    mdm,
+    cpmm ? `CPMM` : `RikiddoSigmoidFeeMarketEma`,
     false
   );
 
   if (marketId && marketId.length > 0) {
-    console.log(`Categorical market created! Market Id: ${marketId}`);
+    console.log(
+      `\x1b[36m%s\x1b[0m`,
+      `\nCategorical market created with id ${marketId}!`
+    );
   } else {
-    console.log(`Categorical market creation failed!`);
+    console.log(`\x1b[36m%s\x1b[0m`, `\nCategorical market creation failed!`);
   }
 
   process.exit(0);
