@@ -71,7 +71,7 @@ export default class SDK {
       );
 
       if (opts.logEndpointInitTime) {
-        console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
+        console.log(`${endpoint} initialised in ${Date.now() - start} ms\n`);
       }
 
       const { graphQlEndpoint, ipfsClientUrl } = opts;
