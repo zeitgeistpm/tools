@@ -93,17 +93,17 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     mdm = court ? { Court: null } : { SimpleDisputes: null };
   }
 
-  const marketId = await sdk.models.createMarket(
+  const marketId = await sdk.models.createMarket({
     signer,
     oracle,
-    marketPeriod,
+    period: marketPeriod,
     metadata,
-    advised ? `Advised` : `Permissionless`,
-    { Categorical: categoriesMeta.length },
+    creationType: advised ? `Advised` : `Permissionless`,
+    marketType: { Categorical: categoriesMeta.length },
     mdm,
-    cpmm ? `CPMM` : `RikiddoSigmoidFeeMarketEma`,
-    false
-  );
+    scoringRule: cpmm ? `CPMM` : `RikiddoSigmoidFeeMarketEma`,
+    callbackOrPaymentInfo: false,
+  });
 
   if (marketId && marketId.length > 0) {
     console.log(

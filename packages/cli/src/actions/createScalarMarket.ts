@@ -40,15 +40,13 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
 
   if (bounds && bounds.length !== 2) {
     throw new Error(
-      "If specifying bounds, both lower and higher must be specified."
+      `If specifying bounds, both lower and higher must be specified.`
     );
-  } else {
-    bounds ? bounds : [0, 100];
   }
 
   const marketPeriod = timestamp
-    ? { timestamp: period.split(" ").map((x) => +x) }
-    : { block: period.split(" ").map((x) => +x) };
+    ? { timestamp: period.split(` `).map((x) => +x) }
+    : { block: period.split(` `).map((x) => +x) };
 
   let mdm = null;
   if (authorized) {
@@ -57,17 +55,17 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     mdm = court ? { Court: null } : { SimpleDisputes: null };
   }
 
-  const marketId = await sdk.models.createMarket(
+  const marketId = await sdk.models.createMarket({
     signer,
     oracle,
-    marketPeriod,
+    period: marketPeriod,
     metadata,
-    advised ? "Advised" : "Permissionless",
-    { Scalar: bounds },
+    creationType: advised ? `Advised` : `Permissionless`,
+    marketType: { Scalar: bounds ? bounds : [0, 100] },
     mdm,
-    cpmm ? "CPMM" : "RikiddoSigmoidFeeMarketEma",
-    false
-  );
+    scoringRule: cpmm ? `CPMM` : `RikiddoSigmoidFeeMarketEma`,
+    callbackOrPaymentInfo: false,
+  });
 
   if (marketId && marketId.length > 0) {
     console.log(
@@ -75,7 +73,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
       `\nScalar market created with id ${marketId}!`
     );
   } else {
-    console.log(`\x1b[36m%s\x1b[0m`, `\nCategorical market creation failed!`);
+    console.log(`\x1b[36m%s\x1b[0m`, `\nScalar market creation failed!`);
   }
 
   process.exit(0);
