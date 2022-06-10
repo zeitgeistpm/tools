@@ -42,6 +42,20 @@ type Options = {
   ipfsClientUrl?: string;
 };
 
+type CreateMarketParams = {
+  signer: KeyringPairOrExtSigner;
+  oracle: string;
+  period: MarketPeriod;
+  metadata: DecodedMarketMetadata;
+  creationType: string;
+  marketType: MarketTypeOf;
+  mdm: MarketDisputeMechanism;
+  scoringRule: string;
+  callbackOrPaymentInfo:
+    | ((result: ISubmittableResult, _unsub: () => void) => void)
+    | boolean;
+};
+
 export default class Models {
   private api: ApiPromise;
   private errorTable: ErrorTable;
@@ -228,19 +242,18 @@ export default class Models {
    * @param callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
-  async createMarket(
-    signer: KeyringPairOrExtSigner,
-    oracle: string,
-    period: MarketPeriod,
-    metadata: DecodedMarketMetadata,
-    creationType = `Advised`,
-    marketType: MarketTypeOf,
-    mdm: MarketDisputeMechanism,
-    scoringRule = `CPMM`,
-    callbackOrPaymentInfo:
-      | ((result: ISubmittableResult, _unsub: () => void) => void)
-      | boolean = false
-  ): Promise<string> {
+  async createMarket(params: CreateMarketParams): Promise<string> {
+    const {
+      signer,
+      oracle,
+      period,
+      metadata,
+      creationType,
+      marketType,
+      mdm,
+      scoringRule,
+      callbackOrPaymentInfo,
+    } = params;
     const cid = await this.ipfsClient.add(
       JSON.stringify({
         ...metadata,
