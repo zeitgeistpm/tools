@@ -303,9 +303,12 @@ export default class Models {
               try {
                 const { errorName, documentation } = this.errorTable.getEntry(
                   index,
-                  error
+                  parseInt(error.substring(2, 4), 16)
                 );
-                console.log(`${errorName}: ${documentation}`);
+                console.log(
+                  `\x1b[36m%s\x1b[0m`,
+                  `\n${errorName}: ${documentation}`
+                );
               } catch (err) {
                 console.log(err);
               } finally {
