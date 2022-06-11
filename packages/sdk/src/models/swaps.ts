@@ -624,16 +624,18 @@ export default class Swap {
    * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   swapExactAmountOut = async (
-    signer: KeyringPairOrExtSigner,
-    assetIn: string,
-    maxAmountIn: string,
-    assetOut: string,
-    assetAmountOut: string,
-    maxPrice: string,
-    callbackOrPaymentInfo:
-      | ((result: ISubmittableResult, _unsub: () => void) => void)
-      | boolean = false
+    params: SwapExactAmountOutParams
   ): Promise<string | boolean> => {
+    const {
+      signer,
+      assetIn,
+      maxAmountIn,
+      assetOut,
+      assetAmountOut,
+      maxPrice,
+      callbackOrPaymentInfo,
+    } = params;
+
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
       AssetIdFromString(assetIn),
@@ -643,11 +645,11 @@ export default class Swap {
       maxPrice
     );
 
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       return estimatedFee(tx, signer.address);
     }
     const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
+      typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
 
@@ -657,20 +659,41 @@ export default class Swap {
       _unsub: () => void
     ) => {
       const { events, status } = result;
-      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        events.forEach(({ phase, event: { data, method, section } }) => {
-          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+        console.log(`Transaction included at blockHash ${status.asInBlock}\n`);
 
-          if (method == "ExtrinsicSuccess") {
-            unsubOrWarns(_unsub);
+        events.forEach(({ event: { data, method, section } }, index) => {
+          console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+
+          if (method == `SwapExactAmountOut`) {
+            console.log(
+              `\x1b[36m%s\x1b[0m`,
+              `\n${data[0][`assetAmountIn`]} units of ${
+                data[0][`assetIn`]
+              } used for buying ${data[0][`assetAmountOut`]} units of ${
+                data[0][`assetOut`]
+              }\n`
+            );
             _resolve(true);
+          } else if (method == `ExtrinsicFailed`) {
+            const { index, error } = data.toJSON()[0].module;
+            try {
+              const { errorName, documentation } = this.errorTable.getEntry(
+                index,
+                parseInt(error.substring(2, 4), 16)
+              );
+              console.log(
+                `\x1b[36m%s\x1b[0m`,
+                `\n${errorName}: ${documentation}`
+              );
+            } catch (err) {
+              console.log(err);
+            } finally {
+              _resolve(false);
+            }
           }
-          if (method == "ExtrinsicFailed") {
-            unsubOrWarns(_unsub);
-            _resolve(false);
-          }
+          unsubOrWarns(_unsub);
         });
       }
     };
