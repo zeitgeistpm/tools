@@ -463,14 +463,20 @@ program
   );
 
 program
-  .command(
-    "swapExactAmountIn <poolId> <assetIn> <assetAmountIn> <assetOut> <minAmountOut> <maxPrice>"
-  )
+  .command("swapExactAmountIn <poolId> <assetIn> <assetAmountIn> <assetOut>")
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--minAmountOut <string>",
+    "Minimum asset amount that can leave the pool"
+  )
+  .option(
+    "--maxPrice <string>",
+    "Market price must be equal or less than the provided value"
   )
   .action(
     (
@@ -478,9 +484,12 @@ program
       assetIn: string,
       assetAmountIn: string,
       assetOut: string,
-      minAmountOut: string,
-      maxPrice: string,
-      opts: { seed: string; endpoint: string }
+      opts: {
+        seed: string;
+        endpoint: string;
+        minAmountOut: string;
+        maxPrice: string;
+      }
     ) =>
       catchErrorsAndExit(
         swapExactAmountIn,
@@ -488,41 +497,46 @@ program
           assetIn,
           assetAmountIn,
           assetOut,
-          minAmountOut,
-          maxPrice,
           poolId,
         })
       )
   );
 
 program
-  .command(
-    "swapExactAmountOut <poolId> <assetIn> <maxAmountIn> <assetOut> <assetAmountOut> <maxPrice>"
-  )
+  .command("swapExactAmountOut <poolId> <assetIn> <assetOut> <assetAmountOut>")
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bsr.zeitgeist.pm"
   )
+  .option(
+    "--maxAmountIn <string>",
+    "Maximum asset amount that can enter the pool"
+  )
+  .option(
+    "--maxPrice <string>",
+    "Market price must be equal or less than the provided value"
+  )
   .action(
     (
       poolId: number,
       assetIn: string,
-      maxAmountIn: string,
       assetOut: string,
       assetAmountOut: string,
-      maxPrice: string,
-      opts: { seed: string; endpoint: string }
+      opts: {
+        seed: string;
+        endpoint: string;
+        maxAmountIn: string;
+        maxPrice: string;
+      }
     ) =>
       catchErrorsAndExit(
         swapExactAmountOut,
         Object.assign(opts, {
           assetIn,
-          maxAmountIn,
           assetOut,
           assetAmountOut,
-          maxPrice,
           poolId,
         })
       )
