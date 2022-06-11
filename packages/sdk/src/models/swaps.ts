@@ -1,5 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
+import ErrorTable from "../errorTable";
 
 import { KeyringPairOrExtSigner, AssetId, poolJoinOpts } from "../types";
 import {
@@ -31,11 +32,17 @@ export default class Swap {
   public weights;
   /** The unique identifier for this pool. */
   public poolId: number;
-
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
+  /** All system & custom errors with documentation. */
+  private errorTable: ErrorTable;
 
-  constructor(poolId: number, details: Pool, api: ApiPromise) {
+  constructor(
+    poolId: number,
+    details: Pool,
+    api: ApiPromise,
+    errorTable: ErrorTable
+  ) {
     const { assets, poolStatus, swapFee, totalWeight, weights } = details;
 
     this.assets = assets;
@@ -43,10 +50,9 @@ export default class Swap {
     this.swapFee = swapFee.toString();
     this.totalWeight = totalWeight.toString();
     this.weights = weights;
-
     this.poolId = poolId;
-
     this.api = api;
+    this.errorTable = errorTable;
   }
 
   /**

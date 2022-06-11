@@ -20,6 +20,7 @@ import {
 import { estimatedFee, isExtSigner, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
+import ErrorTable from "../errorTable";
 
 /**
  * The Market class initializes all the market data.
@@ -64,22 +65,22 @@ class Market {
   public tags: string[];
 
   public confidentialId?: string;
-
   /** The image for the market. */
   img?: string;
-
   /** Liquidty pool id. */
   poolId?: number;
-
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
+  /** All system & custom errors with documentation. */
+  private errorTable: ErrorTable;
 
   constructor(
     /** The unique identifier for this market. */
     public marketId: number,
     market: MarketResponse,
     decodedMetadata: DecodedMarketMetadata,
-    api: ApiPromise
+    api: ApiPromise,
+    errorTable: ErrorTable
   ) {
     ({
       creator: this.creator,
@@ -108,6 +109,7 @@ class Market {
     } = decodedMetadata);
 
     this.api = api;
+    this.errorTable = errorTable;
   }
 
   /**
@@ -205,7 +207,7 @@ class Market {
     const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
     if (pool.isSome) {
-      return new Swap(poolId, pool.unwrap(), this.api);
+      return new Swap(poolId, pool.unwrap(), this.api, this.errorTable);
     }
     return null;
   };
