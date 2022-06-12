@@ -26,19 +26,27 @@ const swapExactAmountOut = async (opts: Options): Promise<void> => {
   const sdk = await SDK.initialize(endpoint);
 
   const signer = util.signerFromSeed(seed);
-  console.log("Sending transaction from", signer.address);
+  console.log(
+    `\x1b[33m%s\x1b[0m`,
+    `Sending transaction from ${signer.address}\n`
+  );
 
   const pool = await sdk.models.fetchPoolData(poolId);
-  const res = await pool.swapExactAmountOut(
+  const res = await pool.swapExactAmountOut({
     signer,
     assetIn,
     maxAmountIn,
     assetOut,
     assetAmountOut,
     maxPrice,
-    false
-  );
-  console.log(res);
+    callbackOrPaymentInfo: false,
+  });
+
+  if (res) {
+    console.log(`\x1b[36m%s\x1b[0m`, `\nSwapExactAmountOut successful!`);
+  } else {
+    console.log(`\x1b[36m%s\x1b[0m`, `\nSwapExactAmountOut failed!`);
+  }
 };
 
 export default swapExactAmountOut;

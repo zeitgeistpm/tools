@@ -797,7 +797,13 @@ export default class Models {
       resolvedOutcome: data.resolvedOutcome,
     };
 
-    const market = new Market(marketId, basicMarketData, metadata, this.api);
+    const market = new Market(
+      marketId,
+      basicMarketData,
+      metadata,
+      this.api,
+      this.errorTable
+    );
     if (data.poolId != null) {
       market.poolId = data.poolId;
     }
@@ -1282,7 +1288,8 @@ export default class Models {
       marketId,
       basicMarketData,
       metadata as DecodedMarketMetadata,
-      this.api
+      this.api,
+      this.errorTable
     );
   }
 
@@ -1345,7 +1352,7 @@ export default class Models {
     const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
     if (pool.isSome) {
-      return new Swap(poolId, pool.unwrap(), this.api);
+      return new Swap(poolId, pool.unwrap(), this.api, this.errorTable);
     } else {
       return null;
     }
