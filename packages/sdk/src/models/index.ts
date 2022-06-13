@@ -40,6 +40,7 @@ type Options = {
   MAX_RPC_REQUESTS?: number;
   graphQLClient?: GraphQLClient;
   ipfsClientUrl?: string;
+  endpoint: string;
 };
 
 type CreateMarketParams = {
@@ -62,18 +63,19 @@ export default class Models {
   private graphQLClient?: GraphQLClient;
 
   private ipfsClient: IPFS;
+  private endpoint: string;
 
   private marketIds: number[];
 
   MAX_RPC_REQUESTS: number;
 
-  constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options = {}) {
+  constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options) {
     this.api = api;
     this.errorTable = errorTable;
     this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
     this.graphQLClient = opts.graphQLClient;
-
     this.ipfsClient = new IPFS(opts.ipfsClientUrl);
+    this.endpoint = opts.endpoint;
   }
 
   getGraphQLClient(): GraphQLClient {
