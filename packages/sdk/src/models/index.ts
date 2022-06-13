@@ -40,6 +40,7 @@ type Options = {
   MAX_RPC_REQUESTS?: number;
   graphQLClient?: GraphQLClient;
   ipfsClientUrl?: string;
+  endpoint: string;
 };
 
 type CreateMarketParams = {
@@ -62,18 +63,19 @@ export default class Models {
   private graphQLClient?: GraphQLClient;
 
   private ipfsClient: IPFS;
+  private endpoint: string;
 
   private marketIds: number[];
 
   MAX_RPC_REQUESTS: number;
 
-  constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options = {}) {
+  constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options) {
     this.api = api;
     this.errorTable = errorTable;
     this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
     this.graphQLClient = opts.graphQLClient;
-
     this.ipfsClient = new IPFS(opts.ipfsClientUrl);
+    this.endpoint = opts.endpoint;
   }
 
   getGraphQLClient(): GraphQLClient {
@@ -1298,13 +1300,17 @@ export default class Models {
    * but includes those which have been cancelled, and all other statuses.
    * @returns The `market_count` from Zeitgeist chain.
    */
-  async getMarketCount(): Promise<number | null> {
+  async getMarketCount(): Promise<number> {
     const count = (await this.api.query.marketCommons.marketCounter()).toJSON();
-    if (typeof count !== "number") {
+    if (typeof count !== `number`) {
       throw new Error(
-        "Expected a number to return from api.query.marketCommons.marketCounter (even if variable remains unset)"
+        `Expected a number to return from api.query.marketCommons.marketCounter (even if variable remains unset)`
       );
     }
+    console.log(
+      `\x1b[36m%s\x1b[0m`,
+      `${count} markets are present in ${this.endpoint}`
+    );
     return count;
   }
 
