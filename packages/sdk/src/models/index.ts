@@ -1300,13 +1300,17 @@ export default class Models {
    * but includes those which have been cancelled, and all other statuses.
    * @returns The `market_count` from Zeitgeist chain.
    */
-  async getMarketCount(): Promise<number | null> {
+  async getMarketCount(): Promise<number> {
     const count = (await this.api.query.marketCommons.marketCounter()).toJSON();
-    if (typeof count !== "number") {
+    if (typeof count !== `number`) {
       throw new Error(
-        "Expected a number to return from api.query.marketCommons.marketCounter (even if variable remains unset)"
+        `Expected a number to return from api.query.marketCommons.marketCounter (even if variable remains unset)`
       );
     }
+    console.log(
+      `\x1b[36m%s\x1b[0m`,
+      `${count} markets are present in ${this.endpoint}`
+    );
     return count;
   }
 
