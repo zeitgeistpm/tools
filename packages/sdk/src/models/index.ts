@@ -13,9 +13,7 @@ import {
   KeyringPairOrExtSigner,
   PoolId,
   DecodedMarketMetadata,
-  MarketDisputeMechanism,
   CurrencyIdOf,
-  MarketTypeOf,
   MarketsFilteringOptions,
   MarketsPaginationOptions,
   ActiveAssetsResponse,
@@ -43,19 +41,10 @@ type Options = {
   endpoint: string;
 };
 
-type CreateMarketParams = {
-  signer: KeyringPairOrExtSigner;
-  oracle: string;
-  period: MarketPeriod;
-  metadata: DecodedMarketMetadata;
-  creationType: string;
-  marketType: MarketTypeOf;
-  mdm: MarketDisputeMechanism;
-  scoringRule: string;
-  callbackOrPaymentInfo:
-    | ((result: ISubmittableResult, _unsub: () => void) => void)
-    | boolean;
-};
+import {
+  CreateCpmmMarketAndDeployAssetsParams,
+  CreateMarketParams,
+} from "../types/market";
 
 export default class Models {
   private api: ApiPromise;
