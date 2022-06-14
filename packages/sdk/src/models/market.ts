@@ -222,14 +222,15 @@ class Market {
   };
 
   /**
-   * Creates swap pool for this market via `api.tx.predictionMarkets.deploySwapPoolForMarket(marketId, weights)`.
-   * @param signer The actual signer provider to sign the transaction.
-   * @param weights List of lengths for each asset.
-   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
-   * @throws Error if swap pool already exists for the market.
+   * Creates swap pool for this market with specified liquidity.
+   * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction.
+   * @param {string} amount The amount of each token to add to the pool.
+   * @param {string[]} weights The relative denormalized weight of each asset.
+   * @param {boolean} callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result.
    */
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
+    amount: string,
     weights: string[],
     callbackOrPaymentInfo:
       | ((result: ISubmittableResult, _unsub: () => void) => void)
@@ -237,81 +238,69 @@ class Market {
   ): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId) {
-      throw new Error("Pool already exists for this market.");
+      throw new Error(`Pool already exists for this market.`);
     }
 
     const tx = this.api.tx.predictionMarkets.deploySwapPoolForMarket(
       this.marketId,
+      amount,
       weights
     );
 
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       return estimatedFee(tx, signer.address);
     }
+
     const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
+      typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
 
-    const _callback = (
-      result: ISubmittableResult,
-      _resolve: (value: string | PromiseLike<string>) => void,
-      _unsub: () => void
-    ) => {
-      const { events, status } = result;
-      console.log("status:", status.toHuman());
-
-      if (status.isInBlock) {
-        events.forEach(({ phase, event: { data, method, section } }) => {
-          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-
-          if (method == "PoolCreate") {
-            unsubOrWarns(_unsub);
-            _resolve(data[0].toString());
-          }
-          if (method == "ExtrinsicFailed") {
-            unsubOrWarns(_unsub);
-            _resolve("");
-          }
-        });
-      }
-    };
-
     return new Promise(async (resolve) => {
-      // TODO: // sanity check: weights.length should equal outcomes.length+1 (for ZTG)
-      // TODO: // weights should each be >= runtime's MinWeight (currently 1e10)
-      console.log(
-        "Relative weights: ",
-        weights
-          .map(Number)
-          .map((x) => x / 1e10)
-          .map((x) => `${x}X1e10`)
-      );
-      console.log(
-        `If market ${this.marketId} has a different number of outcomes than ${
-          weights.length - 1
-        }, you might get error {6,13}.\n`
-      );
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
 
-      if (this.outcomeAssets) {
-        if (weights.length !== this.outcomeAssets.length + 1) {
+        if (status.isInBlock) {
           console.log(
-            "Weights length mismatch. Expect an error {6,13}: ProvidedValuesLenMustEqualAssetsLen."
+            `Transaction included at blockHash ${status.asInBlock}\n`
           );
-          if (weights.length === this.outcomeAssets.length) {
-            console.log(
-              "Hint: don't forget to include the weight of ZTG as the last weight!"
-            );
-          }
+
+          events.forEach(({ event: { data, method, section } }, index) => {
+            console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+
+            if (method == `PoolCreate`) {
+              console.log(
+                `\x1b[36m%s\x1b[0m`,
+                `\nCanonical pool for market deployed with id ${
+                  data[0][`poolId`]
+                }.\n`
+              );
+              _resolve(data[0][`poolId`]);
+            } else if (method == `ExtrinsicFailed`) {
+              const { index, error } = data.toJSON()[0].module;
+              try {
+                const { errorName, documentation } = this.errorTable.getEntry(
+                  index,
+                  parseInt(error.substring(2, 4), 16)
+                );
+                console.log(
+                  `\x1b[31m%s\x1b[0m`,
+                  `\n${errorName}: ${documentation}`
+                );
+              } catch (err) {
+                console.log(err);
+              } finally {
+                _resolve(``);
+              }
+            }
+            unsubOrWarns(_unsub);
+          });
         }
-      } else {
-        console.log(
-          "Market object appears to be a bare MarketResponse, not an ExtendedMarket"
-        );
-        console.log(
-          "This should not happen unless you are running old code for bug testing."
-        );
-      }
+      };
 
       if (isExtSigner(signer)) {
         const unsub = await tx.signAndSend(
