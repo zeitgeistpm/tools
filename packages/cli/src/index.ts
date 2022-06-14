@@ -88,9 +88,9 @@ program
     "Use Court instead of Simple Disputes as Market Dispute Mechanism",
     false
   )
-  .option("--amount", "The amount of each token to add to the pool")
+  .option("--amount <string>", "The amount of each token to add to the pool")
   .option(
-    "--weights <weights>",
+    "--weights <string>",
     "A comma-separated list of relative denormalized weights of each asset price",
     ""
   )
@@ -370,7 +370,7 @@ program
   );
 
 program
-  .command("deployPool <marketId>")
+  .command("deployPool <marketId> <amount>")
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
@@ -382,8 +382,13 @@ program
     "A comma-separated list of lengths for each asset",
     ""
   )
-  .action((marketId: number, opts: { endpoint: string; seed: string }) =>
-    catchErrorsAndExit(deployPool, Object.assign(opts, { marketId }))
+  .action(
+    (
+      marketId: number,
+      amount: string,
+      opts: { endpoint: string; seed: string; weights: string }
+    ) =>
+      catchErrorsAndExit(deployPool, Object.assign(opts, { marketId, amount }))
   );
 
 program

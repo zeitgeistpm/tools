@@ -4,16 +4,20 @@ type Options = {
   endpoint: string;
   marketId: number;
   seed: string;
+  amount: string;
   weights: string;
 };
 
 const deployPool = async (opts: Options): Promise<void> => {
-  const { endpoint, marketId, seed, weights } = opts;
+  const { endpoint, marketId, seed, weights, amount } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
   const signer = util.signerFromSeed(seed);
-  console.log("Sending transaction from", signer.address);
+  console.log(
+    `\x1b[33m%s\x1b[0m`,
+    `Sending transaction from ${signer.address}\n`
+  );
 
   const market = await sdk.models.fetchMarketData(marketId);
   const { outcomeAssets } = market;
@@ -35,17 +39,12 @@ const deployPool = async (opts: Options): Promise<void> => {
     wts = Array(outcomeAssets.length + 1).fill("1".concat("0".repeat(10)));
   }
 
-  const res = await market.deploySwapPool(signer, wts, false);
-  const poolId = await market.getPoolId();
-
-  console.log(res);
-  if (poolId !== null) {
-    console.log(
-      `Canonical pool for market ${marketId} deployed - pool ID: ${poolId}`
-    );
+  const poolId = await market.deploySwapPool(signer, amount, wts, false);
+  if (poolId && poolId.length > 0) {
+    console.log(`\x1b[36m%s\x1b[0m`, `\nDeployPool successful!`);
+  } else {
+    console.log(`\x1b[36m%s\x1b[0m`, `\nDeployPool failed!`);
   }
-
-  // process.exit(0);
 };
 
 export default deployPool;
