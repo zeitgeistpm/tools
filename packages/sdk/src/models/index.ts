@@ -109,34 +109,33 @@ export default class Models {
   }
 
   /**
-   * Create a market using CPMM scoring rule, buy a complete set of the assets used and deploy
+   * Create a market, buy a complete set of the assets used and deploy
    * within and deploy an arbitrary amount of those that's greater than the minimum amount.
-   * @param signer The actual signer provider to sign the transaction.
-   * @param oracle The address that will be responsible for reporting the market.
-   * @param period Start and end block numbers or unix timestamp of the market.
-   * @param marketType "Categorical" or "Scalar"
-   * @param mdm Dispute settlement can be authorized, court or simple_disputes
-   * @param metadata Market metadata
-   * @param amounts List of amounts of each outcome asset that should be deployed.
-   * @param baseAssetAmount Amount for native currency liquidity
-   * @param weights List of relative denormalized weights of each asset price.
-   * @param keep Specifies how many assets to keep.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
+   * @param {string} params.oracle The address that will be responsible for reporting the market.
+   * @param {MarketPeriod} params.period Start and end block numbers or unix timestamp of the market.
+   * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
+   * @param {MarketDisputeMechanism} params.mdm Dispute settlement can be authorized, court or simple_disputes
+   * @param {DecodedMarketMetadata} params.metadata Market metadata
+   * @param {string} params.amount Amount for native currency liquidity.
+   * @param {string[]} params.weights List of relative denormalized weights of each asset price.
+   * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
    */
   async createCpmmMarketAndDeployAssets(
-    signer: KeyringPairOrExtSigner,
-    oracle: string,
-    period: MarketPeriod,
-    marketType: MarketTypeOf,
-    mdm: MarketDisputeMechanism,
-    amounts: string[],
-    baseAssetAmount: string,
-    weights: string[],
-    metadata: DecodedMarketMetadata,
-    callbackOrPaymentInfo:
-      | ((result: ISubmittableResult, _unsub: () => void) => void)
-      | boolean = false
-  ): Promise<string> {
+    params: CreateCpmmMarketAndDeployAssetsParams
+  ): Promise<boolean | string> {
+    const {
+      signer,
+      oracle,
+      period,
+      metadata,
+      amount,
+      marketType,
+      mdm,
+      weights,
+      callbackOrPaymentInfo,
+    } = params;
+
     const cid = await this.ipfsClient.add(
       JSON.stringify({
         ...metadata,
@@ -151,54 +150,66 @@ export default class Models {
       multihash,
       marketType,
       mdm,
-      baseAssetAmount,
-      amounts,
+      amount,
       weights
     );
 
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       return estimatedFee(tx, signer.address);
     }
+
     const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
+      typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
+
     return new Promise(async (resolve) => {
       const _callback = (
         result: ISubmittableResult,
-        _resolve: (value: string | PromiseLike<string>) => void,
+        _resolve: (value: boolean | PromiseLike<boolean>) => void,
         _unsub: () => void
       ) => {
         const { events, status } = result;
 
         if (status.isInBlock) {
-          console.log(`Transaction included at blockHash ${status.asInBlock}`);
-          events.forEach(({ phase, event: { data, method, section } }) => {
-            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+          console.log(
+            `Transaction included at blockHash ${status.asInBlock}\n`
+          );
 
-            if (method == "MarketCreated") {
-              unsubOrWarns(_unsub);
+          events.forEach(({ event: { data, method, section } }, index) => {
+            console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+
+            if (method == `MarketCreated`) {
               console.log(
-                `Market created with market ID: ${data[0].toString()}`
+                `\x1b[36m%s\x1b[0m`,
+                `\nMarket created with id ${data[0].toString()}.\n`
               );
-            }
-            if (method == "PoolCreate") {
-              unsubOrWarns(_unsub);
+            } else if (method == `PoolCreate`) {
               console.log(
-                `Canonical pool for market deployed - pool ID: ${data[0]["poolId"]}`
+                `\x1b[36m%s\x1b[0m`,
+                `\nCanonical pool for market deployed with id ${
+                  data[0][`poolId`]
+                }.\n`
               );
-              _resolve(data[0]["poolId"]);
-            }
-            if (method == "ExtrinsicFailed") {
-              unsubOrWarns(_unsub);
+              _resolve(true);
+            } else if (method == `ExtrinsicFailed`) {
               const { index, error } = data.toJSON()[0].module;
-              const { errorName, documentation } = this.errorTable.getEntry(
-                index,
-                error
-              );
-              console.log(`${errorName}: ${documentation}`);
-              _resolve("");
+              try {
+                const { errorName, documentation } = this.errorTable.getEntry(
+                  index,
+                  parseInt(error.substring(2, 4), 16)
+                );
+                console.log(
+                  `\x1b[31m%s\x1b[0m`,
+                  `\n${errorName}: ${documentation}`
+                );
+              } catch (err) {
+                console.log(err);
+              } finally {
+                _resolve(false);
+              }
             }
+            unsubOrWarns(_unsub);
           });
         }
       };
