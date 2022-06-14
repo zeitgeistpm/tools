@@ -88,16 +88,7 @@ program
     "Use Court instead of Simple Disputes as Market Dispute Mechanism",
     false
   )
-  .option(
-    "--amounts <amounts>",
-    "A comma-separated list of amounts of each outcome asset that should be deployed",
-    ""
-  )
-  .option(
-    "--base-asset-amount <amount>",
-    "Amount to deploy for native currency",
-    ""
-  )
+  .option("--amount", "The amount of each token to add to the pool")
   .option(
     "--weights <weights>",
     "A comma-separated list of relative denormalized weights of each asset price",
@@ -117,8 +108,7 @@ program
         timestamp: boolean;
         authorized: string;
         court: boolean;
-        amounts: string;
-        baseAssetAmount: string;
+        amount: string;
         weights: string;
       }
     ) =>
