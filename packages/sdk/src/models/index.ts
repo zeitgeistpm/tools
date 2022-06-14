@@ -109,15 +109,15 @@ export default class Models {
   }
 
   /**
-   * Create a market, buy a complete set of the assets used and deploy
+   * Create a market using CPMM scoring rule, buy a complete set of the assets used and deploy
    * within and deploy an arbitrary amount of those that's greater than the minimum amount.
    * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
    * @param {string} params.oracle The address that will be responsible for reporting the market.
    * @param {MarketPeriod} params.period Start and end block numbers or unix timestamp of the market.
    * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
    * @param {MarketDisputeMechanism} params.mdm Dispute settlement can be authorized, court or simple_disputes
-   * @param {DecodedMarketMetadata} params.metadata Market metadata
-   * @param {string} params.amount Amount for native currency liquidity.
+   * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market.
+   * @param {string} params.amount The amount of each token to add to the pool.
    * @param {string[]} params.weights List of relative denormalized weights of each asset price.
    * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
    */
