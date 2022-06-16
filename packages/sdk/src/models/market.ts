@@ -222,6 +222,105 @@ class Market {
   };
 
   /**
+   * Buy complete sets and deploy a pool with specified liquidity for a market.
+   * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction.
+   * @param {string} amount The amount of each token to add to the pool.
+   * @param {string[]} weights The relative denormalized weight of each asset.
+   * @param {boolean} callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result.
+   */
+  deploySwapPoolAndAdditionalLiquidity = async (
+    signer: KeyringPairOrExtSigner,
+    amount: string,
+    weights: string[],
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
+  ): Promise<string> => {
+    const poolId = await this.getPoolId();
+    if (poolId) {
+      throw new Error(`Pool already exists for this market.`);
+    }
+
+    const tx =
+      this.api.tx.predictionMarkets.deploySwapPoolAndAdditionalLiquidity(
+        this.marketId,
+        amount,
+        weights
+      );
+
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
+    }
+
+    const callback =
+      typeof callbackOrPaymentInfo !== `boolean`
+        ? callbackOrPaymentInfo
+        : undefined;
+
+    return new Promise(async (resolve) => {
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
+
+        if (status.isInBlock) {
+          console.log(
+            `Transaction included at blockHash ${status.asInBlock}\n`
+          );
+
+          events.forEach(({ event: { data, method, section } }, index) => {
+            console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+
+            if (method == `PoolCreate`) {
+              console.log(
+                `\x1b[36m%s\x1b[0m`,
+                `\nCanonical pool for market deployed with id ${
+                  data[0][`poolId`]
+                }.\n`
+              );
+              _resolve(data[0][`poolId`]);
+            } else if (method == `ExtrinsicFailed`) {
+              const { index, error } = data.toJSON()[0].module;
+              try {
+                const { errorName, documentation } = this.errorTable.getEntry(
+                  index,
+                  parseInt(error.substring(2, 4), 16)
+                );
+                console.log(
+                  `\x1b[31m%s\x1b[0m`,
+                  `\n${errorName}: ${documentation}`
+                );
+              } catch (err) {
+                console.log(err);
+              } finally {
+                _resolve(``);
+              }
+            }
+            unsubOrWarns(_unsub);
+          });
+        }
+      };
+
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
+      }
+    });
+  };
+
+  /**
    * Creates swap pool for this market with specified liquidity.
    * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction.
    * @param {string} amount The amount of each token to add to the pool.

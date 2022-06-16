@@ -2,6 +2,7 @@ import program, { Option } from "commander";
 
 import approveMarket from "./actions/approveMarket";
 import getBlockHashes from "./actions/blockHashes";
+import buyAssetsAndDeployPool from "./actions/buyAssetsAndDeployPool";
 import buyCompleteSet from "./actions/buyCompleteSet";
 import createScalarMarket from "./actions/createScalarMarket";
 import cancelPendingMarket from "./actions/cancelPendingMarket";
@@ -367,6 +368,31 @@ program
   )
   .action((marketId: number, opts: { seed: string }) =>
     catchErrorsAndExit(redeemShares, Object.assign(opts, { marketId }))
+  );
+
+program
+  .command("buyAssetsAndDeployPool <marketId> <amount>")
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--weights <weights>",
+    "A comma-separated list of lengths for each asset",
+    ""
+  )
+  .action(
+    (
+      marketId: number,
+      amount: string,
+      opts: { endpoint: string; seed: string; weights: string }
+    ) =>
+      catchErrorsAndExit(
+        buyAssetsAndDeployPool,
+        Object.assign(opts, { marketId, amount })
+      )
   );
 
 program
