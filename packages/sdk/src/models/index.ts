@@ -113,9 +113,9 @@ export default class Models {
    * within and deploy an arbitrary amount of those that's greater than the minimum amount.
    * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
    * @param {string} params.oracle The address that will be responsible for reporting the market.
-   * @param {MarketPeriod} params.period Start and end block numbers or unix timestamp of the market.
+   * @param {MarketPeriod} params.period Start and end block numbers or milliseconds since epoch.
    * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
-   * @param {MarketDisputeMechanism} params.mdm Dispute settlement can be authorized, court or simple_disputes
+   * @param {MarketDisputeMechanism} params.mdm Dispute settlement can only be `Authorized` currently
    * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market.
    * @param {string} params.amount The amount of each token to add to the pool.
    * @param {string[]} params.weights List of relative denormalized weights of each asset price.
@@ -232,16 +232,16 @@ export default class Models {
   }
 
   /**
-   * Creates a new categorical market with the given parameters.
-   * @param signer The actual signer provider to sign the transaction.
-   * @param oracle The address that will be responsible for reporting the market.
-   * @param period Start and end block numbers or unix timestamp of the market.
-   * @param metadata Market metadata
-   * @param creationType `Permissionless` or `Advised`
-   * @param marketType `Categorical` or `Scalar`
-   * @param mdm Dispute settlement can be authorized, court or simple_disputes
-   * @param scoringRule The scoring rule of the market (default: CPMM)
-   * @param callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
+   * Creates a new categorical or scalar market with the given parameters.
+   * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
+   * @param {string} params.oracle The address that will be responsible for reporting the market.
+   * @param {MarketPeriod} params.period Start and end block numbers or milliseconds since epoch.
+   * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market.
+   * @param {string} params.creationType `Permissionless` or `Advised`
+   * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
+   * @param {MarketDisputeMechanism} params.mdm Dispute settlement can only be `Authorized` currently
+   * @param {string} params.scoringRule The scoring rule of the market
+   * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
   async createMarket(params: CreateMarketParams): Promise<string> {
