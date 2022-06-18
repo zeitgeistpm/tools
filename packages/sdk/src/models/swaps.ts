@@ -1,5 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { ISubmittableResult } from "@polkadot/types/types";
+import ErrorTable from "../errorTable";
 
 import { KeyringPairOrExtSigner, AssetId, poolJoinOpts } from "../types";
 import {
@@ -13,6 +14,10 @@ import {
   Pool,
   PoolStatus,
 } from "@zeitgeistpm/types/dist/interfaces/index";
+import {
+  SwapExactAmountInParams,
+  SwapExactAmountOutParams,
+} from "../types/swaps";
 
 /**
  * The Swap class provides an interface over the `Swaps` module for
@@ -31,11 +36,17 @@ export default class Swap {
   public weights;
   /** The unique identifier for this pool. */
   public poolId: number;
-
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
+  /** All system & custom errors with documentation. */
+  private errorTable: ErrorTable;
 
-  constructor(poolId: number, details: Pool, api: ApiPromise) {
+  constructor(
+    poolId: number,
+    details: Pool,
+    api: ApiPromise,
+    errorTable: ErrorTable
+  ) {
     const { assets, poolStatus, swapFee, totalWeight, weights } = details;
 
     this.assets = assets;
@@ -43,10 +54,9 @@ export default class Swap {
     this.swapFee = swapFee.toString();
     this.totalWeight = totalWeight.toString();
     this.weights = weights;
-
     this.poolId = poolId;
-
     this.api = api;
+    this.errorTable = errorTable;
   }
 
   /**
@@ -508,16 +518,18 @@ export default class Swap {
    * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   swapExactAmountIn = async (
-    signer: KeyringPairOrExtSigner,
-    assetIn: string,
-    assetAmountIn: string,
-    assetOut: string,
-    minAmountOut: string,
-    maxPrice: string,
-    callbackOrPaymentInfo:
-      | ((result: ISubmittableResult, _unsub: () => void) => void)
-      | boolean = false
+    params: SwapExactAmountInParams
   ): Promise<string | boolean> => {
+    const {
+      signer,
+      assetIn,
+      assetAmountIn,
+      assetOut,
+      minAmountOut,
+      maxPrice,
+      callbackOrPaymentInfo,
+    } = params;
+
     const tx = this.api.tx.swaps.swapExactAmountIn(
       this.poolId,
       AssetIdFromString(assetIn),
@@ -527,11 +539,11 @@ export default class Swap {
       maxPrice
     );
 
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       return estimatedFee(tx, signer.address);
     }
     const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
+      typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
 
@@ -541,20 +553,41 @@ export default class Swap {
       _unsub: () => void
     ) => {
       const { events, status } = result;
-      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        events.forEach(({ phase, event: { data, method, section } }) => {
-          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+        console.log(`Transaction included at blockHash ${status.asInBlock}\n`);
 
-          if (method == "ExtrinsicSuccess") {
-            unsubOrWarns(_unsub);
+        events.forEach(({ event: { data, method, section } }, index) => {
+          console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+
+          if (method == `SwapExactAmountIn`) {
+            console.log(
+              `\x1b[36m%s\x1b[0m`,
+              `\n${data[0][`assetAmountOut`]} units of ${
+                data[0][`assetOut`]
+              } credited for selling ${data[0][`assetAmountIn`]} units of ${
+                data[0][`assetIn`]
+              }\n`
+            );
             _resolve(true);
+          } else if (method == `ExtrinsicFailed`) {
+            const { index, error } = data.toJSON()[0].module;
+            try {
+              const { errorName, documentation } = this.errorTable.getEntry(
+                index,
+                parseInt(error.substring(2, 4), 16)
+              );
+              console.log(
+                `\x1b[36m%s\x1b[0m`,
+                `\n${errorName}: ${documentation}`
+              );
+            } catch (err) {
+              console.log(err);
+            } finally {
+              _resolve(false);
+            }
           }
-          if (method == "ExtrinsicFailed") {
-            unsubOrWarns(_unsub);
-            _resolve(false);
-          }
+          unsubOrWarns(_unsub);
         });
       }
     };
@@ -591,16 +624,18 @@ export default class Swap {
    * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   swapExactAmountOut = async (
-    signer: KeyringPairOrExtSigner,
-    assetIn: string,
-    maxAmountIn: string,
-    assetOut: string,
-    assetAmountOut: string,
-    maxPrice: string,
-    callbackOrPaymentInfo:
-      | ((result: ISubmittableResult, _unsub: () => void) => void)
-      | boolean = false
+    params: SwapExactAmountOutParams
   ): Promise<string | boolean> => {
+    const {
+      signer,
+      assetIn,
+      maxAmountIn,
+      assetOut,
+      assetAmountOut,
+      maxPrice,
+      callbackOrPaymentInfo,
+    } = params;
+
     const tx = this.api.tx.swaps.swapExactAmountOut(
       this.poolId,
       AssetIdFromString(assetIn),
@@ -610,11 +645,11 @@ export default class Swap {
       maxPrice
     );
 
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       return estimatedFee(tx, signer.address);
     }
     const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
+      typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
 
@@ -624,20 +659,41 @@ export default class Swap {
       _unsub: () => void
     ) => {
       const { events, status } = result;
-      console.log("status:", status.toHuman());
 
       if (status.isInBlock) {
-        events.forEach(({ phase, event: { data, method, section } }) => {
-          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+        console.log(`Transaction included at blockHash ${status.asInBlock}\n`);
 
-          if (method == "ExtrinsicSuccess") {
-            unsubOrWarns(_unsub);
+        events.forEach(({ event: { data, method, section } }, index) => {
+          console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+
+          if (method == `SwapExactAmountOut`) {
+            console.log(
+              `\x1b[36m%s\x1b[0m`,
+              `\n${data[0][`assetAmountIn`]} units of ${
+                data[0][`assetIn`]
+              } used for buying ${data[0][`assetAmountOut`]} units of ${
+                data[0][`assetOut`]
+              }\n`
+            );
             _resolve(true);
+          } else if (method == `ExtrinsicFailed`) {
+            const { index, error } = data.toJSON()[0].module;
+            try {
+              const { errorName, documentation } = this.errorTable.getEntry(
+                index,
+                parseInt(error.substring(2, 4), 16)
+              );
+              console.log(
+                `\x1b[36m%s\x1b[0m`,
+                `\n${errorName}: ${documentation}`
+              );
+            } catch (err) {
+              console.log(err);
+            } finally {
+              _resolve(false);
+            }
           }
-          if (method == "ExtrinsicFailed") {
-            unsubOrWarns(_unsub);
-            _resolve(false);
-          }
+          unsubOrWarns(_unsub);
         });
       }
     };

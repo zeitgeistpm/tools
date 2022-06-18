@@ -20,6 +20,7 @@ import {
 import { estimatedFee, isExtSigner, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
+import ErrorTable from "../errorTable";
 
 /**
  * The Market class initializes all the market data.
@@ -64,22 +65,22 @@ class Market {
   public tags: string[];
 
   public confidentialId?: string;
-
   /** The image for the market. */
   img?: string;
-
   /** Liquidty pool id. */
   poolId?: number;
-
   /** Internally hold a reference to the API that created it. */
   private api: ApiPromise;
+  /** All system & custom errors with documentation. */
+  private errorTable: ErrorTable;
 
   constructor(
     /** The unique identifier for this market. */
     public marketId: number,
     market: MarketResponse,
     decodedMetadata: DecodedMarketMetadata,
-    api: ApiPromise
+    api: ApiPromise,
+    errorTable: ErrorTable
   ) {
     ({
       creator: this.creator,
@@ -108,6 +109,7 @@ class Market {
     } = decodedMetadata);
 
     this.api = api;
+    this.errorTable = errorTable;
   }
 
   /**
@@ -205,7 +207,7 @@ class Market {
     const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
     if (pool.isSome) {
-      return new Swap(poolId, pool.unwrap(), this.api);
+      return new Swap(poolId, pool.unwrap(), this.api, this.errorTable);
     }
     return null;
   };
@@ -220,14 +222,15 @@ class Market {
   };
 
   /**
-   * Creates swap pool for this market via `api.tx.predictionMarkets.deploySwapPoolForMarket(marketId, weights)`.
-   * @param signer The actual signer provider to sign the transaction.
-   * @param weights List of lengths for each asset.
-   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
-   * @throws Error if swap pool already exists for the market.
+   * Buy complete sets and deploy a pool with specified liquidity for a market.
+   * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction.
+   * @param {string} amount The amount of each token to add to the pool.
+   * @param {string[]} weights The relative denormalized weight of each asset.
+   * @param {boolean} callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result.
    */
-  deploySwapPool = async (
+  deploySwapPoolAndAdditionalLiquidity = async (
     signer: KeyringPairOrExtSigner,
+    amount: string,
     weights: string[],
     callbackOrPaymentInfo:
       | ((result: ISubmittableResult, _unsub: () => void) => void)
@@ -235,81 +238,168 @@ class Market {
   ): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId) {
-      throw new Error("Pool already exists for this market.");
+      throw new Error(`Pool already exists for this market.`);
+    }
+
+    const tx =
+      this.api.tx.predictionMarkets.deploySwapPoolAndAdditionalLiquidity(
+        this.marketId,
+        amount,
+        weights
+      );
+
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
+      return estimatedFee(tx, signer.address);
+    }
+
+    const callback =
+      typeof callbackOrPaymentInfo !== `boolean`
+        ? callbackOrPaymentInfo
+        : undefined;
+
+    return new Promise(async (resolve) => {
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
+
+        if (status.isInBlock) {
+          console.log(
+            `Transaction included at blockHash ${status.asInBlock}\n`
+          );
+
+          events.forEach(({ event: { data, method, section } }, index) => {
+            console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+
+            if (method == `PoolCreate`) {
+              console.log(
+                `\x1b[36m%s\x1b[0m`,
+                `\nCanonical pool for market deployed with id ${
+                  data[0][`poolId`]
+                }.\n`
+              );
+              _resolve(data[0][`poolId`]);
+            } else if (method == `ExtrinsicFailed`) {
+              const { index, error } = data.toJSON()[0].module;
+              try {
+                const { errorName, documentation } = this.errorTable.getEntry(
+                  index,
+                  parseInt(error.substring(2, 4), 16)
+                );
+                console.log(
+                  `\x1b[31m%s\x1b[0m`,
+                  `\n${errorName}: ${documentation}`
+                );
+              } catch (err) {
+                console.log(err);
+              } finally {
+                _resolve(``);
+              }
+            }
+            unsubOrWarns(_unsub);
+          });
+        }
+      };
+
+      if (isExtSigner(signer)) {
+        const unsub = await tx.signAndSend(
+          signer.address,
+          { signer: signer.signer },
+          (result) =>
+            callback
+              ? callback(result, unsub)
+              : _callback(result, resolve, unsub)
+        );
+      } else {
+        const unsub = await tx.signAndSend(signer, (result) =>
+          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
+        );
+      }
+    });
+  };
+
+  /**
+   * Creates swap pool for this market with specified liquidity.
+   * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction.
+   * @param {string} amount The amount of each token to add to the pool.
+   * @param {string[]} weights The relative denormalized weight of each asset.
+   * @param {boolean} callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result.
+   */
+  deploySwapPool = async (
+    signer: KeyringPairOrExtSigner,
+    amount: string,
+    weights: string[],
+    callbackOrPaymentInfo:
+      | ((result: ISubmittableResult, _unsub: () => void) => void)
+      | boolean = false
+  ): Promise<string> => {
+    const poolId = await this.getPoolId();
+    if (poolId) {
+      throw new Error(`Pool already exists for this market.`);
     }
 
     const tx = this.api.tx.predictionMarkets.deploySwapPoolForMarket(
       this.marketId,
+      amount,
       weights
     );
 
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       return estimatedFee(tx, signer.address);
     }
+
     const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
+      typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
 
-    const _callback = (
-      result: ISubmittableResult,
-      _resolve: (value: string | PromiseLike<string>) => void,
-      _unsub: () => void
-    ) => {
-      const { events, status } = result;
-      console.log("status:", status.toHuman());
-
-      if (status.isInBlock) {
-        events.forEach(({ phase, event: { data, method, section } }) => {
-          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-
-          if (method == "PoolCreate") {
-            unsubOrWarns(_unsub);
-            _resolve(data[0].toString());
-          }
-          if (method == "ExtrinsicFailed") {
-            unsubOrWarns(_unsub);
-            _resolve("");
-          }
-        });
-      }
-    };
-
     return new Promise(async (resolve) => {
-      // TODO: // sanity check: weights.length should equal outcomes.length+1 (for ZTG)
-      // TODO: // weights should each be >= runtime's MinWeight (currently 1e10)
-      console.log(
-        "Relative weights: ",
-        weights
-          .map(Number)
-          .map((x) => x / 1e10)
-          .map((x) => `${x}X1e10`)
-      );
-      console.log(
-        `If market ${this.marketId} has a different number of outcomes than ${
-          weights.length - 1
-        }, you might get error {6,13}.\n`
-      );
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
 
-      if (this.outcomeAssets) {
-        if (weights.length !== this.outcomeAssets.length + 1) {
+        if (status.isInBlock) {
           console.log(
-            "Weights length mismatch. Expect an error {6,13}: ProvidedValuesLenMustEqualAssetsLen."
+            `Transaction included at blockHash ${status.asInBlock}\n`
           );
-          if (weights.length === this.outcomeAssets.length) {
-            console.log(
-              "Hint: don't forget to include the weight of ZTG as the last weight!"
-            );
-          }
+
+          events.forEach(({ event: { data, method, section } }, index) => {
+            console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+
+            if (method == `PoolCreate`) {
+              console.log(
+                `\x1b[36m%s\x1b[0m`,
+                `\nCanonical pool for market deployed with id ${
+                  data[0][`poolId`]
+                }.\n`
+              );
+              _resolve(data[0][`poolId`]);
+            } else if (method == `ExtrinsicFailed`) {
+              const { index, error } = data.toJSON()[0].module;
+              try {
+                const { errorName, documentation } = this.errorTable.getEntry(
+                  index,
+                  parseInt(error.substring(2, 4), 16)
+                );
+                console.log(
+                  `\x1b[31m%s\x1b[0m`,
+                  `\n${errorName}: ${documentation}`
+                );
+              } catch (err) {
+                console.log(err);
+              } finally {
+                _resolve(``);
+              }
+            }
+            unsubOrWarns(_unsub);
+          });
         }
-      } else {
-        console.log(
-          "Market object appears to be a bare MarketResponse, not an ExtendedMarket"
-        );
-        console.log(
-          "This should not happen unless you are running old code for bug testing."
-        );
-      }
+      };
 
       if (isExtSigner(signer)) {
         const unsub = await tx.signAndSend(

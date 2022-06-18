@@ -71,7 +71,7 @@ export default class SDK {
       );
 
       if (opts.logEndpointInitTime) {
-        console.log(`${endpoint} initialised in ${Date.now() - start} ms.`);
+        console.log(`${endpoint} initialised in ${Date.now() - start} ms\n`);
       }
 
       const { graphQlEndpoint, ipfsClientUrl } = opts;
@@ -87,7 +87,7 @@ export default class SDK {
       }
 
       const eTable = await ErrorTable.populate(api);
-      const sdk = new SDK(api, eTable, graphQLClient, ipfsClientUrl);
+      const sdk = new SDK(api, eTable, graphQLClient, ipfsClientUrl, endpoint);
 
       return sdk;
     } catch (e) {
@@ -112,11 +112,13 @@ export default class SDK {
     public api: ApiPromise,
     public errorTable?: ErrorTable,
     public graphQLClient?: GraphQLClient,
-    ipfsClientUrl?: string
+    ipfsClientUrl?: string,
+    endpoint?: string
   ) {
     this.models = new Models(this.api, errorTable, {
       graphQLClient,
       ipfsClientUrl,
+      endpoint,
     });
   }
 }

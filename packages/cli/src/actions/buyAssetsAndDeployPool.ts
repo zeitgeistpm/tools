@@ -8,7 +8,7 @@ type Options = {
   weights: string;
 };
 
-const deployPool = async (opts: Options): Promise<void> => {
+const buyAssetsAndDeployPool = async (opts: Options): Promise<void> => {
   const { endpoint, marketId, seed, weights, amount } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -39,12 +39,17 @@ const deployPool = async (opts: Options): Promise<void> => {
     wts = Array(outcomeAssets.length + 1).fill("1".concat("0".repeat(10)));
   }
 
-  const poolId = await market.deploySwapPool(signer, amount, wts, false);
+  const poolId = await market.deploySwapPoolAndAdditionalLiquidity(
+    signer,
+    amount,
+    wts,
+    false
+  );
   if (poolId && poolId.length > 0) {
-    console.log(`\x1b[36m%s\x1b[0m`, `\nDeployPool successful!`);
+    console.log(`\x1b[36m%s\x1b[0m`, `\nbuyAssetsAndDeployPool successful!`);
   } else {
-    console.log(`\x1b[36m%s\x1b[0m`, `\nDeployPool failed!`);
+    console.log(`\x1b[36m%s\x1b[0m`, `\nbuyAssetsAndDeployPool failed!`);
   }
 };
 
-export default deployPool;
+export default buyAssetsAndDeployPool;

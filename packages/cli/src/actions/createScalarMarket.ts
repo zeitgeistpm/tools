@@ -33,17 +33,20 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
   const sdk = await SDK.initialize(endpoint);
 
   const signer = util.signerFromSeed(seed);
-  console.log("Sending transaction from", signer.address);
+  console.log(
+    `\x1b[33m%s\x1b[0m`,
+    `Sending transaction from ${signer.address}\n`
+  );
 
   if (bounds && bounds.length !== 2) {
     throw new Error(
-      "If specifying bounds, both lower and higher must be specified."
+      `If specifying bounds, both lower and higher must be specified.`
     );
   }
 
   const marketPeriod = timestamp
-    ? { timestamp: period.split(" ").map((x) => +x) }
-    : { block: period.split(" ").map((x) => +x) };
+    ? { timestamp: period.split(` `).map((x) => +x) }
+    : { block: period.split(` `).map((x) => +x) };
 
   let mdm = null;
   if (authorized) {
@@ -52,22 +55,25 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     mdm = court ? { Court: null } : { SimpleDisputes: null };
   }
 
-  const marketId = await sdk.models.createScalarMarket(
+  const marketId = await sdk.models.createMarket({
     signer,
     oracle,
-    marketPeriod,
-    advised ? "Advised" : "Permissionless",
-    mdm,
-    cpmm ? "CPMM" : "RikiddoSigmoidFeeMarketEma",
+    period: marketPeriod,
     metadata,
-    bounds ? bounds : [0, 100],
-    false
-  );
+    creationType: advised ? `Advised` : `Permissionless`,
+    marketType: { Scalar: bounds ? bounds : [0, 100] },
+    mdm,
+    scoringRule: cpmm ? `CPMM` : `RikiddoSigmoidFeeMarketEma`,
+    callbackOrPaymentInfo: false,
+  });
 
   if (marketId && marketId.length > 0) {
-    console.log(`Scalar market created! Market Id: ${marketId}`);
+    console.log(
+      `\x1b[36m%s\x1b[0m`,
+      `\nScalar market created with id ${marketId}!`
+    );
   } else {
-    console.log(`Scalar market creation failed!`);
+    console.log(`\x1b[36m%s\x1b[0m`, `\nScalar market creation failed!`);
   }
 
   process.exit(0);

@@ -2,6 +2,7 @@ import program, { Option } from "commander";
 
 import approveMarket from "./actions/approveMarket";
 import getBlockHashes from "./actions/blockHashes";
+import buyAssetsAndDeployPool from "./actions/buyAssetsAndDeployPool";
 import buyCompleteSet from "./actions/buyCompleteSet";
 import createScalarMarket from "./actions/createScalarMarket";
 import cancelPendingMarket from "./actions/cancelPendingMarket";
@@ -88,18 +89,9 @@ program
     "Use Court instead of Simple Disputes as Market Dispute Mechanism",
     false
   )
+  .option("--amount <string>", "The amount of each token to add to the pool")
   .option(
-    "--amounts <amounts>",
-    "A comma-separated list of amounts of each outcome asset that should be deployed",
-    ""
-  )
-  .option(
-    "--base-asset-amount <amount>",
-    "Amount to deploy for native currency",
-    ""
-  )
-  .option(
-    "--weights <weights>",
+    "--weights <string>",
     "A comma-separated list of relative denormalized weights of each asset price",
     ""
   )
@@ -117,8 +109,7 @@ program
         timestamp: boolean;
         authorized: string;
         court: boolean;
-        amounts: string;
-        baseAssetAmount: string;
+        amount: string;
         weights: string;
       }
     ) =>
@@ -380,7 +371,7 @@ program
   );
 
 program
-  .command("deployPool <marketId>")
+  .command("buyAssetsAndDeployPool <marketId> <amount>")
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
@@ -392,8 +383,38 @@ program
     "A comma-separated list of lengths for each asset",
     ""
   )
-  .action((marketId: number, opts: { endpoint: string; seed: string }) =>
-    catchErrorsAndExit(deployPool, Object.assign(opts, { marketId }))
+  .action(
+    (
+      marketId: number,
+      amount: string,
+      opts: { endpoint: string; seed: string; weights: string }
+    ) =>
+      catchErrorsAndExit(
+        buyAssetsAndDeployPool,
+        Object.assign(opts, { marketId, amount })
+      )
+  );
+
+program
+  .command("deployPool <marketId> <amount>")
+  .option("--seed <string>", "The signer's seed", "//Alice")
+  .option(
+    "--endpoint <string>",
+    "The endpoint URL of the API connection",
+    "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--weights <weights>",
+    "A comma-separated list of lengths for each asset",
+    ""
+  )
+  .action(
+    (
+      marketId: number,
+      amount: string,
+      opts: { endpoint: string; seed: string; weights: string }
+    ) =>
+      catchErrorsAndExit(deployPool, Object.assign(opts, { marketId, amount }))
   );
 
 program
@@ -463,14 +484,20 @@ program
   );
 
 program
-  .command(
-    "swapExactAmountIn <poolId> <assetIn> <assetAmountIn> <assetOut> <minAmountOut> <maxPrice>"
-  )
+  .command("swapExactAmountIn <poolId> <assetIn> <assetAmountIn> <assetOut>")
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bsr.zeitgeist.pm"
+  )
+  .option(
+    "--minAmountOut <string>",
+    "Minimum asset amount that can leave the pool"
+  )
+  .option(
+    "--maxPrice <string>",
+    "Market price must be equal or less than the provided value"
   )
   .action(
     (
@@ -478,9 +505,12 @@ program
       assetIn: string,
       assetAmountIn: string,
       assetOut: string,
-      minAmountOut: string,
-      maxPrice: string,
-      opts: { seed: string; endpoint: string }
+      opts: {
+        seed: string;
+        endpoint: string;
+        minAmountOut: string;
+        maxPrice: string;
+      }
     ) =>
       catchErrorsAndExit(
         swapExactAmountIn,
@@ -488,41 +518,46 @@ program
           assetIn,
           assetAmountIn,
           assetOut,
-          minAmountOut,
-          maxPrice,
           poolId,
         })
       )
   );
 
 program
-  .command(
-    "swapExactAmountOut <poolId> <assetIn> <maxAmountIn> <assetOut> <assetAmountOut> <maxPrice>"
-  )
+  .command("swapExactAmountOut <poolId> <assetIn> <assetOut> <assetAmountOut>")
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
     "wss://bsr.zeitgeist.pm"
   )
+  .option(
+    "--maxAmountIn <string>",
+    "Maximum asset amount that can enter the pool"
+  )
+  .option(
+    "--maxPrice <string>",
+    "Market price must be equal or less than the provided value"
+  )
   .action(
     (
       poolId: number,
       assetIn: string,
-      maxAmountIn: string,
       assetOut: string,
       assetAmountOut: string,
-      maxPrice: string,
-      opts: { seed: string; endpoint: string }
+      opts: {
+        seed: string;
+        endpoint: string;
+        maxAmountIn: string;
+        maxPrice: string;
+      }
     ) =>
       catchErrorsAndExit(
         swapExactAmountOut,
         Object.assign(opts, {
           assetIn,
-          maxAmountIn,
           assetOut,
           assetAmountOut,
-          maxPrice,
           poolId,
         })
       )

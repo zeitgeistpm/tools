@@ -13,9 +13,7 @@ import {
   KeyringPairOrExtSigner,
   PoolId,
   DecodedMarketMetadata,
-  MarketDisputeMechanism,
   CurrencyIdOf,
-  MarketTypeOf,
   MarketsFilteringOptions,
   MarketsPaginationOptions,
   ActiveAssetsResponse,
@@ -40,7 +38,13 @@ type Options = {
   MAX_RPC_REQUESTS?: number;
   graphQLClient?: GraphQLClient;
   ipfsClientUrl?: string;
+  endpoint: string;
 };
+
+import {
+  CreateCpmmMarketAndDeployAssetsParams,
+  CreateMarketParams,
+} from "../types/market";
 
 export default class Models {
   private api: ApiPromise;
@@ -48,18 +52,19 @@ export default class Models {
   private graphQLClient?: GraphQLClient;
 
   private ipfsClient: IPFS;
+  private endpoint: string;
 
   private marketIds: number[];
 
   MAX_RPC_REQUESTS: number;
 
-  constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options = {}) {
+  constructor(api: ApiPromise, errorTable: ErrorTable, opts: Options) {
     this.api = api;
     this.errorTable = errorTable;
     this.MAX_RPC_REQUESTS = opts.MAX_RPC_REQUESTS || 33000;
     this.graphQLClient = opts.graphQLClient;
-
     this.ipfsClient = new IPFS(opts.ipfsClientUrl);
+    this.endpoint = opts.endpoint;
   }
 
   getGraphQLClient(): GraphQLClient {
@@ -106,32 +111,31 @@ export default class Models {
   /**
    * Create a market using CPMM scoring rule, buy a complete set of the assets used and deploy
    * within and deploy an arbitrary amount of those that's greater than the minimum amount.
-   * @param signer The actual signer provider to sign the transaction.
-   * @param oracle The address that will be responsible for reporting the market.
-   * @param period Start and end block numbers or unix timestamp of the market.
-   * @param marketType "Categorical" or "Scalar"
-   * @param mdm Dispute settlement can be authorized, court or simple_disputes
-   * @param metadata Market metadata
-   * @param amounts List of amounts of each outcome asset that should be deployed.
-   * @param baseAssetAmount Amount for native currency liquidity
-   * @param weights List of relative denormalized weights of each asset price.
-   * @param keep Specifies how many assets to keep.
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
+   * @param {string} params.oracle The address that will be responsible for reporting the market.
+   * @param {MarketPeriod} params.period Start and end block numbers or unix timestamp of the market.
+   * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
+   * @param {MarketDisputeMechanism} params.mdm Dispute settlement can be authorized, court or simple_disputes
+   * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market.
+   * @param {string} params.amount The amount of each token to add to the pool.
+   * @param {string[]} params.weights List of relative denormalized weights of each asset price.
+   * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
    */
   async createCpmmMarketAndDeployAssets(
-    signer: KeyringPairOrExtSigner,
-    oracle: string,
-    period: MarketPeriod,
-    marketType: MarketTypeOf,
-    mdm: MarketDisputeMechanism,
-    amounts: string[],
-    baseAssetAmount: string,
-    weights: string[],
-    metadata: DecodedMarketMetadata,
-    callbackOrPaymentInfo:
-      | ((result: ISubmittableResult, _unsub: () => void) => void)
-      | boolean = false
-  ): Promise<string> {
+    params: CreateCpmmMarketAndDeployAssetsParams
+  ): Promise<boolean | string> {
+    const {
+      signer,
+      oracle,
+      period,
+      metadata,
+      amount,
+      marketType,
+      mdm,
+      weights,
+      callbackOrPaymentInfo,
+    } = params;
+
     const cid = await this.ipfsClient.add(
       JSON.stringify({
         ...metadata,
@@ -146,54 +150,66 @@ export default class Models {
       multihash,
       marketType,
       mdm,
-      baseAssetAmount,
-      amounts,
+      amount,
       weights
     );
 
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       return estimatedFee(tx, signer.address);
     }
+
     const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
+      typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
+
     return new Promise(async (resolve) => {
       const _callback = (
         result: ISubmittableResult,
-        _resolve: (value: string | PromiseLike<string>) => void,
+        _resolve: (value: boolean | PromiseLike<boolean>) => void,
         _unsub: () => void
       ) => {
         const { events, status } = result;
 
         if (status.isInBlock) {
-          console.log(`Transaction included at blockHash ${status.asInBlock}`);
-          events.forEach(({ phase, event: { data, method, section } }) => {
-            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+          console.log(
+            `Transaction included at blockHash ${status.asInBlock}\n`
+          );
 
-            if (method == "MarketCreated") {
-              unsubOrWarns(_unsub);
+          events.forEach(({ event: { data, method, section } }, index) => {
+            console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+
+            if (method == `MarketCreated`) {
               console.log(
-                `Market created with market ID: ${data[0].toString()}`
+                `\x1b[36m%s\x1b[0m`,
+                `\nMarket created with id ${data[0].toString()}.\n`
               );
-            }
-            if (method == "PoolCreate") {
-              unsubOrWarns(_unsub);
+            } else if (method == `PoolCreate`) {
               console.log(
-                `Canonical pool for market deployed - pool ID: ${data[0]["poolId"]}`
+                `\x1b[36m%s\x1b[0m`,
+                `\nCanonical pool for market deployed with id ${
+                  data[0][`poolId`]
+                }.\n`
               );
-              _resolve(data[0]["poolId"]);
-            }
-            if (method == "ExtrinsicFailed") {
-              unsubOrWarns(_unsub);
+              _resolve(true);
+            } else if (method == `ExtrinsicFailed`) {
               const { index, error } = data.toJSON()[0].module;
-              const { errorName, documentation } = this.errorTable.getEntry(
-                index,
-                error
-              );
-              console.log(`${errorName}: ${documentation}`);
-              _resolve("");
+              try {
+                const { errorName, documentation } = this.errorTable.getEntry(
+                  index,
+                  parseInt(error.substring(2, 4), 16)
+                );
+                console.log(
+                  `\x1b[31m%s\x1b[0m`,
+                  `\n${errorName}: ${documentation}`
+                );
+              } catch (err) {
+                console.log(err);
+              } finally {
+                _resolve(false);
+              }
             }
+            unsubOrWarns(_unsub);
           });
         }
       };
@@ -220,149 +236,49 @@ export default class Models {
    * @param signer The actual signer provider to sign the transaction.
    * @param oracle The address that will be responsible for reporting the market.
    * @param period Start and end block numbers or unix timestamp of the market.
-   * @param creationType "Permissionless" or "Advised"
-   * @param mdm Dispute settlement can be authorized, court or simple_disputes
    * @param metadata Market metadata
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
-   * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
-   */
-  async createCategoricalMarket(
-    signer: KeyringPairOrExtSigner,
-    oracle: string,
-    period: MarketPeriod,
-    creationType = "Advised",
-    mdm: MarketDisputeMechanism,
-    scoringRule = "CPMM",
-    metadata: DecodedMarketMetadata,
-    callbackOrPaymentInfo:
-      | ((result: ISubmittableResult, _unsub: () => void) => void)
-      | boolean = false
-  ): Promise<string> {
-    const categories = metadata.categories;
-
-    const cid = await this.ipfsClient.add(
-      JSON.stringify({
-        ...metadata,
-      })
-    );
-
-    const multihash = { Sha3_384: cid.multihash };
-
-    const tx = this.api.tx.predictionMarkets.createCategoricalMarket(
-      oracle,
-      period,
-      multihash,
-      creationType,
-      categories.length,
-      mdm,
-      scoringRule
-    );
-
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
-      return estimatedFee(tx, signer.address);
-    }
-    const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
-        ? callbackOrPaymentInfo
-        : undefined;
-
-    return new Promise(async (resolve) => {
-      const _callback = (
-        result: ISubmittableResult,
-        _resolve: (value: string | PromiseLike<string>) => void,
-        _unsub: () => void
-      ) => {
-        const { events, status } = result;
-
-        if (status.isInBlock) {
-          console.log(`Transaction included at blockHash ${status.asInBlock}`);
-
-          events.forEach(({ phase, event: { data, method, section } }) => {
-            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-
-            if (method == "MarketCreated") {
-              _resolve(data[0].toString());
-            } else if (method == "ExtrinsicFailed") {
-              const { index, error } = data.toJSON()[0].module;
-              const { errorName, documentation } = this.errorTable.getEntry(
-                index,
-                error
-              );
-              console.log(`${errorName}: ${documentation}`);
-              _resolve("");
-            }
-
-            unsubOrWarns(_unsub);
-          });
-        }
-      };
-
-      if (isExtSigner(signer)) {
-        const unsub = await tx.signAndSend(
-          signer.address,
-          { signer: signer.signer },
-          (result) =>
-            callback
-              ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
-        );
-      } else {
-        const unsub = await tx.signAndSend(signer, (result) =>
-          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
-        );
-      }
-    });
-  }
-
-  /**
-   * Creates a new scalar market with the given parameters.
-   * @param signer The actual signer provider to sign the transaction.
-   * @param title The title of the new prediction market.
-   * @param description The description / extra information for the market.
-   * @param oracle The address that will be responsible for reporting the market.
-   * @param period Start and end block numbers or unix timestamp of the market.
-   * @param creationType "Permissionless" or "Advised"
-   * @param bounds The array having lower and higher bound values denoting range set.
+   * @param creationType `Permissionless` or `Advised`
+   * @param marketType `Categorical` or `Scalar`
    * @param mdm Dispute settlement can be authorized, court or simple_disputes
-   * @param paymentInfo "true" to get txn fee estimation otherwise "false"
+   * @param scoringRule The scoring rule of the market (default: CPMM)
+   * @param callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
    */
-  async createScalarMarket(
-    signer: KeyringPairOrExtSigner,
-    oracle: string,
-    period: MarketPeriod,
-    creationType = "Advised",
-    mdm: MarketDisputeMechanism,
-    scoringRule = "CPMM",
-    metadata: DecodedMarketMetadata,
-    bounds: number[],
-    callbackOrPaymentInfo:
-      | ((result: ISubmittableResult, _unsub: () => void) => void)
-      | boolean = false
-  ): Promise<string> {
+  async createMarket(params: CreateMarketParams): Promise<string> {
+    const {
+      signer,
+      oracle,
+      period,
+      metadata,
+      creationType,
+      marketType,
+      mdm,
+      scoringRule,
+      callbackOrPaymentInfo,
+    } = params;
     const cid = await this.ipfsClient.add(
       JSON.stringify({
         ...metadata,
       })
     );
-
     const multihash = { Sha3_384: cid.multihash };
 
-    const tx = this.api.tx.predictionMarkets.createScalarMarket(
+    const tx = this.api.tx.predictionMarkets.createMarket(
       oracle,
       period,
       multihash,
       creationType,
-      bounds,
+      marketType,
       mdm,
       scoringRule
     );
 
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       return estimatedFee(tx, signer.address);
     }
+
     const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
+      typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
 
@@ -375,21 +291,31 @@ export default class Models {
         const { events, status } = result;
 
         if (status.isInBlock) {
-          console.log(`Transaction included at blockHash ${status.asInBlock}`);
+          console.log(
+            `Transaction included at blockHash ${status.asInBlock}\n`
+          );
 
-          events.forEach(({ phase, event: { data, method, section } }) => {
-            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+          events.forEach(({ event: { data, method, section } }, index) => {
+            console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
 
-            if (method == "MarketCreated") {
+            if (method == `MarketCreated`) {
               _resolve(data[0].toString());
-            } else if (method == "ExtrinsicFailed") {
+            } else if (method == `ExtrinsicFailed`) {
               const { index, error } = data.toJSON()[0].module;
-              const { errorName, documentation } = this.errorTable.getEntry(
-                index,
-                error
-              );
-              console.log(`${errorName}: ${documentation}`);
-              _resolve("");
+              try {
+                const { errorName, documentation } = this.errorTable.getEntry(
+                  index,
+                  parseInt(error.substring(2, 4), 16)
+                );
+                console.log(
+                  `\x1b[36m%s\x1b[0m`,
+                  `\n${errorName}: ${documentation}`
+                );
+              } catch (err) {
+                console.log(err);
+              } finally {
+                _resolve(``);
+              }
             }
 
             unsubOrWarns(_unsub);
@@ -873,7 +799,13 @@ export default class Models {
       resolvedOutcome: data.resolvedOutcome,
     };
 
-    const market = new Market(marketId, basicMarketData, metadata, this.api);
+    const market = new Market(
+      marketId,
+      basicMarketData,
+      metadata,
+      this.api,
+      this.errorTable
+    );
     if (data.poolId != null) {
       market.poolId = data.poolId;
     }
@@ -1358,7 +1290,8 @@ export default class Models {
       marketId,
       basicMarketData,
       metadata as DecodedMarketMetadata,
-      this.api
+      this.api,
+      this.errorTable
     );
   }
 
@@ -1367,13 +1300,17 @@ export default class Models {
    * but includes those which have been cancelled, and all other statuses.
    * @returns The `market_count` from Zeitgeist chain.
    */
-  async getMarketCount(): Promise<number | null> {
+  async getMarketCount(): Promise<number> {
     const count = (await this.api.query.marketCommons.marketCounter()).toJSON();
-    if (typeof count !== "number") {
+    if (typeof count !== `number`) {
       throw new Error(
-        "Expected a number to return from api.query.marketCommons.marketCounter (even if variable remains unset)"
+        `Expected a number to return from api.query.marketCommons.marketCounter (even if variable remains unset)`
       );
     }
+    console.log(
+      `\x1b[36m%s\x1b[0m`,
+      `${count} markets are present in ${this.endpoint}`
+    );
     return count;
   }
 
@@ -1421,7 +1358,7 @@ export default class Models {
     const pool = (await this.api.query.swaps.pools(poolId)) as Option<Pool>;
 
     if (pool.isSome) {
-      return new Swap(poolId, pool.unwrap(), this.api);
+      return new Swap(poolId, pool.unwrap(), this.api, this.errorTable);
     } else {
       return null;
     }
