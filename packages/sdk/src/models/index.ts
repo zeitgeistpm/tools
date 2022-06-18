@@ -299,6 +299,10 @@ export default class Models {
             console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
 
             if (method == `MarketCreated`) {
+              console.log(
+                `\x1b[36m%s\x1b[0m`,
+                `\nMarket created with id ${data[0].toString()}.\n`
+              );
               _resolve(data[0].toString());
             } else if (method == `ExtrinsicFailed`) {
               const { index, error } = data.toJSON()[0].module;
@@ -308,7 +312,7 @@ export default class Models {
                   parseInt(error.substring(2, 4), 16)
                 );
                 console.log(
-                  `\x1b[36m%s\x1b[0m`,
+                  `\x1b[31m%s\x1b[0m`,
                   `\n${errorName}: ${documentation}`
                 );
               } catch (err) {
@@ -317,7 +321,6 @@ export default class Models {
                 _resolve(``);
               }
             }
-
             unsubOrWarns(_unsub);
           });
         }
