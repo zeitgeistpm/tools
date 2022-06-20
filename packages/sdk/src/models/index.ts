@@ -118,7 +118,7 @@ export default class Models {
    * @param {MarketDisputeMechanism} params.mdm Dispute settlement can only be `Authorized` currently
    * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market.
    * @param {string} params.amount The amount of each token to add to the pool.
-   * @param {string[]} params.weights List of relative denormalized weights of each asset price.
+   * @param {string[]} params.weights List of relative denormalized weights of each asset.
    * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
    */
   async createCpmmMarketAndDeployAssets(
