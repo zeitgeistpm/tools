@@ -68,15 +68,10 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
   });
 
   if (marketId && marketId.length > 0) {
-    console.log(
-      `\x1b[36m%s\x1b[0m`,
-      `\nScalar market created with id ${marketId}!`
-    );
+    console.log(`\x1b[36m%s\x1b[0m`, `\ncreateScalarMarket successful!`);
   } else {
-    console.log(`\x1b[36m%s\x1b[0m`, `\nScalar market creation failed!`);
+    console.log(`\x1b[36m%s\x1b[0m`, `\ncreateScalarMarket failed!`);
   }
-
-  process.exit(0);
 };
 
 export default createScalarMarket;
