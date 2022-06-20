@@ -509,13 +509,13 @@ export default class Swap {
 
   /**
    * Swaps a given `assetAmountIn` of the `assetIn/assetOut` pair to pool.
-   * @param signer The actual signer provider to sign the transaction.
-   * @param assetIn Asset entering the pool.
-   * @param assetAmountIn Amount that will be transferred from the provider to the pool.
-   * @param assetOut Asset leaving the pool.
-   * @param minAmountOut Minimum asset amount that can leave the pool.
-   * @param maxPrice Market price must be equal or less than the provided value.
-   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
+   * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
+   * @param {string} params.assetIn Asset entering the pool.
+   * @param {string} params.assetAmountIn Amount that will be transferred from the provider to the pool.
+   * @param {string} params.assetOut Asset leaving the pool.
+   * @param {string} params.minAmountOut Minimum asset amount that can leave the pool.
+   * @param {string} params.maxPrice Market price must be equal or less than the provided value.
+   * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result.
    */
   swapExactAmountIn = async (
     params: SwapExactAmountInParams
@@ -615,13 +615,13 @@ export default class Swap {
 
   /**
    * Swaps a given `assetAmountOut` of the `assetIn/assetOut` pair to pool.
-   * @param signer The actual signer provider to sign the transaction.
-   * @param assetIn Asset entering the pool.
-   * @param maxAmountIn Maximum asset amount that can enter the pool.
-   * @param assetOut Asset leaving the pool.
-   * @param assetAmountOut Amount that will be transferred from the pool to the provider.
-   * @param maxPrice Market price must be equal or less than the provided value.
-   * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
+   * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
+   * @param {string} params.assetIn Asset entering the pool.
+   * @param {string} params.maxAmountIn Maximum asset amount that can enter the pool.
+   * @param {string} params.assetOut Asset leaving the pool.
+   * @param {string} params.assetAmountOut Amount that will be transferred from the pool to the provider.
+   * @param {string} params.maxPrice Market price must be equal or less than the provided value.
+   * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result.
    */
   swapExactAmountOut = async (
     params: SwapExactAmountOutParams
