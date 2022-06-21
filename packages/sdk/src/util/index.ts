@@ -1,6 +1,5 @@
 import { ISubmittableResult } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { initIpfs } from "./ipfs";
 import {
   initApi,
   signerFromSeed,
@@ -9,7 +8,7 @@ import {
 } from "./polkadot";
 import { KeyringPairOrExtSigner, ExtSigner, AssetId } from "../types";
 
-export { initApi, initIpfs, signerFromSeed, unsubOrWarns, isValidAddress };
+export { initApi, signerFromSeed, unsubOrWarns, isValidAddress };
 
 export const changeEndianness = (string) => {
   const result = [];
