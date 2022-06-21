@@ -3,26 +3,68 @@ import CID from "cids";
 import all from "it-all";
 import { concat, toString } from "uint8arrays";
 import ipfsClient from "ipfs-http-client";
-import { Cluster } from "@nftstorage/ipfs-cluster";
+import axios from "axios";
+import dotenv from "dotenv";
 
 export default class IPFS {
   private client: ReturnType<typeof ipfsClient>;
-  private cluster: Cluster;
 
-  constructor(ipfsClientUrl = "https://ipfs.zeitgeist.pm") {
+  constructor(ipfsClientUrl = `https://ipfs.zeitgeist.pm`) {
+    dotenv.config();
+
     this.client = ipfsClient({ url: ipfsClientUrl });
-    this.cluster = new Cluster(ipfsClientUrl);
   }
 
-  async add(content: string, hashAlg = "sha3-384"): Promise<CID> {
-    const { cid } = await this.client.add({ content }, { hashAlg });
-    return cid;
+  async add(content: string): Promise<CID> {
+    let ipfsClientCid;
+    try {
+      ipfsClientCid = (
+        await this.client.add(content, {
+          hashAlg: `sha3-384`,
+        })
+      ).cid;
+    } catch (e) {
+      throw new Error(
+        `Failed to publish content to provided IPFS gateway, ${e}`
+      );
+    }
+
+    if (process.env.PROJECT_ENV === `production`) {
+      try {
+        const res = await this.pinCidToCluster(ipfsClientCid.toString());
+        if (res) {
+          console.log(
+            `\x1b[36m%s\x1b[0m`,
+            `\nData published on ${res.allocations.length} cluster peers.\n`
+          );
+        } else {
+          console.log(
+            `\x1b[31m%s\x1b[0m`,
+            `\nFailed to publish data on cluster\n`
+          );
+        }
+      } catch (e) {
+        console.log(`Failed to publish data on cluster\n ${e}\n`);
+      }
+    }
+    return ipfsClientCid;
   }
 
-  async addToCluster(content: string): Promise<any> {
-    const blob = new Blob([content]);
-    const { cid } = await this.cluster.add(blob);
-    return cid;
+  async pinCidToCluster(cid: string): Promise<any> {
+    const result = (
+      await axios({
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        method: `post`,
+        url: `https://ipfs-cluster.zeitgeist.pm/pins/${cid}?replication-min=2&replication-max=2`,
+        auth: {
+          username: process.env.IPFS_CLUSTER_USERNAME,
+          password: process.env.IPFS_CLUSTER_PASSWORD,
+        },
+      })
+    ).data;
+    return result;
   }
 
   /**
