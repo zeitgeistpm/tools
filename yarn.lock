@@ -1494,11 +1494,6 @@
   resolved "https://registry.yarnpkg.com/@multiformats/base-x/-/base-x-4.0.1.tgz#95ff0fa58711789d53aefb2590a8b7a4e715d121"
   integrity sha512-eMk0b9ReBbV23xXU693TAIrLyeO5iTgBZGSJfpqriG8UkYvr/hC9u9pyMlAakDNHWmbhMZCDs6KQO0jzKD8OTw==
 
-"@nftstorage/ipfs-cluster@^5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@nftstorage/ipfs-cluster/-/ipfs-cluster-5.0.1.tgz#28655fd1bd35ac145b0acdd045f7db242713b3f4"
-  integrity sha512-e5+ICMllFgMRWIojh00vk/nk6SshDKQK/LDslg2249lHuBLEeIEajxiI8eM+9+w6DO14+o12IRjhtVIRk5rRaw==
-
 "@noble/hashes@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.0.0.tgz#d5e38bfbdaba174805a4e649f13be9a9ed3351ae"

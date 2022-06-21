@@ -17,7 +17,6 @@
   "author": "Zeitgeist PM <contact@zeitgeist.pm>",
   "license": "GPL-3.0",
   "dependencies": {
-    "@nftstorage/ipfs-cluster": "^5.0.1",
     "@polkadot/api": "^8.7.1",
     "@polkadot/keyring": "^9.4.1",
     "@polkadot/util": "^9.4.1",
