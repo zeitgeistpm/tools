@@ -65,6 +65,7 @@ export default class Swap {
   public toJSONString(): string {
     const swap = Object.assign({}, this);
     delete swap.api;
+    delete swap.errorTable;
     return JSON.stringify(swap, null, 2);
   }
 

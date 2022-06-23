@@ -118,6 +118,7 @@ class Market {
   toJSONString(): string {
     const market = Object.assign({}, this);
     delete market.api;
+    delete market.errorTable;
     return JSON.stringify(market, null, 2);
   }
 
