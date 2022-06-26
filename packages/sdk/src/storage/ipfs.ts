@@ -4,18 +4,15 @@ import all from "it-all";
 import { concat, toString } from "uint8arrays";
 import ipfsClient from "ipfs-http-client";
 import axios from "axios";
-import dotenv from "dotenv";
 
 export default class IPFS {
   private client: ReturnType<typeof ipfsClient>;
 
   constructor(ipfsClientUrl = `https://ipfs.zeitgeist.pm`) {
-    dotenv.config();
-
     this.client = ipfsClient({ url: ipfsClientUrl });
   }
 
-  async add(content: string): Promise<CID> {
+  async add(content: string, pinToCluster = false): Promise<CID> {
     let ipfsClientCid;
     try {
       ipfsClientCid = (
@@ -29,7 +26,7 @@ export default class IPFS {
       );
     }
 
-    if (process.env.PROJECT_ENV === `production`) {
+    if (pinToCluster) {
       try {
         const res = await this.pinCidToCluster(ipfsClientCid.toString());
         if (res) {
@@ -58,10 +55,6 @@ export default class IPFS {
         },
         method: `post`,
         url: `https://ipfs-cluster.zeitgeist.pm/pins/${cid}?replication-min=2&replication-max=2`,
-        auth: {
-          username: process.env.IPFS_CLUSTER_USERNAME,
-          password: process.env.IPFS_CLUSTER_PASSWORD,
-        },
       })
     ).data;
     return result;
