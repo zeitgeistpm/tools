@@ -21,16 +21,14 @@ const typesFromDefs = (
   );
 };
 
-const resolveProvider = async (
-  uri: string
-): Promise<WsProvider | ScProvider> => {
+const resolveProvider = async (uri: string): Promise<WsProvider | any> => {
   const [_, proto, host] = uri.match(/([a-z]+)\:\/\/(.+)/);
 
   if (proto === "wss") {
     return new WsProvider(uri);
   }
 
-  if (proto === "sc") {
+  if (proto === "light") {
     const spec =
       host === "bsr"
         ? JSON.stringify(bsrSpec)
@@ -42,7 +40,7 @@ const resolveProvider = async (
         `Unsuported light client host: ${host}, isnt a valid light client host, only 'bsr' and 'zeitgeist' are supported.`
       );
     }
-    const provider = new ScProvider(host);
+    const provider = new ScProvider(spec);
     await provider.connect();
     return provider;
   }
