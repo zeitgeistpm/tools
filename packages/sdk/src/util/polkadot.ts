@@ -24,7 +24,7 @@ const typesFromDefs = (
 const resolveProvider = async (
   uri: string
 ): Promise<WsProvider | ScProvider> => {
-  const [proto, host] = uri.match(/sc\:\/\/([a-z]+)/);
+  const [_, proto, host] = uri.match(/([a-z]+)\:\/\/(.+)/);
 
   if (proto === "wss") {
     return new WsProvider(uri);
