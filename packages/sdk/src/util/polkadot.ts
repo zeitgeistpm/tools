@@ -1,7 +1,10 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Keyring, encodeAddress, decodeAddress } from "@polkadot/keyring";
+import { ScProvider } from "@polkadot/rpc-provider/substrate-connect";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { hexToU8a, isHex } from "@polkadot/util";
+import zeitgeistSpec from "../types/chainspecs/zeitgeist";
+import bsrSpec from "../types/chainspecs/bsr";
 
 import * as zeitgeistDefinitions from "@zeitgeistpm/type-defs";
 import "@zeitgeistpm/types";
@@ -18,11 +21,44 @@ const typesFromDefs = (
   );
 };
 
-export const initApi = (
+const resolveProvider = async (
+  uri: string
+): Promise<WsProvider | ScProvider> => {
+  const [proto, host] = uri.match(/sc\:\/\/([a-z]+)/);
+
+  if (proto === "wss") {
+    return new WsProvider(uri);
+  }
+
+  if (proto === "sc") {
+    const spec =
+      host === "bsr"
+        ? JSON.stringify(bsrSpec)
+        : host === "zeitgeist"
+        ? JSON.stringify(zeitgeistSpec)
+        : null;
+    if (!spec) {
+      throw new Error(
+        `Unsuported light client host: ${host}, isnt a valid light client host, only 'bsr' and 'zeitgeist' are supported.`
+      );
+    }
+    const provider = new ScProvider(host);
+    await provider.connect();
+    return provider;
+  }
+
+  throw new Error(
+    `Unspupported protocol: ${proto}. Only wss for websocket and sc for light client are supported.`
+  );
+};
+
+export const initApi = async (
   endpoint = "wss://bsr.zeitgeist.pm"
 ): Promise<ApiPromise> => {
+  const provider = await resolveProvider(endpoint);
+
   return ApiPromise.create({
-    provider: new WsProvider(endpoint),
+    provider,
     rpc: {
       predictionMarkets: {
         marketOutcomeShareId: {
