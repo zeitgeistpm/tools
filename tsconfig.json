@@ -20,6 +20,7 @@
             "@zeitgeistpm/type-defs": ["packages/type-defs"],
             "@zeitgeistpm/types": ["packages/types"],
         },
+        "resolveJsonModule": true,
         "esModuleInterop": true
     },
     "files": [],

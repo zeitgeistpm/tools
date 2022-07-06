@@ -1,10 +1,12 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Keyring, encodeAddress, decodeAddress } from "@polkadot/keyring";
-import { ScProvider } from "@polkadot/rpc-provider/substrate-connect";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { hexToU8a, isHex } from "@polkadot/util";
-import zeitgeistSpec from "../types/chainspecs/zeitgeist";
-import bsrSpec from "../types/chainspecs/bsr";
+import battery_station_relay from "../types/chainspecs/battery_station_relay.json";
+import bs_parachain from "../types/chainspecs/bs_parachain.json";
+import zeitgeist_parachain from "../types/chainspecs/zeitgeist_parachain.json";
+import zeitgeist from "../types/chainspecs/zeitgeist.json";
+import bs from "../types/chainspecs/bs.json";
 
 import * as zeitgeistDefinitions from "@zeitgeistpm/type-defs";
 import "@zeitgeistpm/types";
@@ -24,29 +26,47 @@ const typesFromDefs = (
 const resolveProvider = async (uri: string): Promise<WsProvider | any> => {
   const [_, proto, host] = uri.match(/([a-z]+)\:\/\/(.+)/);
 
+  console.log("Resolved: ", proto, host);
+
   if (proto === "wss") {
     return new WsProvider(uri);
   }
 
   if (proto === "light") {
+    const { ScProvider, WellKnownChain } = await import(
+      "@polkadot/rpc-provider/substrate-connect"
+    );
+
     const spec =
       host === "bsr"
-        ? JSON.stringify(bsrSpec)
-        : host === "zeitgeist"
-        ? JSON.stringify(zeitgeistSpec)
+        ? JSON.stringify(bs_parachain)
+        : host === "zeitgeist.pm"
+        ? JSON.stringify(zeitgeist_parachain)
         : null;
+
     if (!spec) {
       throw new Error(
         `Unsuported light client host: ${host}, isnt a valid light client host, only 'bsr' and 'zeitgeist' are supported.`
       );
     }
-    const provider = new ScProvider(spec);
+
+    console.debug(JSON.parse(spec));
+
+    const relayProvider = new ScProvider(
+      host === "zeitgeist.pm"
+        ? WellKnownChain.ksmcc3
+        : JSON.stringify(battery_station_relay)
+    );
+
+    const provider = new ScProvider(spec, relayProvider);
+
     await provider.connect();
+
     return provider;
   }
 
   throw new Error(
-    `Unspupported protocol: ${proto}. Only wss for websocket and sc for light client are supported.`
+    `Unspupported protocol: ${proto}. Only wss: for websocket and light: for light client are supported.`
   );
 };
 

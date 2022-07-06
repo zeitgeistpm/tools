@@ -13,6 +13,7 @@ type InitOptions = {
   logEndpointInitTime?: boolean;
   graphQlEndpoint?: string;
   ipfsClientUrl?: string;
+  timeout?: number;
 };
 
 export const pingGqlEndpoint = async (endpoint: string) => {
@@ -65,7 +66,7 @@ export default class SDK {
     try {
       const start = Date.now();
       const api = await SDK.promiseWithTimeout(
-        10000,
+        opts.timeout || 17000,
         initApi(endpoint),
         "Timed out while connecting to the zeitgeist node. Check your node address."
       );
