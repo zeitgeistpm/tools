@@ -4,7 +4,7 @@ export const isAuthorisedDisputeMechanism = (
   marketDisputeMechanism: MarketDisputeMechanism
 ): marketDisputeMechanism is AuthorisedDisputeMechanism => {
   return (
-    (marketDisputeMechanism as AuthorisedDisputeMechanism).Authorized !==
+    (marketDisputeMechanism as AuthorisedDisputeMechanism).authorized !==
     undefined
   );
 };
