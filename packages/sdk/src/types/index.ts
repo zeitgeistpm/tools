@@ -122,7 +122,7 @@ export type MarketResponse = {
   status: string;
   report: Report | null;
   resolvedOutcome: OutcomeReport | null;
-  mdm: MarketDisputeMechanism;
+  disputeMechanism: MarketDisputeMechanism;
   outcomeAssets: Asset[];
   end: BigInt;
 };
@@ -190,7 +190,7 @@ export type MarketTypeOf = { Categorical: number } | { Scalar: number[] };
 export type ScoringRule = "CPMM" | "RikiddoSigmoidFeeMarketEma";
 
 export type MarketDisputeMechanism =
-  | { Authorized: number }
+  | { Authorized: string }
   | { Court: null }
   | { SimpleDisputes: null };
 

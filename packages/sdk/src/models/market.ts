@@ -54,7 +54,7 @@ class Market {
   /** Timestamp at which market should end */
   public end: BigInt;
 
-  public mdm: MarketDisputeMechanism;
+  public disputeMechanism: MarketDisputeMechanism;
   /** The description of the market. */
   public description: string;
   /** The market question. */
@@ -93,7 +93,7 @@ class Market {
       status: this.status,
       report: this.report,
       resolvedOutcome: this.resolvedOutcome,
-      mdm: this.mdm,
+      disputeMechanism: this.disputeMechanism,
       outcomeAssets: this.outcomeAssets,
       end: this.end,
     } = market);
