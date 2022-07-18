@@ -189,10 +189,16 @@ export type MarketTypeOf = { Categorical: number } | { Scalar: number[] };
 
 export type ScoringRule = "CPMM" | "RikiddoSigmoidFeeMarketEma";
 
+export type AuthorisedDisputeMechanism = { Authorized: string };
+
+export type CourtDisputeMechanism = { Court: null };
+
+export type SimpleDisputeMechanism = { SimpleDisputes: null };
+
 export type MarketDisputeMechanism =
-  | { Authorized: string }
-  | { Court: null }
-  | { SimpleDisputes: null };
+  | AuthorisedDisputeMechanism
+  | CourtDisputeMechanism
+  | SimpleDisputeMechanism;
 
 export type MarketDispute = {
   at: number;
