@@ -846,7 +846,7 @@ export default class Models {
     const now = parseInt((await this.api.query.timestamp.now()).toString());
 
     if (queriedMarketData.end < BigInt(now)) {
-      queriedMarketData.status = "Ended";
+      queriedMarketData.status = "Closed";
     }
 
     return this.constructMarketFromQueryData(queriedMarketData);
@@ -866,7 +866,7 @@ export default class Models {
     let statuses = filteringOptions.statuses ?? [
       "Proposed",
       "Active",
-      "Ended",
+      "Closed",
       "Disputed",
       "Reported",
       "Resolved",
@@ -875,10 +875,10 @@ export default class Models {
 
     // since Ended is not actual stored status, if active status is specified in parameters,
     // it needs to be handled in a separate `where` clause
-    const containsEnded = statuses.includes("Ended") ?? false;
+    const containsEnded = statuses.includes("Closed") ?? false;
     const containsActive = statuses.includes("Active") ?? false;
 
-    statuses = statuses.filter((s) => s !== "Ended" && s !== "Active");
+    statuses = statuses.filter((s) => s !== "Closed" && s !== "Active");
 
     const whereSearchText = `slug_contains: ${
       searchText == null
@@ -1111,7 +1111,7 @@ export default class Models {
 
     for (const market of queriedMarkets) {
       if (market.status === "Active" && market.end < BigInt(timestamp)) {
-        market.status = "Ended";
+        market.status = "Closed";
       }
     }
 
