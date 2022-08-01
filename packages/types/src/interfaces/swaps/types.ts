@@ -48,8 +48,10 @@ export interface PoolId extends u128 {}
 export interface PoolStatus extends Enum {
   readonly isActive: boolean;
   readonly isCollectingSubsidy: boolean;
-  readonly isStale: boolean;
-  readonly type: 'Active' | 'CollectingSubsidy' | 'Stale';
+  readonly isClosed: boolean;
+  readonly isClean: boolean;
+  readonly isInitialized: boolean;
+  readonly type: 'Active' | 'CollectingSubsidy' | 'Closed' | 'Clean' | 'Initialized';
 }
 
 /** @name SubsidyUntil */

@@ -65,6 +65,24 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       [key: string]: AugmentedError<ApiType>;
     };
+    assetManager: {
+      /**
+       * Unable to convert the Amount type into Balance.
+       **/
+      AmountIntoBalanceFailed: AugmentedError<ApiType>;
+      /**
+       * Balance is too low.
+       **/
+      BalanceTooLow: AugmentedError<ApiType>;
+      /**
+       * Deposit result is not expected
+       **/
+      DepositFailed: AugmentedError<ApiType>;
+      /**
+       * Generic error
+       **/
+      [key: string]: AugmentedError<ApiType>;
+    };
     authorized: {
       /**
        * The market unexpectedly has the incorrect dispute mechanism.
@@ -206,24 +224,6 @@ declare module '@polkadot/api-base/types/errors' {
        * Forbids voting of unknown accounts
        **/
       OnlyJurorsCanVote: AugmentedError<ApiType>;
-      /**
-       * Generic error
-       **/
-      [key: string]: AugmentedError<ApiType>;
-    };
-    currency: {
-      /**
-       * Unable to convert the Amount type into Balance.
-       **/
-      AmountIntoBalanceFailed: AugmentedError<ApiType>;
-      /**
-       * Balance is too low.
-       **/
-      BalanceTooLow: AugmentedError<ApiType>;
-      /**
-       * Deposit result is not expected
-       **/
-      DepositFailed: AugmentedError<ApiType>;
       /**
        * Generic error
        **/
@@ -479,6 +479,14 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       NoMarketHasBeenCreated: AugmentedError<ApiType>;
       /**
+       * Market does not have a report
+       **/
+      NoReport: AugmentedError<ApiType>;
+      /**
+       * There's a pool registered for this market already.
+       **/
+      PoolAlreadyExists: AugmentedError<ApiType>;
+      /**
        * Generic error
        **/
       [key: string]: AugmentedError<ApiType>;
@@ -624,10 +632,6 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       MaxDisputesReached: AugmentedError<ApiType>;
       /**
-       * The number of assets specified in a parameter does not match the total asset count.
-       **/
-      NotEnoughAssets: AugmentedError<ApiType>;
-      /**
        * Sender does not have enough balance to buy shares.
        **/
       NotEnoughBalance: AugmentedError<ApiType>;
@@ -651,10 +655,6 @@ declare module '@polkadot/api-base/types/errors' {
        * It was tried to append an item to storage beyond the boundaries.
        **/
       StorageOverflow: AugmentedError<ApiType>;
-      /**
-       * A swap pool already exists for this market.
-       **/
-      SwapPoolExists: AugmentedError<ApiType>;
       /**
        * Too many categories for a categorical market.
        **/
@@ -831,13 +831,25 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       InsufficientBalance: AugmentedError<ApiType>;
       /**
+       * Liquidity provided to new Balancer pool is less than `MinLiquidity`.
+       **/
+      InsufficientLiquidity: AugmentedError<ApiType>;
+      /**
        * The market was not started since the subsidy goal was not reached.
        **/
       InsufficientSubsidy: AugmentedError<ApiType>;
       /**
+       * Could not create CPMM pool since no amount was specified.
+       **/
+      InvalidAmountArgument: AugmentedError<ApiType>;
+      /**
        * Could not create CPMM pool since no fee was supplied.
        **/
       InvalidFeeArgument: AugmentedError<ApiType>;
+      /**
+       * Dispatch called on pool with invalid status.
+       **/
+      InvalidPoolStatus: AugmentedError<ApiType>;
       /**
        * A function that is only valid for pools with specific scoring rules was called for a
        * pool with another scoring rule.
@@ -859,6 +871,10 @@ declare module '@polkadot/api-base/types/errors' {
        * A transferal of funds into a swaps pool was above a threshhold specified by the sender.
        **/
       LimitIn: AugmentedError<ApiType>;
+      /**
+       * No limit was specified for a swap.
+       **/
+      LimitMissing: AugmentedError<ApiType>;
       /**
        * A transferal of funds out of a swaps pool was below a threshhold specified by the
        * receiver.
@@ -912,6 +928,18 @@ declare module '@polkadot/api-base/types/errors' {
        * Two vectors do not have the same length (usually CPMM pool assets and weights).
        **/
       ProvidedValuesLenMustEqualAssetsLen: AugmentedError<ApiType>;
+      /**
+       * Tried to create a pool with at least two identical assets.
+       **/
+      SomeIdenticalAssets: AugmentedError<ApiType>;
+      /**
+       * No swap fee information found for CPMM pool
+       **/
+      SwapFeeMissing: AugmentedError<ApiType>;
+      /**
+       * The swap fee is higher than the allowed maximum.
+       **/
+      SwapFeeTooHigh: AugmentedError<ApiType>;
       /**
        * Tried to create a pool that has less assets than the lower threshhold specified by
        * a constant.
