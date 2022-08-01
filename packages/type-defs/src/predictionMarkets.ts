@@ -64,7 +64,7 @@ export default {
       status: "MarketStatus",
       report: "Option<Report>",
       resolvedOutcome: "Option<OutcomeReport>",
-      mdm: "MarketDisputeMechanism",
+      disputeMechanism: "MarketDisputeMechanism",
     },
     ScoringRule: {
       _enum: ["CPMM", "RikiddoSigmoidFeeMarketEma"],
