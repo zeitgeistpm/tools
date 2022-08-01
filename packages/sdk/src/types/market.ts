@@ -11,11 +11,12 @@ export type CreateCpmmMarketAndDeployAssetsParams = {
   signer: KeyringPairOrExtSigner;
   oracle: string;
   period: MarketPeriod;
+  metadata: DecodedMarketMetadata;
   marketType: MarketTypeOf;
   mdm: MarketDisputeMechanism;
+  swapFee: string;
   amount: string;
   weights: string[];
-  metadata: DecodedMarketMetadata;
   callbackOrPaymentInfo:
     | ((result: ISubmittableResult, _unsub: () => void) => void)
     | boolean;

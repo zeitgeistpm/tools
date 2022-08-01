@@ -117,6 +117,7 @@ export default class Models {
    * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
    * @param {MarketDisputeMechanism} params.mdm Dispute settlement can only be `Authorized` currently
    * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market.
+   * @param {string} params.swapFee The fee applied to each swap after pool creation.
    * @param {string} params.amount The amount of each token to add to the pool.
    * @param {string[]} params.weights List of relative denormalized weights of each asset.
    * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
@@ -129,6 +130,7 @@ export default class Models {
       oracle,
       period,
       metadata,
+      swapFee,
       amount,
       marketType,
       mdm,
@@ -150,6 +152,7 @@ export default class Models {
       multihash,
       marketType,
       mdm,
+      swapFee,
       amount,
       weights
     );
@@ -177,7 +180,9 @@ export default class Models {
           );
 
           events.forEach(({ event: { data, method, section } }, index) => {
-            console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+            console.log(
+              `Event ${index + 1} -> ${section}.${method} :: ${data}`
+            );
 
             if (method == `MarketCreated`) {
               console.log(
