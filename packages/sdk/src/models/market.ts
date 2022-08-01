@@ -338,12 +338,14 @@ class Market {
   /**
    * Creates swap pool for this market with specified liquidity.
    * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction.
+   * @param {string} swapFee The fee applied to each swap after pool creation.
    * @param {string} amount The amount of each token to add to the pool.
    * @param {string[]} weights The relative denormalized weight of each asset.
    * @param {boolean} callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result.
    */
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,
+    swapFee: string,
     amount: string,
     weights: string[],
     callbackOrPaymentInfo:
@@ -352,11 +354,21 @@ class Market {
   ): Promise<string> => {
     const poolId = await this.getPoolId();
     if (poolId) {
-      throw new Error(`Pool already exists for this market.`);
+      throw new Error(`Pool already exists for this market`);
+    }
+
+    if (weights.length !== this.outcomeAssets.length) {
+      console.log(
+        `Weights: ${weights.length}\nOutcome Assets: ${this.outcomeAssets.length}`
+      );
+      throw new Error(
+        `Provided weights length must match outcome assets length`
+      );
     }
 
     const tx = this.api.tx.predictionMarkets.deploySwapPoolForMarket(
       this.marketId,
+      swapFee,
       amount,
       weights
     );
@@ -384,7 +396,9 @@ class Market {
           );
 
           events.forEach(({ event: { data, method, section } }, index) => {
-            console.log(`Event ${index} -> ${section}.${method} :: ${data}`);
+            console.log(
+              `Event ${index + 1} -> ${section}.${method} :: ${data}`
+            );
 
             if (method == `PoolCreate`) {
               console.log(
