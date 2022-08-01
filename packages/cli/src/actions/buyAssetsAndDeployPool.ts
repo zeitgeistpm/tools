@@ -4,12 +4,13 @@ type Options = {
   endpoint: string;
   marketId: number;
   seed: string;
+  swapFee: string;
   amount: string;
   weights: string;
 };
 
 const buyAssetsAndDeployPool = async (opts: Options): Promise<void> => {
-  const { endpoint, marketId, seed, weights, amount } = opts;
+  const { endpoint, marketId, seed, weights, amount, swapFee } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
@@ -25,22 +26,16 @@ const buyAssetsAndDeployPool = async (opts: Options): Promise<void> => {
   let wts = [];
   if (weights) {
     wts = weights.split(",");
-    if (wts.length !== outcomeAssets.length + 1) {
-      throw new Error(
-        `Provided weights length must match assets length!\nWeights: ${
-          wts.length
-        }\nAssets: ${outcomeAssets.length + 1}`
-      );
-    }
   } else {
     //default
     // do not exceed: pub const MaxWeight: Balance = 50 * BASE;
     // (See: /zeitgeist/runtime/src/lib.rs )
-    wts = Array(outcomeAssets.length + 1).fill("1".concat("0".repeat(10)));
+    wts = Array(outcomeAssets.length).fill("1".concat("0".repeat(10)));
   }
 
   const poolId = await market.deploySwapPoolAndAdditionalLiquidity(
     signer,
+    swapFee,
     amount,
     wts,
     false

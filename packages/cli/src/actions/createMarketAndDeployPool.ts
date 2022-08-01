@@ -16,6 +16,7 @@ type Options = {
   timestamp: boolean;
   authorized: string;
   court: boolean;
+  swapFee: string;
   amount: string;
   weights: string;
 };
@@ -33,6 +34,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     timestamp,
     authorized,
     court,
+    swapFee,
     amount,
     weights,
   } = opts;
@@ -101,6 +103,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     period: marketPeriod,
     marketType,
     mdm,
+    swapFee,
     amount,
     weights: weights.split(`,`),
     metadata,

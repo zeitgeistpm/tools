@@ -17,7 +17,7 @@ export interface Market extends Struct {
   readonly status: MarketStatus;
   readonly report: Option<Report>;
   readonly resolvedOutcome: Option<OutcomeReport>;
-  readonly mdm: MarketDisputeMechanism;
+  readonly disputeMechanism: MarketDisputeMechanism;
 }
 
 /** @name MarketCreation */

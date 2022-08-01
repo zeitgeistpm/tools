@@ -54,6 +54,7 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
     await market.deploySwapPool(
       signer,
       `10000000000`,
+      `10`,
       [
         `10000000000`,
         `10000000000`,
@@ -63,7 +64,6 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
         `10000000000`,
         `10000000000`,
         `10000000000`,
-        `80000000000`,
       ],
       false
     );

@@ -63,7 +63,7 @@ program
 
 program
   .command(
-    "createMarketAndDeployPool <slug> <description> <oracle> <period> <question>"
+    "createMarketAndDeployPool <slug> <description> <oracle> <period> <question> <swapFee> <amount>"
   )
   .option(
     "-c --categories [categories...]",
@@ -89,7 +89,6 @@ program
     "Use Court instead of Simple Disputes as Market Dispute Mechanism",
     false
   )
-  .option("--amount <string>", "The amount of each token to add to the pool")
   .option(
     "--weights <string>",
     "A comma-separated list of relative denormalized weights of each asset price",
@@ -102,6 +101,8 @@ program
       oracle: string,
       period: string,
       question: string,
+      swapFee: string,
+      amount: string,
       opts: {
         endpoint: string;
         seed: string;
@@ -109,13 +110,20 @@ program
         timestamp: boolean;
         authorized: string;
         court: boolean;
-        amount: string;
         weights: string;
       }
     ) =>
       catchErrorsAndExit(
         createMarketAndDeployPool,
-        Object.assign(opts, { slug, description, oracle, period, question })
+        Object.assign(opts, {
+          slug,
+          description,
+          oracle,
+          period,
+          question,
+          swapFee,
+          amount,
+        })
       )
   );
 
@@ -371,7 +379,7 @@ program
   );
 
 program
-  .command("buyAssetsAndDeployPool <marketId> <amount>")
+  .command("buyAssetsAndDeployPool <marketId> <swapFee> <amount>")
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
@@ -386,17 +394,18 @@ program
   .action(
     (
       marketId: number,
+      swapFee: string,
       amount: string,
       opts: { endpoint: string; seed: string; weights: string }
     ) =>
       catchErrorsAndExit(
         buyAssetsAndDeployPool,
-        Object.assign(opts, { marketId, amount })
+        Object.assign(opts, { marketId, swapFee, amount })
       )
   );
 
 program
-  .command("deployPool <marketId> <amount>")
+  .command("deployPool <marketId> <swapFee> <amount>")
   .option("--seed <string>", "The signer's seed", "//Alice")
   .option(
     "--endpoint <string>",
@@ -411,10 +420,14 @@ program
   .action(
     (
       marketId: number,
+      swapFee: string,
       amount: string,
       opts: { endpoint: string; seed: string; weights: string }
     ) =>
-      catchErrorsAndExit(deployPool, Object.assign(opts, { marketId, amount }))
+      catchErrorsAndExit(
+        deployPool,
+        Object.assign(opts, { marketId, swapFee, amount })
+      )
   );
 
 program
