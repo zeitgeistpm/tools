@@ -141,7 +141,7 @@ export type ExtendedMarketResponse = {
   report: Report | null;
   categories: string[] | null;
   resolvedOutcome: OutcomeReport | null;
-  mdm: MarketDisputeMechanism;
+  disputeMechanism: MarketDisputeMechanism;
   // new ones
   marketId: number;
   title: string;
