@@ -843,12 +843,6 @@ export default class Models {
       return;
     }
 
-    const now = parseInt((await this.api.query.timestamp.now()).toString());
-
-    if (queriedMarketData.end < BigInt(now)) {
-      queriedMarketData.status = "Closed";
-    }
-
     return this.constructMarketFromQueryData(queriedMarketData);
   }
 
@@ -857,13 +851,11 @@ export default class Models {
     countOnly = false
   ): {
     queries: string[];
-    containsActive: boolean;
-    containsEnded: boolean;
     statuses: MarketStatusText[];
   } {
     // need this since `status_in` needs [String!] type which is `undefined` or non-empty array of strings
     // `statuses` variable is returned and used in queries as a variable
-    let statuses = filteringOptions.statuses ?? [
+    const statuses = filteringOptions.statuses ?? [
       "Proposed",
       "Active",
       "Closed",
@@ -873,22 +865,14 @@ export default class Models {
     ];
     const { searchText } = filteringOptions;
 
-    // since Ended is not actual stored status, if active status is specified in parameters,
-    // it needs to be handled in a separate `where` clause
-    const containsEnded = statuses.includes("Closed") ?? false;
-    const containsActive = statuses.includes("Active") ?? false;
-
-    statuses = statuses.filter((s) => s !== "Closed" && s !== "Active");
-
     const whereSearchText = `slug_contains: ${
       searchText == null
         ? '""'
         : "$searchText, OR: { question_contains: $searchText },"
     }`;
 
-    const whereNoActive = `{
-      status_in: $statuses
-      ${whereSearchText}
+    const where = `where: {
+      status_in: $statuses ${whereSearchText}
       tags_containsAll: $tags
       creator_eq: $creator
       oracle_eq: $oracle
@@ -896,31 +880,6 @@ export default class Models {
       marketId_in: $marketIds
       outcomeAssets_containsAny: $assets
     }`;
-
-    const whereActive = `{
-      status_eq: "Active"
-      ${whereSearchText}
-      tags_containsAll: $tags
-      creator_eq: $creator
-      oracle_eq: $oracle
-      end_gt: $end_gt
-      end_lt: $end_lt
-      poolId_gte: $minPoolId
-      marketId_in: $marketIds
-      outcomeAssets_containsAny: $assets
-    }`;
-
-    let where = `where: { OR: [`;
-
-    if (statuses.length > 0) {
-      where = `${where} ${whereNoActive}`;
-    }
-    const searchActive = containsActive || containsEnded;
-    if (searchActive) {
-      where = `${where}, ${whereActive}`;
-    }
-
-    where = `${where} ] }`;
 
     const countQuery = gql`
       query TotalMarketsCount(
@@ -929,7 +888,6 @@ export default class Models {
         ${searchText == null ? "" : "$searchText: String!"}
         $creator: String
         $oracle: String
-        ${searchActive ? "$end_gt: BigInt, $end_lt: BigInt," : ""}
         $minPoolId: Int
         $marketIds: [Int!]
         $assets: [String!]
@@ -944,7 +902,7 @@ export default class Models {
     `;
 
     if (countOnly) {
-      return { statuses, containsActive, containsEnded, queries: [countQuery] };
+      return { statuses, queries: [countQuery] };
     }
 
     const filterQuery = gql`
@@ -957,7 +915,6 @@ export default class Models {
         $orderByQuery: [MarketOrderByInput!]
         $creator: String
         $oracle: String
-        ${searchActive ? "$end_gt: BigInt, $end_lt: BigInt," : ""}
         $minPoolId: Int
         $marketIds: [Int!]
         $assets: [String!]
@@ -976,8 +933,6 @@ export default class Models {
 
     return {
       statuses,
-      containsActive,
-      containsEnded,
       queries: [countQuery, filterQuery],
     };
   }
@@ -1038,13 +993,10 @@ export default class Models {
 
     const marketIds = await this.getAllMarketIds();
 
-    const { statuses, containsActive, containsEnded, queries } =
+    const { statuses, queries } =
       this.constructQueriesForMarketsFiltering(filteringOptions, countOnly);
 
     const [totalCountQuery, marketsQuery] = queries;
-
-    // console.log("QUERIES-------------------");
-    // console.log(totalCountQuery, marketsQuery);
 
     let assets: string[];
     if (assetOwner) {
@@ -1085,14 +1037,11 @@ export default class Models {
       orderByQuery,
       creator,
       oracle,
-      end_gt: !containsEnded && containsActive ? timestamp : undefined,
-      end_lt: containsEnded && !containsActive ? timestamp : undefined,
       minPoolId: liquidityOnly ? 0 : undefined,
       marketIds,
       assets,
     };
 
-    // console.log(JSON.stringify({ ...variables, marketIds: null }, null, 2));
     const totalCountData = await this.graphQLClient.request<{
       marketsConnection: { totalCount: number };
     }>(totalCountQuery, variables);
@@ -1108,12 +1057,6 @@ export default class Models {
     // console.log("markets", JSON.stringify(marketsData, null, 2));
 
     const queriedMarkets = marketsData.markets;
-
-    for (const market of queriedMarkets) {
-      if (market.status === "Active" && market.end < BigInt(timestamp)) {
-        market.status = "Closed";
-      }
-    }
 
     const result = queriedMarkets.map((m) => {
       return this.constructMarketFromQueryData(m);
