@@ -993,8 +993,10 @@ export default class Models {
 
     const marketIds = await this.getAllMarketIds();
 
-    const { statuses, queries } =
-      this.constructQueriesForMarketsFiltering(filteringOptions, countOnly);
+    const { statuses, queries } = this.constructQueriesForMarketsFiltering(
+      filteringOptions,
+      countOnly
+    );
 
     const [totalCountQuery, marketsQuery] = queries;
 
