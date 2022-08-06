@@ -731,7 +731,7 @@ export default class Models {
   }
 
   private constructMarketFromQueryData(data: MarketQueryData): Market {
-    const { marketType, period, mdm, marketId } = data;
+    const { marketType, period, disputeMechanism, marketId } = data;
 
     for (const type in marketType) {
       const val = marketType[type];
@@ -755,12 +755,12 @@ export default class Models {
       }
     }
 
-    for (const dispMech in mdm) {
-      const val = mdm[dispMech];
+    for (const dispMech in disputeMechanism) {
+      const val = disputeMechanism[dispMech];
       if (val == null) {
-        delete mdm[dispMech];
+        delete disputeMechanism[dispMech];
       } else {
-        mdm[dispMech] = val;
+        disputeMechanism[dispMech] = val;
       }
     }
 
@@ -800,7 +800,9 @@ export default class Models {
       status: data.status,
       outcomeAssets,
       marketType: marketTypeAsType,
-      mdm: this.api.createType("MarketDisputeMechanism", mdm).toJSON(),
+      disputeMechanism: this.api
+        .createType("MarketDisputeMechanism", disputeMechanism)
+        .toJSON(),
       report: marketReport,
       period: this.api.createType("MarketPeriod", marketPeriod).toJSON(),
       //@ts-ignore
