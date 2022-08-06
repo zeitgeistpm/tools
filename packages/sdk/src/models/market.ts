@@ -224,11 +224,11 @@ class Market {
 
   /**
    * Buy complete sets and deploy a pool with specified liquidity for a market.
-   * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction.
-   * @param {string} swapFee The fee applied to each swap after pool creation.
-   * @param {string} amount The amount of each token to add to the pool.
-   * @param {string[]} weights The relative denormalized weight of each asset.
-   * @param {boolean} callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result.
+   * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction
+   * @param {string} swapFee The fee applied to each swap after pool creation
+   * @param {string} amount The amount of each token to add to the pool
+   * @param {string[]} weights The relative denormalized weight of each outcome asset
+   * @param {boolean} callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result
    */
   deploySwapPoolAndAdditionalLiquidity = async (
     signer: KeyringPairOrExtSigner,
@@ -336,12 +336,13 @@ class Market {
   };
 
   /**
-   * Creates swap pool for this market with specified liquidity.
-   * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction.
-   * @param {string} swapFee The fee applied to each swap after pool creation.
-   * @param {string} amount The amount of each token to add to the pool.
-   * @param {string[]} weights The relative denormalized weight of each asset.
-   * @param {boolean} callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result.
+   * Creates swap pool for this market with specified liquidity. The sender must have
+   * enough funds to cover all of the required shares to seed the pool.
+   * @param {KeyringPairOrExtSigner} signer The actual signer provider to sign the transaction
+   * @param {string} swapFee The fee applied to each swap after pool creation
+   * @param {string} amount The amount of each token to add to the pool
+   * @param {string[]} weights The relative denormalized weight of each outcome asset
+   * @param {boolean} callbackOrPaymentInfo `true` to get txn fee estimation otherwise callback to capture transaction result
    */
   deploySwapPool = async (
     signer: KeyringPairOrExtSigner,

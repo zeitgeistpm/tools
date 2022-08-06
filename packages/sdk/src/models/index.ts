@@ -109,17 +109,16 @@ export default class Models {
   }
 
   /**
-   * Create a market using CPMM scoring rule, buy a complete set of the assets used and deploy
-   * within and deploy an arbitrary amount of those that's greater than the minimum amount.
-   * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
-   * @param {string} params.oracle The address that will be responsible for reporting the market.
-   * @param {MarketPeriod} params.period Start and end block numbers or milliseconds since epoch.
+   * Creates a market using CPMM scoring rule, buys a complete set of the assets used and deploys the funds.
+   * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction
+   * @param {string} params.oracle The address that will be responsible for reporting the market
+   * @param {MarketPeriod} params.period Start and end block numbers or milliseconds since epoch
    * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
-   * @param {MarketDisputeMechanism} params.mdm Dispute settlement can only be `Authorized` currently
-   * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market.
-   * @param {string} params.swapFee The fee applied to each swap after pool creation.
-   * @param {string} params.amount The amount of each token to add to the pool.
-   * @param {string[]} params.weights List of relative denormalized weights of each asset.
+   * @param {MarketDisputeMechanism} params.disputeMechanism Dispute settlement can only be `Authorized` currently
+   * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market
+   * @param {string} params.swapFee The fee applied to each swap after pool creation
+   * @param {string} params.amount The amount of each token to add to the pool
+   * @param {string[]} params.weights List of relative denormalized weights of each outcome asset
    * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
    */
   async createCpmmMarketAndDeployAssets(
@@ -133,7 +132,7 @@ export default class Models {
       swapFee,
       amount,
       marketType,
-      mdm,
+      disputeMechanism,
       weights,
       callbackOrPaymentInfo,
     } = params;
@@ -151,7 +150,7 @@ export default class Models {
       period,
       multihash,
       marketType,
-      mdm,
+      disputeMechanism,
       swapFee,
       amount,
       weights
@@ -244,7 +243,7 @@ export default class Models {
    * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market.
    * @param {string} params.creationType `Permissionless` or `Advised`
    * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
-   * @param {MarketDisputeMechanism} params.mdm Dispute settlement can only be `Authorized` currently
+   * @param {MarketDisputeMechanism} params.disputeMechanism Dispute settlement can only be `Authorized` currently
    * @param {string} params.scoringRule The scoring rule of the market
    * @param {boolean} params.callbackOrPaymentInfo `true` to get txn fee estimation otherwise `false`
    * @returns The `marketId` that can be used to get the full data via `sdk.models.fetchMarket(marketId)`.
@@ -257,7 +256,7 @@ export default class Models {
       metadata,
       creationType,
       marketType,
-      mdm,
+      disputeMechanism,
       scoringRule,
       callbackOrPaymentInfo,
     } = params;
@@ -274,7 +273,7 @@ export default class Models {
       multihash,
       creationType,
       marketType,
-      mdm,
+      disputeMechanism,
       scoringRule
     );
 
