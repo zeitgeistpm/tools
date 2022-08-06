@@ -38,7 +38,9 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
       },
       creationType: `Permissionless`,
       marketType: { Categorical: 8 },
-      mdm: { SimpleDisputes: null },
+      disputeMechanism: {
+        authorized: `5D2L4ghyiYE8p2z7VNJo9JYwRuc8uzPWtMBqdVyvjRcsnw4P`,
+      },
       scoringRule: `CPMM`,
       callbackOrPaymentInfo: false,
     });
@@ -53,8 +55,8 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
     await market.buyCompleteSet(signer, `5000000000000` as any, false);
     await market.deploySwapPool(
       signer,
+      `10000000`,
       `10000000000`,
-      `10`,
       [
         `10000000000`,
         `10000000000`,
