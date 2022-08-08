@@ -280,7 +280,7 @@ export type MarketIdOf = MarketId;
 export type MarketStatusText =
   | "Proposed"
   | "Active"
-  | "Ended"
+  | "Closed"
   | "Reported"
   | "Disputed"
   | "Resolved";
