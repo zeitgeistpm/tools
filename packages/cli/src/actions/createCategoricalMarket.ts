@@ -86,11 +86,11 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     ? { timestamp: period.split(` `).map((x) => +x) }
     : { block: period.split(` `).map((x) => +x) };
 
-  let mdm = null;
+  let disputeMechanism = null;
   if (authorized) {
-    mdm = { Authorized: authorized };
+    disputeMechanism = { Authorized: authorized };
   } else {
-    mdm = court ? { Court: null } : { SimpleDisputes: null };
+    disputeMechanism = court ? { Court: null } : { SimpleDisputes: null };
   }
 
   const marketId = await sdk.models.createMarket({
@@ -100,7 +100,7 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     metadata,
     creationType: advised ? `Advised` : `Permissionless`,
     marketType: { Categorical: categoriesMeta.length },
-    mdm,
+    disputeMechanism,
     scoringRule: cpmm ? `CPMM` : `RikiddoSigmoidFeeMarketEma`,
     callbackOrPaymentInfo: false,
   });

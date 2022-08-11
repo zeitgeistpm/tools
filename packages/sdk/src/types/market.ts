@@ -13,7 +13,7 @@ export type CreateCpmmMarketAndDeployAssetsParams = {
   period: MarketPeriod;
   metadata: DecodedMarketMetadata;
   marketType: MarketTypeOf;
-  mdm: MarketDisputeMechanism;
+  disputeMechanism: MarketDisputeMechanism;
   swapFee: string;
   amount: string;
   weights: string[];
@@ -29,7 +29,7 @@ export type CreateMarketParams = {
   metadata: DecodedMarketMetadata;
   creationType: string;
   marketType: MarketTypeOf;
-  mdm: MarketDisputeMechanism;
+  disputeMechanism: MarketDisputeMechanism;
   scoringRule: string;
   callbackOrPaymentInfo:
     | ((result: ISubmittableResult, _unsub: () => void) => void)

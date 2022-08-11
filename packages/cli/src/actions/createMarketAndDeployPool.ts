@@ -90,11 +90,11 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
 
   const marketType = { Categorical: metadata.categories.length };
 
-  let mdm = null;
+  let disputeMechanism = null;
   if (authorized) {
-    mdm = { Authorized: authorized };
+    disputeMechanism = { Authorized: authorized };
   } else {
-    mdm = court ? { Court: null } : { SimpleDisputes: null };
+    disputeMechanism = court ? { Court: null } : { SimpleDisputes: null };
   }
 
   const res = await sdk.models.createCpmmMarketAndDeployAssets({
@@ -102,7 +102,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     oracle,
     period: marketPeriod,
     marketType,
-    mdm,
+    disputeMechanism,
     swapFee,
     amount,
     weights: weights.split(`,`),
