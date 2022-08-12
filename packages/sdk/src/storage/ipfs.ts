@@ -55,6 +55,10 @@ export default class IPFS {
         },
         method: `post`,
         url: `https://ipfs-cluster.zeitgeist.pm/pins/${cid}?replication-min=2&replication-max=2`,
+        auth: {
+          username: `zeitgeist`,
+          password: `5ZpmQl*rWn%Z`,
+        },
       })
     ).data;
     return result;
