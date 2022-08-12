@@ -12,7 +12,7 @@ export default class IPFS {
     this.client = ipfsClient({ url: ipfsClientUrl });
   }
 
-  async add(content: string, pinToCluster = false): Promise<CID> {
+  async add(content: string, pinToCluster = true): Promise<CID> {
     let ipfsClientCid;
     try {
       ipfsClientCid = (
