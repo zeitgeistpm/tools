@@ -12,7 +12,7 @@ export default class IPFS {
     this.client = ipfsClient({ url: ipfsClientUrl });
   }
 
-  async add(content: string, pinToCluster = false): Promise<CID> {
+  async add(content: string, pinToCluster = true): Promise<CID> {
     let ipfsClientCid;
     try {
       ipfsClientCid = (
@@ -55,6 +55,10 @@ export default class IPFS {
         },
         method: `post`,
         url: `https://ipfs-cluster.zeitgeist.pm/pins/${cid}?replication-min=2&replication-max=2`,
+        auth: {
+          username: `zeitgeist`,
+          password: `5ZpmQl*rWn%Z`,
+        },
       })
     ).data;
     return result;
