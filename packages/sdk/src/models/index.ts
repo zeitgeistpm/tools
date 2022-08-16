@@ -1031,10 +1031,6 @@ export default class Models {
     const orderByQuery =
       orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
 
-    const timestamp = parseInt(
-      (await this.api.query.timestamp.now()).toString()
-    );
-
     const variables = {
       statuses,
       tags,
@@ -1044,7 +1040,7 @@ export default class Models {
       orderByQuery,
       creator,
       oracle,
-      minPoolId: liquidityOnly ? 0 : undefined,
+      minPoolId: liquidityOnly ? 0 : null,
       marketIds,
       assets,
     };
