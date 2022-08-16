@@ -7,12 +7,19 @@ import axios from "axios";
 
 export default class IPFS {
   private client: ReturnType<typeof ipfsClient>;
+  private pinToCluster: boolean;
 
   constructor(ipfsClientUrl = `https://ipfs.zeitgeist.pm`) {
     this.client = ipfsClient({ url: ipfsClientUrl });
+
+    if (ipfsClientUrl == `https://ipfs.zeitgeist.pm`) {
+      this.pinToCluster = true;
+    } else {
+      this.pinToCluster = false;
+    }
   }
 
-  async add(content: string, pinToCluster = true): Promise<CID> {
+  async add(content: string): Promise<CID> {
     let ipfsClientCid;
     try {
       ipfsClientCid = (
@@ -26,7 +33,7 @@ export default class IPFS {
       );
     }
 
-    if (pinToCluster) {
+    if (this.pinToCluster) {
       try {
         const res = await this.pinCidToCluster(ipfsClientCid.toString());
         if (res) {
