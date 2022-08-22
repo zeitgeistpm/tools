@@ -70,13 +70,13 @@ export default class SDK {
       const start = Date.now();
 
       const api = await SDK.promiseWithTimeout<ApiPromise>(
-        12000,
+        15000,
         new Promise(async (resolve, reject) => {
           const [provider, create] = lazyInitApi(endpoint);
           let connectionTries = 0;
           provider.on("error", () => {
             connectionTries++;
-            if (connectionTries > opts.initialConnectionTries) {
+            if (connectionTries > (opts.initialConnectionTries || 5)) {
               provider.disconnect();
               reject("Could not connect to the node");
             }

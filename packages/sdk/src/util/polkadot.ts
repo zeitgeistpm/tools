@@ -141,7 +141,7 @@ export const constructApiOptions = (provider: WsProvider) => ({
 export const lazyInitApi = (
   endpoint?: string
 ): [WsProvider, () => Promise<ApiPromise>] => {
-  const provider = new WsProvider(endpoint);
+  const provider = new WsProvider(endpoint, 1200, undefined, 15000);
   return [provider, () => ApiPromise.create(constructApiOptions(provider))];
 };
 
