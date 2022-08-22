@@ -1,10 +1,8 @@
 import { ApiPromise } from "@polkadot/api";
-import { isFunction } from "@polkadot/util";
 import { GraphQLClient, request, gql } from "graphql-request";
 
 import ErrorTable from "./errorTable";
 import Models from "./models";
-import { initApi } from "./util";
 import { lazyInitApi } from "./util/polkadot";
 
 export * as models from "./models";
