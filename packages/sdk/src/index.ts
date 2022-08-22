@@ -71,15 +71,20 @@ export default class SDK {
         15000,
         new Promise(async (resolve, reject) => {
           const [provider, create] = lazyInitApi(endpoint);
+          let finished = false;
           let connectionTries = 0;
           provider.on("error", () => {
-            connectionTries++;
-            if (connectionTries > (opts.initialConnectionTries || 5)) {
+            if (
+              !finished &&
+              connectionTries++ > (opts.initialConnectionTries || 5)
+            ) {
+              finished = true;
               provider.disconnect();
               reject("Could not connect to the node");
             }
           });
           provider.on("connected", () => {
+            finished = true;
             resolve(create());
           });
         }),
