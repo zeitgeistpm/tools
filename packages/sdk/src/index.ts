@@ -68,7 +68,7 @@ export default class SDK {
       const start = Date.now();
 
       const api = await SDK.promiseWithTimeout<ApiPromise>(
-        15000,
+        60 * 1000,
         new Promise(async (resolve, reject) => {
           const [provider, create] = lazyInitApi(endpoint);
           let finished = false;
