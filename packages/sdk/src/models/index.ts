@@ -143,6 +143,8 @@ export default class Models {
       })
     );
 
+    this.ipfsClient;
+
     const multihash = { Sha3_384: cid.multihash };
 
     const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
@@ -222,15 +224,28 @@ export default class Models {
         const unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
-          (result) =>
+          (result) => {
+            setTimeout(() => {
+              if (result.dispatchError || result.internalError) {
+                this.ipfsClient.unpinCidFromCluster(cid.toString());
+              }
+            });
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
+              : _callback(result, resolve, unsub);
+          }
         );
       } else {
-        const unsub = await tx.signAndSend(signer, (result) =>
-          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
-        );
+        const unsub = await tx.signAndSend(signer, (result) => {
+          setTimeout(() => {
+            if (result.dispatchError || result.internalError) {
+              this.ipfsClient.unpinCidFromCluster(cid.toString());
+            }
+          });
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
       }
     });
   }
