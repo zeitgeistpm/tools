@@ -22,6 +22,9 @@ export type PinsPostResponse = {
   reference: string;
 };
 
+const username = "zeitgeist";
+const password = "5ZpmQl*rWn%Z";
+
 export default class IPFS {
   private client: ReturnType<typeof ipfsClient>;
   private pinToCluster: boolean;
@@ -81,8 +84,25 @@ export default class IPFS {
         method: `post`,
         url: `https://ipfs-cluster.zeitgeist.pm/pins/${cid}?replication-min=2&replication-max=2`,
         auth: {
-          username: `zeitgeist`,
-          password: `5ZpmQl*rWn%Z`,
+          username,
+          password,
+        },
+      })
+    ).data;
+    return result;
+  }
+
+  async unpinCidFromCluster(cid: string): Promise<PinsPostResponse> {
+    const result = (
+      await axios({
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        method: `delete`,
+        url: `https://ipfs-cluster.zeitgeist.pm/pins/${cid}`,
+        auth: {
+          username,
+          password,
         },
       })
     ).data;
