@@ -143,8 +143,6 @@ export default class Models {
       })
     );
 
-    this.ipfsClient;
-
     const multihash = { Sha3_384: cid.multihash };
 
     const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
@@ -166,6 +164,15 @@ export default class Models {
       typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
+
+    const ipfsCleanup = async () => {
+      try {
+        await this.ipfsClient.unpinCidFromCluster(cid.toString());
+      } catch (error) {
+        console.log("Ipfs cleanup error:");
+        console.log(error);
+      }
+    };
 
     return new Promise(async (resolve) => {
       const _callback = (
@@ -225,11 +232,9 @@ export default class Models {
           signer.address,
           { signer: signer.signer },
           (result) => {
-            setTimeout(() => {
-              if (result.dispatchError || result.internalError) {
-                this.ipfsClient.unpinCidFromCluster(cid.toString());
-              }
-            });
+            if (result.dispatchError || result.internalError) {
+              setTimeout(ipfsCleanup);
+            }
             callback
               ? callback(result, unsub)
               : _callback(result, resolve, unsub);
@@ -237,11 +242,9 @@ export default class Models {
         );
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
-          setTimeout(() => {
-            if (result.dispatchError || result.internalError) {
-              this.ipfsClient.unpinCidFromCluster(cid.toString());
-            }
-          });
+          if (result.dispatchError || result.internalError) {
+            setTimeout(ipfsCleanup);
+          }
           callback
             ? callback(result, unsub)
             : _callback(result, resolve, unsub);
