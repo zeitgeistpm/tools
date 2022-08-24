@@ -1,7 +1,12 @@
 import { ApiPromise } from "@polkadot/api";
 import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { AssetIdFromString, estimatedFee, unsubOrWarns } from "../util";
+import {
+  AssetIdFromString,
+  createMarket,
+  estimatedFee,
+  unsubOrWarns,
+} from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 import Decimal from "decimal.js";
@@ -1190,6 +1195,26 @@ export default class Models {
     return this.queryMarketPage(filteringOptions, paginationOptions);
   }
 
+  async subscribeMarketChanges(
+    marketId: MarketId,
+    cb: (market: Market) => void
+  ): Promise<any> {
+    const unsub = await this.api.query.marketCommons.markets(
+      marketId,
+      async (marketRaw) => {
+        const market = await createMarket(
+          marketId,
+          marketRaw,
+          this.api,
+          this.ipfsClient,
+          this.errorTable
+        );
+        cb(market);
+      }
+    );
+    return unsub;
+  }
+
   /**
    * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
    * @param marketId The unique identifier for the market you want to fetch.
@@ -1197,51 +1222,14 @@ export default class Models {
   async fetchMarketData(marketId: MarketId): Promise<Market> {
     const marketRaw = await this.api.query.marketCommons.markets(marketId);
 
-    const marketJson = marketRaw.toJSON() as never as MarketResponse;
-
-    if (!marketJson) {
-      throw new Error(`Market with market id ${marketId} does not exist.`);
-    }
-
-    const basicMarketData: MarketResponse = { ...marketJson };
-    const { metadata: metadataString } = basicMarketData;
-
-    // Default to no metadata, but actually parse it below if it exists.
-    let metadata = {
-      slug: "No metadata",
-    } as Partial<DecodedMarketMetadata>;
-
-    try {
-      if (metadataString) {
-        const raw = await this.ipfsClient.read(metadataString);
-
-        const parsed = JSON.parse(raw) as DecodedMarketMetadata;
-        metadata = parsed;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-
-    //@ts-ignore
-    const market = marketRaw.unwrap();
-
-    basicMarketData.outcomeAssets = this.createAssetsForMarket(
+    const market = await createMarket(
       marketId,
-      market.marketType
-    );
-
-    basicMarketData.report = market.report.isSome ? market.report.value : null;
-    basicMarketData.resolvedOutcome = market.resolvedOutcome.isSome
-      ? market.resolvedOutcome.value.toNumber()
-      : null;
-
-    return new Market(
-      marketId,
-      basicMarketData,
-      metadata as DecodedMarketMetadata,
+      marketRaw,
       this.api,
+      this.ipfsClient,
       this.errorTable
     );
+    return market;
   }
 
   /**
