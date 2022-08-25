@@ -1,10 +1,16 @@
 // Auto-generated via `yarn polkadot-types-from-chain`, do not edit
 /* eslint-disable */
 
-import type { ApiTypes } from '@polkadot/api-base/types';
+// import type lookup before we augment - in some environments
+// this is required to allow for ambient/previous definitions
+import '@polkadot/api-base/types/errors';
+
+import type { ApiTypes, AugmentedError } from '@polkadot/api-base/types';
+
+export type __AugmentedError<ApiType extends ApiTypes> = AugmentedError<ApiType>;
 
 declare module '@polkadot/api-base/types/errors' {
-  export interface AugmentedErrors<ApiType extends ApiTypes> {
+  interface AugmentedErrors<ApiType extends ApiTypes> {
     advisoryCommittee: {
       /**
        * Members are already initialized!
@@ -791,6 +797,20 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       [key: string]: AugmentedError<ApiType>;
     };
+    styx: {
+      /**
+       * Account does not have enough balance to cross.
+       **/
+      FundDoesNotHaveEnoughFreeBalance: AugmentedError<ApiType>;
+      /**
+       * Account has already crossed.
+       **/
+      HasAlreadyCrossed: AugmentedError<ApiType>;
+      /**
+       * Generic error
+       **/
+      [key: string]: AugmentedError<ApiType>;
+    };
     sudo: {
       /**
        * Sender must be the Sudo account
@@ -908,6 +928,10 @@ declare module '@polkadot/api-base/types/errors' {
        * The pool in question does not exist.
        **/
       PoolDoesNotExist: AugmentedError<ApiType>;
+      /**
+       * A pool balance dropped below the allowed minimum.
+       **/
+      PoolDrain: AugmentedError<ApiType>;
       /**
        * The pool in question is inactive.
        **/

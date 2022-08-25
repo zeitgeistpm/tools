@@ -20,6 +20,7 @@ const typesFromDefs = (
 
 export const constructApiOptions = (provider: WsProvider) => ({
   provider,
+  noInitWarn: true,
   rpc: {
     predictionMarkets: {
       marketOutcomeShareId: {
