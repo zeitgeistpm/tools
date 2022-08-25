@@ -34,7 +34,7 @@ export const FRAGMENT_MARKET_DETAILS = gql`
       at
       by
     }
-    mdm {
+    disputeMechanism {
       Authorized: authorized
       Court: court
       SimpleDisputes: simpleDisputes
@@ -51,7 +51,7 @@ export type MarketQueryData = {
   marketId: number;
   poolId: number;
   marketType: { categorical: string | null; scalar: string | null };
-  mdm: {
+  disputeMechanism: {
     authorized: boolean | null;
     court: boolean | null;
     simpleDisputes: boolean | null;

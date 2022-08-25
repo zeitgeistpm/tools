@@ -5,14 +5,41 @@ import { concat, toString } from "uint8arrays";
 import ipfsClient from "ipfs-http-client";
 import axios from "axios";
 
+export type PinsPostResponse = {
+  replication_factor_min: number;
+  replication_factor_max: number;
+  name: string;
+  mode: string;
+  shard_size: number;
+  user_allocations: string;
+  expire_at: string;
+  metadata: string;
+  pin_update: string;
+  cid: string;
+  type: number;
+  allocations: Array<string>;
+  max_depth: number;
+  reference: string;
+};
+
+const username = "zeitgeist";
+const password = "5ZpmQl*rWn%Z";
+
 export default class IPFS {
   private client: ReturnType<typeof ipfsClient>;
+  private pinToCluster: boolean;
 
   constructor(ipfsClientUrl = `https://ipfs.zeitgeist.pm`) {
     this.client = ipfsClient({ url: ipfsClientUrl });
+
+    if (ipfsClientUrl == `https://ipfs.zeitgeist.pm`) {
+      this.pinToCluster = true;
+    } else {
+      this.pinToCluster = false;
+    }
   }
 
-  async add(content: string, pinToCluster = false): Promise<CID> {
+  async add(content: string): Promise<CID> {
     let ipfsClientCid;
     try {
       ipfsClientCid = (
@@ -26,7 +53,7 @@ export default class IPFS {
       );
     }
 
-    if (pinToCluster) {
+    if (this.pinToCluster) {
       try {
         const res = await this.pinCidToCluster(ipfsClientCid.toString());
         if (res) {
@@ -40,14 +67,15 @@ export default class IPFS {
             `\nFailed to publish data on cluster\n`
           );
         }
-      } catch (e) {
-        console.log(`Failed to publish data on cluster\n ${e}\n`);
+      } catch (error) {
+        console.log(`Failed to publish data on cluster\n ${error}\n`);
+        throw error;
       }
     }
     return ipfsClientCid;
   }
 
-  async pinCidToCluster(cid: string): Promise<any> {
+  async pinCidToCluster(cid: string): Promise<PinsPostResponse> {
     const result = (
       await axios({
         headers: {
@@ -55,6 +83,27 @@ export default class IPFS {
         },
         method: `post`,
         url: `https://ipfs-cluster.zeitgeist.pm/pins/${cid}?replication-min=2&replication-max=2`,
+        auth: {
+          username,
+          password,
+        },
+      })
+    ).data;
+    return result;
+  }
+
+  async unpinCidFromCluster(cid: string): Promise<PinsPostResponse> {
+    const result = (
+      await axios({
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        method: `delete`,
+        url: `https://ipfs-cluster.zeitgeist.pm/pins/${cid}`,
+        auth: {
+          username,
+          password,
+        },
       })
     ).data;
     return result;
