@@ -3,7 +3,7 @@ import { GraphQLClient, request, gql } from "graphql-request";
 
 import ErrorTable from "./errorTable";
 import Models from "./models";
-import { initApi } from "./util";
+import { lazyInitApi } from "./util/polkadot";
 
 export * as models from "./models";
 export * as types from "./types";
@@ -13,6 +13,7 @@ type InitOptions = {
   logEndpointInitTime?: boolean;
   graphQlEndpoint?: string;
   ipfsClientUrl?: string;
+  initialConnectionTries?: number;
 };
 
 export const pingGqlEndpoint = async (endpoint: string) => {
@@ -60,13 +61,33 @@ export default class SDK {
     opts: InitOptions = {
       logEndpointInitTime: true,
       ipfsClientUrl: "https://ipfs.zeitgeist.pm",
+      initialConnectionTries: 5,
     }
   ): Promise<SDK> {
     try {
       const start = Date.now();
-      const api = await SDK.promiseWithTimeout(
-        10000,
-        initApi(endpoint),
+
+      const api = await SDK.promiseWithTimeout<ApiPromise>(
+        60 * 1000,
+        new Promise(async (resolve, reject) => {
+          const [provider, create] = lazyInitApi(endpoint);
+          let finished = false;
+          let connectionTries = 0;
+          provider.on("error", () => {
+            if (
+              !finished &&
+              connectionTries++ > (opts.initialConnectionTries || 5)
+            ) {
+              finished = true;
+              provider.disconnect();
+              reject("Could not connect to the node");
+            }
+          });
+          provider.on("connected", () => {
+            finished = true;
+            resolve(create());
+          });
+        }),
         "Timed out while connecting to the zeitgeist node. Check your node address."
       );
 

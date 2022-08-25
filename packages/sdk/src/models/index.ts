@@ -165,6 +165,15 @@ export default class Models {
         ? callbackOrPaymentInfo
         : undefined;
 
+    const ipfsCleanup = async () => {
+      try {
+        await this.ipfsClient.unpinCidFromCluster(cid.toString());
+      } catch (error) {
+        console.log("Ipfs cleanup error:");
+        console.log(error);
+      }
+    };
+
     return new Promise(async (resolve) => {
       const _callback = (
         result: ISubmittableResult,
@@ -222,15 +231,24 @@ export default class Models {
         const unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
-          (result) =>
+          (result) => {
+            if (result.dispatchError || result.internalError) {
+              setTimeout(ipfsCleanup);
+            }
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
+              : _callback(result, resolve, unsub);
+          }
         );
       } else {
-        const unsub = await tx.signAndSend(signer, (result) =>
-          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
-        );
+        const unsub = await tx.signAndSend(signer, (result) => {
+          if (result.dispatchError || result.internalError) {
+            setTimeout(ipfsCleanup);
+          }
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
       }
     });
   }
@@ -1032,10 +1050,6 @@ export default class Models {
     const orderByQuery =
       orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
 
-    const timestamp = parseInt(
-      (await this.api.query.timestamp.now()).toString()
-    );
-
     const variables = {
       statuses,
       tags,
@@ -1045,7 +1059,7 @@ export default class Models {
       orderByQuery,
       creator,
       oracle,
-      minPoolId: liquidityOnly ? 0 : undefined,
+      minPoolId: liquidityOnly ? 0 : null,
       marketIds,
       assets,
     };
