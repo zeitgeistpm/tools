@@ -1,12 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { GraphQLClient, gql } from "graphql-request";
 import { ISubmittableResult } from "@polkadot/types/types";
-import {
-  AssetIdFromString,
-  createMarket,
-  estimatedFee,
-  unsubOrWarns,
-} from "../util";
+import { AssetIdFromString, estimatedFee, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
 import { Option } from "@polkadot/types";
 import Decimal from "decimal.js";
@@ -1214,6 +1209,69 @@ export default class Models {
     return this.queryMarketPage(filteringOptions, paginationOptions);
   }
 
+  private getAssetsForMarket(marketId: MarketId, marketType: MarketType) {
+    return marketType?.isCategorical
+      ? [...Array(marketType.asCategorical.toNumber()).keys()].map((catIdx) => {
+          return this.api.createType("Asset", {
+            categoricalOutcome: [marketId, catIdx],
+          });
+        })
+      : ["Long", "Short"].map((pos) => {
+          const position = this.api.createType("ScalarPosition", pos);
+          return this.api.createType("Asset", {
+            scalarOutcome: [marketId, position.toString()],
+          });
+        });
+  }
+
+  private async constructMarket(marketId: MarketId, marketRaw: any) {
+    const marketJson = marketRaw.toJSON() as never as MarketResponse;
+
+    if (!marketJson) {
+      throw new Error(`Market with market id ${marketId} does not exist.`);
+    }
+
+    const basicMarketData: MarketResponse = { ...marketJson };
+    const { metadata: metadataString } = basicMarketData;
+
+    // Default to no metadata, but actually parse it below if it exists.
+    let metadata = {
+      slug: "No metadata",
+    } as Partial<DecodedMarketMetadata>;
+
+    try {
+      if (metadataString) {
+        const raw = await this.ipfsClient.read(metadataString);
+
+        const parsed = JSON.parse(raw) as DecodedMarketMetadata;
+        metadata = parsed;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    //@ts-ignore
+    const market = marketRaw.unwrap();
+
+    basicMarketData.outcomeAssets = this.getAssetsForMarket(
+      marketId,
+      market.marketType
+    );
+
+    basicMarketData.report = market.report.isSome ? market.report.value : null;
+    basicMarketData.resolvedOutcome = market.resolvedOutcome.isSome
+      ? market.resolvedOutcome.value.toNumber()
+      : null;
+
+    return new Market(
+      marketId,
+      basicMarketData,
+      metadata as DecodedMarketMetadata,
+      this.api,
+      this.errorTable
+    );
+  }
+
   async subscribeMarketChanges(
     marketId: MarketId,
     cb: (market: Market) => void
@@ -1221,13 +1279,7 @@ export default class Models {
     const unsub = await this.api.query.marketCommons.markets(
       marketId,
       async (marketRaw) => {
-        const market = await createMarket(
-          marketId,
-          marketRaw,
-          this.api,
-          this.ipfsClient,
-          this.errorTable
-        );
+        const market = await this.constructMarket(marketId, marketRaw);
         cb(market);
       }
     );
@@ -1241,13 +1293,7 @@ export default class Models {
   async fetchMarketData(marketId: MarketId): Promise<Market> {
     const marketRaw = await this.api.query.marketCommons.markets(marketId);
 
-    const market = await createMarket(
-      marketId,
-      marketRaw,
-      this.api,
-      this.ipfsClient,
-      this.errorTable
-    );
+    const market = await this.constructMarket(marketId, marketRaw);
     return market;
   }
 
