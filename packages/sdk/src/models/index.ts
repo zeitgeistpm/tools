@@ -1209,13 +1209,22 @@ export default class Models {
     return this.queryMarketPage(filteringOptions, paginationOptions);
   }
 
-  /**
-   * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
-   * @param marketId The unique identifier for the market you want to fetch.
-   */
-  async fetchMarketData(marketId: MarketId): Promise<Market> {
-    const marketRaw = await this.api.query.marketCommons.markets(marketId);
+  private getAssetsForMarket(marketId: MarketId, marketType: MarketType) {
+    return marketType?.isCategorical
+      ? [...Array(marketType.asCategorical.toNumber()).keys()].map((catIdx) => {
+          return this.api.createType("Asset", {
+            categoricalOutcome: [marketId, catIdx],
+          });
+        })
+      : ["Long", "Short"].map((pos) => {
+          const position = this.api.createType("ScalarPosition", pos);
+          return this.api.createType("Asset", {
+            scalarOutcome: [marketId, position.toString()],
+          });
+        });
+  }
 
+  private async constructMarket(marketId: MarketId, marketRaw: any) {
     const marketJson = marketRaw.toJSON() as never as MarketResponse;
 
     if (!marketJson) {
@@ -1244,7 +1253,7 @@ export default class Models {
     //@ts-ignore
     const market = marketRaw.unwrap();
 
-    basicMarketData.outcomeAssets = this.createAssetsForMarket(
+    basicMarketData.outcomeAssets = this.getAssetsForMarket(
       marketId,
       market.marketType
     );
@@ -1261,6 +1270,31 @@ export default class Models {
       this.api,
       this.errorTable
     );
+  }
+
+  async subscribeMarketChanges(
+    marketId: MarketId,
+    cb: (market: Market) => void
+  ): Promise<any> {
+    const unsub = await this.api.query.marketCommons.markets(
+      marketId,
+      async (marketRaw) => {
+        const market = await this.constructMarket(marketId, marketRaw);
+        cb(market);
+      }
+    );
+    return unsub;
+  }
+
+  /**
+   * Fetches data from Zeitgeist and IPFS for a market with a given identifier.
+   * @param marketId The unique identifier for the market you want to fetch.
+   */
+  async fetchMarketData(marketId: MarketId): Promise<Market> {
+    const marketRaw = await this.api.query.marketCommons.markets(marketId);
+
+    const market = await this.constructMarket(marketId, marketRaw);
+    return market;
   }
 
   /**

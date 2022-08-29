@@ -6,7 +6,19 @@ import {
   unsubOrWarns,
   isValidAddress,
 } from "./polkadot";
-import { KeyringPairOrExtSigner, ExtSigner, AssetId } from "../types";
+import {
+  KeyringPairOrExtSigner,
+  ExtSigner,
+  AssetId,
+  MarketResponse,
+  DecodedMarketMetadata,
+  MarketId,
+} from "../types";
+import IPFS from "../storage/ipfs";
+import { Asset, MarketType } from "@zeitgeistpm/types/dist/interfaces";
+import { ApiPromise } from "@polkadot/api";
+import { Market } from "../models";
+import ErrorTable from "../errorTable";
 
 export { initApi, signerFromSeed, unsubOrWarns, isValidAddress };
 
