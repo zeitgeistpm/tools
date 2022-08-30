@@ -21,6 +21,8 @@ export type DecodedMarketMetadata = {
   confidentialId?: string;
   // The image for the market.
   img?: string;
+  // Type of scalar range if market is of type scaler.
+  scalarType?: "number" | "date";
 };
 
 export type CategoryMetadata = {
