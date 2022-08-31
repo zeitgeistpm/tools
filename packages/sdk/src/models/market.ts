@@ -109,6 +109,7 @@ class Market {
       tags: this.tags,
       confidentialId: this.confidentialId,
       img: this.img,
+      scalarType: this.scalarType,
     } = decodedMetadata);
 
     this.api = api;
