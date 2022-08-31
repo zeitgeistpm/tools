@@ -1,5 +1,5 @@
 import { gql } from "graphql-request";
-import { MarketCreation, ScoringRule } from "../../types";
+import { MarketCreation, ScalarRangeType, ScoringRule } from "../../types";
 
 export const FRAGMENT_MARKET_DETAILS = gql`
   fragment MarketDetails on Market {
@@ -18,6 +18,7 @@ export const FRAGMENT_MARKET_DETAILS = gql`
     scoringRule
     resolvedOutcome
     poolId
+    scalarType
     marketType {
       categorical
       scalar
@@ -66,6 +67,7 @@ export type MarketQueryData = {
     block: string | null;
     timestamp: string | null;
   };
+  scalarType: ScalarRangeType | null;
   description: string;
   creator: string;
   creatorFee: number;
