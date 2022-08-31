@@ -788,6 +788,7 @@ export default class Models {
       description: data.description,
       tags: data.tags ?? [],
       img: data.img,
+      scalarType: data.scalarType,
     };
 
     const marketTypeAsType =
