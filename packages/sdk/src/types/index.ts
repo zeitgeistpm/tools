@@ -22,7 +22,7 @@ export type DecodedMarketMetadata = {
   // The image for the market.
   img?: string;
   // Type of scalar range if market is of type scaler.
-  scalarType?: "number" | "date";
+  scalarType?: ScalarRangeType;
 };
 
 export type CategoryMetadata = {
@@ -43,6 +43,8 @@ export type ScalarMarket = {
   lowerBound: number;
   higherBound: number;
 };
+
+export type ScalarRangeType = "number" | "date";
 
 export type OutcomeIndex = [number, number | string];
 

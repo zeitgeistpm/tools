@@ -16,6 +16,7 @@ import {
   OutcomeReport,
   ScoringRule,
   MarketDisputeMechanism,
+  ScalarRangeType,
 } from "../types";
 import { estimatedFee, isExtSigner, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
@@ -48,6 +49,8 @@ class Market {
   public report: Report | null;
   /** The categories of a categorical market. Null if not a categorical market. */
   public categories: CategoryMetadata[] | null;
+  /** The scalar range type of the market if the market is a scalar market */
+  public scalarType: ScalarRangeType | null;
   /** The resolved outcome for the market. */
   public resolvedOutcome: OutcomeReport | null;
 
