@@ -896,9 +896,21 @@ export default class Models {
         : "$searchText, OR: { question_contains: $searchText },"
     }`;
 
+    const { creator, oracle } = filteringOptions;
+
+    const whereCreatorOrOracle = (() => {
+      if (creator || oracle) {
+        return `
+        OR: [{ oracle_eq: $oracle } { creator_eq: $creator }]
+      `;
+      }
+      return "";
+    })();
+
     const where = `where: {
       status_in: $statuses ${whereSearchText}
       tags_containsAll: $tags
+      ${whereCreatorOrOracle}
       creator_eq: $creator
       oracle_eq: $oracle
       poolId_gte: $minPoolId
