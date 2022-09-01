@@ -989,9 +989,9 @@ export default class Models {
     }
 
     const query1 = gql`
-      query assetsForAccount($limit: Int!, $accountAddress: String!) {
+      query assetsForAccount($accountAddress: String!) {
         accountBalances(
-          where: { account: { wallet_eq: $accountAddress }, balance_gt: 0 }
+          where: { account: { accountId_eq: $accountAddress }, balance_gt: 0 }
         ) {
           assetId
         }
@@ -1060,7 +1060,7 @@ export default class Models {
       orderByQuery,
       creator,
       oracle,
-      minPoolId: liquidityOnly ? 0 : null,
+      minPoolId: liquidityOnly ? 0 : undefined,
       marketIds,
       assets,
     };
