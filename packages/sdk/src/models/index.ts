@@ -896,9 +896,21 @@ export default class Models {
         : "$searchText, OR: { question_contains: $searchText },"
     }`;
 
+    const { creator, oracle } = filteringOptions;
+
+    const whereCreatorOrOracle = (() => {
+      if (creator || oracle) {
+        return `
+        OR: [{ oracle_eq: $oracle } { creator_eq: $creator }]
+      `;
+      }
+      return "";
+    })();
+
     const where = `where: {
       status_in: $statuses ${whereSearchText}
       tags_containsAll: $tags
+      ${whereCreatorOrOracle}
       creator_eq: $creator
       oracle_eq: $oracle
       poolId_gte: $minPoolId
@@ -989,9 +1001,9 @@ export default class Models {
     }
 
     const query1 = gql`
-      query assetsForAccount($limit: Int!, $accountAddress: String!) {
+      query assetsForAccount($accountAddress: String!) {
         accountBalances(
-          where: { account: { wallet_eq: $accountAddress }, balance_gt: 0 }
+          where: { account: { accountId_eq: $accountAddress }, balance_gt: 0 }
         ) {
           assetId
         }
@@ -1060,7 +1072,7 @@ export default class Models {
       orderByQuery,
       creator,
       oracle,
-      minPoolId: liquidityOnly ? 0 : null,
+      minPoolId: liquidityOnly ? 0 : undefined,
       marketIds,
       assets,
     };
