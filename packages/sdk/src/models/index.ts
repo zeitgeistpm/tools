@@ -825,6 +825,7 @@ export default class Models {
       period: this.api.createType("MarketPeriod", marketPeriod).toJSON(),
       //@ts-ignore
       resolvedOutcome: data.resolvedOutcome,
+      metadata: data.metadata,
     };
 
     const market = new Market(
