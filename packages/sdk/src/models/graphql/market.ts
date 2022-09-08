@@ -19,6 +19,7 @@ export const FRAGMENT_MARKET_DETAILS = gql`
     resolvedOutcome
     poolId
     scalarType
+    metadata
     marketType {
       categorical
       scalar
@@ -67,6 +68,7 @@ export type MarketQueryData = {
     block: string | null;
     timestamp: string | null;
   };
+  metadata: string;
   scalarType: ScalarRangeType | null;
   description: string;
   creator: string;
