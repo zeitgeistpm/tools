@@ -12,7 +12,6 @@ export const FRAGMENT_MARKET_DETAILS = gql`
     oracle
     question
     slug
-    img
     tags
     status
     scoringRule
@@ -75,7 +74,6 @@ export type MarketQueryData = {
   creatorFee: number;
   creation: MarketCreation;
   slug: string;
-  img: string | null;
   tags: string[] | null;
   status: string;
   scoringRule: ScoringRule;

@@ -787,7 +787,6 @@ export default class Models {
       categories: data.categories,
       description: data.description,
       tags: data.tags ?? [],
-      img: data.img,
       scalarType: data.scalarType,
     };
 
