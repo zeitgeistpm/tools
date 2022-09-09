@@ -48,7 +48,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
   if (!estimateFee) {
     console.log(
       `\x1b[33m%s\x1b[0m`,
-      `Sending transaction from ${signer.address}\n`,
+      `Sending transaction from ${signer.address}\n`
     );
   }
 
