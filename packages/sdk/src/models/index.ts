@@ -72,6 +72,23 @@ export default class Models {
   }
 
   /**
+   *
+   * @param metadataString IPFS CID stored in the market object
+   * @returns Decoded market data post retrieval from IPFS
+   */
+  async decodeMarketMetadata(
+    metadataString: string
+  ): Promise<DecodedMarketMetadata> {
+    try {
+      const raw = await this.ipfsClient.read(metadataString);
+      const metadata = JSON.parse(raw) as DecodedMarketMetadata;
+      return metadata;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  /**
    * Gets all the market ids that exist in storage.
    * Warning: This could take a while to finish.
    * @returns The `marketId` of all markets.
@@ -1247,20 +1264,13 @@ export default class Models {
     const basicMarketData: MarketResponse = { ...marketJson };
     const { metadata: metadataString } = basicMarketData;
 
-    // Default to no metadata, but actually parse it below if it exists.
-    let metadata = {
-      slug: "No metadata",
-    } as Partial<DecodedMarketMetadata>;
-
-    try {
-      if (metadataString) {
-        const raw = await this.ipfsClient.read(metadataString);
-
-        const parsed = JSON.parse(raw) as DecodedMarketMetadata;
-        metadata = parsed;
-      }
-    } catch (err) {
-      console.error(err);
+    let metadata;
+    if (metadataString) {
+      metadata = await this.decodeMarketMetadata(metadataString);
+    } else {
+      metadata = {
+        slug: "No metadata",
+      } as Partial<DecodedMarketMetadata>;
     }
 
     //@ts-ignore
