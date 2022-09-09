@@ -31,6 +31,7 @@ import Market from "./market";
 import Swap from "./swaps";
 import ErrorTable from "../errorTable";
 import IPFS from "../storage/ipfs";
+import { getDummyMetadataMultihash } from "../util/polkadot";
 
 export { Market, Swap };
 
@@ -154,6 +155,22 @@ export default class Models {
       callbackOrPaymentInfo,
     } = params;
 
+    // don't add metadata to ipfs if we're only estimating fees
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
+      const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
+        oracle,
+        period,
+        getDummyMetadataMultihash(),
+        marketType,
+        disputeMechanism,
+        swapFee,
+        amount,
+        weights
+      );
+      const fee = estimatedFee(tx, signer.address);
+      return fee;
+    }
+
     const cid = await this.ipfsClient.add(
       JSON.stringify({
         ...metadata,
@@ -173,23 +190,10 @@ export default class Models {
       weights
     );
 
-    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
-      return estimatedFee(tx, signer.address);
-    }
-
     const callback =
       typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
-
-    const ipfsCleanup = async () => {
-      try {
-        await this.ipfsClient.unpinCidFromCluster(cid.toString());
-      } catch (error) {
-        console.log("Ipfs cleanup error:");
-        console.log(error);
-      }
-    };
 
     return new Promise(async (resolve) => {
       const _callback = (
@@ -250,7 +254,7 @@ export default class Models {
           { signer: signer.signer },
           (result) => {
             if (result.dispatchError || result.internalError) {
-              setTimeout(ipfsCleanup);
+              setTimeout(() => this.unpinCidFromCluster(cid.toString()));
             }
             callback
               ? callback(result, unsub)
@@ -260,7 +264,7 @@ export default class Models {
       } else {
         const unsub = await tx.signAndSend(signer, (result) => {
           if (result.dispatchError || result.internalError) {
-            setTimeout(ipfsCleanup);
+            setTimeout(() => this.unpinCidFromCluster(cid.toString()));
           }
           callback
             ? callback(result, unsub)
@@ -295,6 +299,21 @@ export default class Models {
       scoringRule,
       callbackOrPaymentInfo,
     } = params;
+    // don't add metadata to ipfs if we're only estimating fees
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
+      const tx = this.api.tx.predictionMarkets.createMarket(
+        oracle,
+        period,
+        getDummyMetadataMultihash(),
+        creationType,
+        marketType,
+        disputeMechanism,
+        scoringRule
+      );
+      const fee = estimatedFee(tx, signer.address);
+      return fee;
+    }
+
     const cid = await this.ipfsClient.add(
       JSON.stringify({
         ...metadata,
@@ -311,10 +330,6 @@ export default class Models {
       disputeMechanism,
       scoringRule
     );
-
-    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
-      return estimatedFee(tx, signer.address);
-    }
 
     const callback =
       typeof callbackOrPaymentInfo !== `boolean`
@@ -369,18 +384,36 @@ export default class Models {
         const unsub = await tx.signAndSend(
           signer.address,
           { signer: signer.signer },
-          (result) =>
+          (result) => {
+            if (result.dispatchError || result.internalError) {
+              setTimeout(() => this.unpinCidFromCluster(cid.toString()));
+            }
             callback
               ? callback(result, unsub)
-              : _callback(result, resolve, unsub)
+              : _callback(result, resolve, unsub);
+          }
         );
       } else {
-        const unsub = await tx.signAndSend(signer, (result) =>
-          callback ? callback(result, unsub) : _callback(result, resolve, unsub)
-        );
+        const unsub = await tx.signAndSend(signer, (result) => {
+          if (result.dispatchError || result.internalError) {
+            setTimeout(() => this.unpinCidFromCluster(cid.toString()));
+          }
+          callback
+            ? callback(result, unsub)
+            : _callback(result, resolve, unsub);
+        });
       }
     });
   }
+
+  private unpinCidFromCluster = async (cid: string) => {
+    try {
+      await this.ipfsClient.unpinCidFromCluster(cid);
+    } catch (error) {
+      console.log("Ipfs cleanup error:");
+      console.log(error);
+    }
+  };
 
   /**
    * Queries all active assets from subsquid indexer.
