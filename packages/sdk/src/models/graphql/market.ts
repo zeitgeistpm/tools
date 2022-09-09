@@ -12,13 +12,13 @@ export const FRAGMENT_MARKET_DETAILS = gql`
     oracle
     question
     slug
-    img
     tags
     status
     scoringRule
     resolvedOutcome
     poolId
     scalarType
+    metadata
     marketType {
       categorical
       scalar
@@ -67,13 +67,13 @@ export type MarketQueryData = {
     block: string | null;
     timestamp: string | null;
   };
+  metadata: string;
   scalarType: ScalarRangeType | null;
   description: string;
   creator: string;
   creatorFee: number;
   creation: MarketCreation;
   slug: string;
-  img: string | null;
   tags: string[] | null;
   status: string;
   scoringRule: ScoringRule;

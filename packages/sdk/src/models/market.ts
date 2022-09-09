@@ -53,10 +53,11 @@ class Market {
   public scalarType: ScalarRangeType | null;
   /** The resolved outcome for the market. */
   public resolvedOutcome: OutcomeReport | null;
-
+  /** IPFS cid for market metadata */
+  public metadata?: string;
   /** Timestamp at which market should end */
   public end: BigInt;
-
+  /** Market dispute details */
   public disputeMechanism: MarketDisputeMechanism;
   /** The description of the market. */
   public description: string;
@@ -99,6 +100,7 @@ class Market {
       disputeMechanism: this.disputeMechanism,
       outcomeAssets: this.outcomeAssets,
       end: this.end,
+      metadata: this.metadata,
     } = market);
 
     ({
