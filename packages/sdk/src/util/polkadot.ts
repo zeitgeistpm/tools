@@ -1,4 +1,5 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
+import CID from "cids";
 import { Keyring, encodeAddress, decodeAddress } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { hexToU8a, isHex } from "@polkadot/util";
@@ -179,4 +180,18 @@ export const isValidAddress = (address: any): boolean => {
   } catch (error) {
     return false;
   }
+};
+
+let cachedMultihash;
+
+export const getDummyMetadataMultihash = () => {
+  if (cachedMultihash) {
+    return cachedMultihash;
+  }
+  const cid = new CID(
+    "bafkrkmbsg2abhdn4owitwmbeutpzjzafmkcz3e66gxd7mtjrhsk2vujkverk3nja2no6w2k6whugpkhhyljq"
+  );
+  const multihash = { Sha3_384: cid.multihash };
+  cachedMultihash = multihash;
+  return multihash;
 };
