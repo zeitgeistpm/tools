@@ -18,6 +18,7 @@ type Options = {
   authorized: string;
   court: boolean;
   cpmm: boolean;
+  estimateFee: boolean;
 };
 
 const createCategoricalMarket = async (opts: Options): Promise<void> => {
@@ -35,15 +36,19 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     authorized,
     court,
     cpmm,
+    estimateFee,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
   const signer = util.signerFromSeed(seed);
-  console.log(
-    `\x1b[33m%s\x1b[0m`,
-    `Sending transaction from ${signer.address}\n`
-  );
+
+  if (!estimateFee) {
+    console.log(
+      `\x1b[33m%s\x1b[0m`,
+      `Sending transaction from ${signer.address}\n`
+    );
+  }
 
   if (categories && !(categories.length > 1)) {
     if (categories.length === 1) {
@@ -93,7 +98,7 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     disputeMechanism = court ? { Court: null } : { SimpleDisputes: null };
   }
 
-  const marketId = await sdk.models.createMarket({
+  const res = await sdk.models.createMarket({
     signer,
     oracle,
     period: marketPeriod,
@@ -102,10 +107,15 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     marketType: { Categorical: categoriesMeta.length },
     disputeMechanism,
     scoringRule: cpmm ? `CPMM` : `RikiddoSigmoidFeeMarketEma`,
-    callbackOrPaymentInfo: false,
+    callbackOrPaymentInfo: estimateFee,
   });
 
-  if (marketId && marketId.length > 0) {
+  if (estimateFee) {
+    console.log("Fee estimation for transaction", res);
+    return;
+  }
+
+  if (res && res.length > 0) {
     console.log(`\x1b[36m%s\x1b[0m`, `\ncreateCategoricalMarket successful!`);
   } else {
     console.log(`\x1b[36m%s\x1b[0m`, `\ncreateCategoricalMarket failed!`);

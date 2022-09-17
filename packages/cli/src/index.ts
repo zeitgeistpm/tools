@@ -94,6 +94,11 @@ program
     "A comma-separated list of relative denormalized weights of each asset price",
     ""
   )
+  .option(
+    "--estimate-fee",
+    "Instead of executing transaction on-chain, simply return transaction fee estimation",
+    false
+  )
   .action(
     (
       slug: string,
@@ -163,6 +168,11 @@ program
   .option(
     "--cpmm",
     "Use cpmm as a scoring rule instead of RikiddoSigmoidFeeMarketEma",
+    false
+  )
+  .option(
+    "--estimate-fee",
+    "Instead of creating a market estimate transaction fee and display it",
     false
   )
   .action(

@@ -19,6 +19,7 @@ type Options = {
   swapFee: string;
   amount: string;
   weights: string;
+  estimateFee: boolean;
 };
 
 const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
@@ -37,15 +38,19 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     swapFee,
     amount,
     weights,
+    estimateFee,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
 
   const signer = util.signerFromSeed(seed);
-  console.log(
-    `\x1b[33m%s\x1b[0m`,
-    `Sending transaction from ${signer.address}\n`
-  );
+
+  if (!estimateFee) {
+    console.log(
+      `\x1b[33m%s\x1b[0m`,
+      `Sending transaction from ${signer.address}\n`
+    );
+  }
 
   if (categories && !(categories.length > 1)) {
     if (categories.length === 1) {
@@ -107,8 +112,13 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     amount,
     weights: weights.split(`,`),
     metadata,
-    callbackOrPaymentInfo: false,
+    callbackOrPaymentInfo: estimateFee,
   });
+
+  if (estimateFee) {
+    console.log("Fee estimation for transaction", res);
+    return;
+  }
 
   if (res) {
     console.log(`\x1b[36m%s\x1b[0m`, `\nCreateMarketAndDeployPool successful!`);
