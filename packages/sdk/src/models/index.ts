@@ -738,16 +738,27 @@ export default class Models {
 
         const assets = pool.weights.map((weight) => {
           const assetId = AssetIdFromString(weight.assetId);
-          const percentage = Math.round(
-            (Number(weight.len) / Number(pool.totalWeight)) * 100
-          );
-          const asset = assetsForFetchedPools.find(
-            (asset) => asset.poolId === pool.poolId
-          );
           const category =
             "categoricalOutcome" in assetId
               ? marketDataForPool.categories[assetId.categoricalOutcome[1]]
               : "ztg";
+          const percentage = Math.round(
+            (Number(weight.len) / Number(pool.totalWeight)) * 100
+          );
+          const isZtg = assetId.hasOwnProperty("ztg");
+          if (isZtg) {
+            return {
+              amountInPool: pool.ztgQty,
+              assetId,
+              category,
+              percentage,
+              poolId: pool.poolId,
+              price: 1,
+            };
+          }
+          const asset = assetsForFetchedPools.find(
+            (asset) => asset.poolId === pool.poolId
+          );
           return {
             ...asset,
             assetId,
