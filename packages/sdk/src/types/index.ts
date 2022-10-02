@@ -90,6 +90,7 @@ export type FilteredPoolsListResponse = {
     totalWeight: string;
     weights: { assetId: string; len: number }[];
     marketId: number;
+    ztgQty: string;
   }[];
 };
 
