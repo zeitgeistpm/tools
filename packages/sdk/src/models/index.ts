@@ -131,6 +131,7 @@ export default class Models {
    * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction
    * @param {string} params.oracle The address that will be responsible for reporting the market
    * @param {MarketPeriod} params.period Start and end block numbers or milliseconds since epoch
+   * @param {MarketDeadlines} params.deadlines Market deadlines represented in blocks
    * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
    * @param {MarketDisputeMechanism} params.disputeMechanism Dispute settlement can only be `Authorized` currently
    * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market
@@ -146,6 +147,7 @@ export default class Models {
       signer,
       oracle,
       period,
+      deadlines,
       metadata,
       swapFee,
       amount,
@@ -160,6 +162,7 @@ export default class Models {
       const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
         oracle,
         period,
+        deadlines,
         getDummyMetadataMultihash(),
         marketType,
         disputeMechanism,
@@ -182,6 +185,7 @@ export default class Models {
     const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
       oracle,
       period,
+      deadlines,
       multihash,
       marketType,
       disputeMechanism,
@@ -279,6 +283,7 @@ export default class Models {
    * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
    * @param {string} params.oracle The address that will be responsible for reporting the market.
    * @param {MarketPeriod} params.period Start and end block numbers or milliseconds since epoch.
+   * @param {MarketDeadlines} params.deadlines Market deadlines represented in blocks
    * @param {DecodedMarketMetadata} params.metadata A hash pointer to the metadata of the market.
    * @param {string} params.creationType `Permissionless` or `Advised`
    * @param {MarketTypeOf} params.marketType `Categorical` or `Scalar`
@@ -292,6 +297,7 @@ export default class Models {
       signer,
       oracle,
       period,
+      deadlines,
       metadata,
       creationType,
       marketType,
@@ -304,6 +310,7 @@ export default class Models {
       const tx = this.api.tx.predictionMarkets.createMarket(
         oracle,
         period,
+        deadlines,
         getDummyMetadataMultihash(),
         creationType,
         marketType,
@@ -324,6 +331,7 @@ export default class Models {
     const tx = this.api.tx.predictionMarkets.createMarket(
       oracle,
       period,
+      deadlines,
       multihash,
       creationType,
       marketType,
