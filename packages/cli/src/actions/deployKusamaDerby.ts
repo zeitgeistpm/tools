@@ -21,6 +21,11 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
       signer,
       oracle: `5D2L4ghyiYE8p2z7VNJo9JYwRuc8uzPWtMBqdVyvjRcsnw4P`,
       period: { timestamp: [1620504000000, 1620604000000] },
+      deadlines: {
+        gracePeriod: `0`,
+        oracleDuration: `60000`,
+        disputeDuration: `20000`,
+      },
       metadata: {
         categories: [
           { name: `karura` },
