@@ -1,10 +1,16 @@
 import SDK, { util } from "@zeitgeistpm/sdk";
-import { DecodedMarketMetadata } from "@zeitgeistpm/sdk/dist/types";
+import {
+  DecodedMarketMetadata,
+  MarketDeadlines,
+} from "@zeitgeistpm/sdk/dist/types";
 
 type Options = {
   endpoint: string;
   oracle: string;
   period: string;
+  gracePeriod: string;
+  oracleDuration: string;
+  disputeDuration: string;
   bounds?: number[];
   advised: boolean;
   seed: string;
@@ -19,6 +25,9 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
   const {
     oracle,
     period,
+    gracePeriod,
+    oracleDuration,
+    disputeDuration,
     bounds,
     advised,
     endpoint,
@@ -48,6 +57,12 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     ? { timestamp: period.split(` `).map((x) => +x) }
     : { block: period.split(` `).map((x) => +x) };
 
+  const deadlines: MarketDeadlines = {
+    gracePeriod: gracePeriod,
+    oracleDuration: oracleDuration,
+    disputeDuration: disputeDuration,
+  };
+
   let disputeMechanism = null;
   if (authorized) {
     disputeMechanism = { Authorized: authorized };
@@ -59,6 +74,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     signer,
     oracle,
     period: marketPeriod,
+    deadlines,
     metadata,
     creationType: advised ? `Advised` : `Permissionless`,
     marketType: { Scalar: bounds ? bounds : [0, 100] },

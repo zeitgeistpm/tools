@@ -149,6 +149,57 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       [key: string]: AugmentedError<ApiType>;
     };
+    bounties: {
+      /**
+       * The bounty cannot be closed because it has active child-bounties.
+       **/
+      HasActiveChildBounty: AugmentedError<ApiType>;
+      /**
+       * Proposer's balance is too low.
+       **/
+      InsufficientProposersBalance: AugmentedError<ApiType>;
+      /**
+       * Invalid bounty fee.
+       **/
+      InvalidFee: AugmentedError<ApiType>;
+      /**
+       * No proposal or bounty at that index.
+       **/
+      InvalidIndex: AugmentedError<ApiType>;
+      /**
+       * Invalid bounty value.
+       **/
+      InvalidValue: AugmentedError<ApiType>;
+      /**
+       * A bounty payout is pending.
+       * To cancel the bounty, you must unassign and slash the curator.
+       **/
+      PendingPayout: AugmentedError<ApiType>;
+      /**
+       * The bounties cannot be claimed/closed because it's still in the countdown period.
+       **/
+      Premature: AugmentedError<ApiType>;
+      /**
+       * The reason given is just too big.
+       **/
+      ReasonTooBig: AugmentedError<ApiType>;
+      /**
+       * Require bounty curator.
+       **/
+      RequireCurator: AugmentedError<ApiType>;
+      /**
+       * Too many approvals are already queued.
+       **/
+      TooManyQueued: AugmentedError<ApiType>;
+      /**
+       * The bounty status is unexpected.
+       **/
+      UnexpectedStatus: AugmentedError<ApiType>;
+      /**
+       * Generic error
+       **/
+      [key: string]: AugmentedError<ApiType>;
+    };
     council: {
       /**
        * Members are already initialized!
@@ -566,6 +617,18 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       CannotDisputeSameOutcome: AugmentedError<ApiType>;
       /**
+       * Specified dispute_duration is greater than MaxDisputeDuration.
+       **/
+      DisputeDurationGreaterThanMaxDisputeDuration: AugmentedError<ApiType>;
+      /**
+       * Specified dispute_duration is smaller than MinDisputeDuration.
+       **/
+      DisputeDurationSmallerThanMinDisputeDuration: AugmentedError<ApiType>;
+      /**
+       * Specified grace_period is greater than MaxGracePeriod.
+       **/
+      GracePeriodGreaterThanMaxGracePeriod: AugmentedError<ApiType>;
+      /**
        * Market account does not have enough funds to pay out.
        **/
       InsufficientFundsInMarketAccount: AugmentedError<ApiType>;
@@ -578,7 +641,7 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       InvalidMarketPeriod: AugmentedError<ApiType>;
       /**
-       * Catch-all error for invalid market status
+       * Catch-all error for invalid market status.
        **/
       InvalidMarketStatus: AugmentedError<ApiType>;
       /**
@@ -614,6 +677,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       MarketIsNotCollectingSubsidy: AugmentedError<ApiType>;
       /**
+       * A disputed market was expected.
+       **/
+      MarketIsNotDisputed: AugmentedError<ApiType>;
+      /**
        * A proposed market was expected.
        **/
       MarketIsNotProposed: AugmentedError<ApiType>;
@@ -638,6 +705,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       MaxDisputesReached: AugmentedError<ApiType>;
       /**
+       * Can not report before market.deadlines.grace_period is ended.
+       **/
+      NotAllowedToReportYet: AugmentedError<ApiType>;
+      /**
        * Sender does not have enough balance to buy shares.
        **/
       NotEnoughBalance: AugmentedError<ApiType>;
@@ -649,6 +720,14 @@ declare module '@polkadot/api-base/types/errors' {
        * The user has no winning balance.
        **/
       NoWinningBalance: AugmentedError<ApiType>;
+      /**
+       * Specified oracle_duration is greater than MaxOracleDuration.
+       **/
+      OracleDurationGreaterThanMaxOracleDuration: AugmentedError<ApiType>;
+      /**
+       * Specified oracle_duration is smaller than MinOracleDuration.
+       **/
+      OracleDurationSmallerThanMinOracleDuration: AugmentedError<ApiType>;
       /**
        * Submitted outcome does not match market type.
        **/
@@ -665,6 +744,14 @@ declare module '@polkadot/api-base/types/errors' {
        * Too many categories for a categorical market.
        **/
       TooManyCategories: AugmentedError<ApiType>;
+      /**
+       * The post dispatch should never be None.
+       **/
+      UnexpectedNoneInPostInfo: AugmentedError<ApiType>;
+      /**
+       * The weights length has to be equal to the assets length.
+       **/
+      WeightsLenMustEqualAssetsLen: AugmentedError<ApiType>;
       /**
        * An amount was illegally specified as zero.
        **/
@@ -851,7 +938,7 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       InsufficientBalance: AugmentedError<ApiType>;
       /**
-       * Liquidity provided to new Balancer pool is less than `MinLiquidity`.
+       * Liquidity provided to new CPMM pool is less than `MinLiquidity`.
        **/
       InsufficientLiquidity: AugmentedError<ApiType>;
       /**

@@ -2,6 +2,7 @@ import SDK, { util } from "@zeitgeistpm/sdk";
 import {
   CategoryMetadata,
   DecodedMarketMetadata,
+  MarketDeadlines,
 } from "@zeitgeistpm/sdk/dist/types";
 
 type Options = {
@@ -10,6 +11,9 @@ type Options = {
   description: string;
   oracle: string;
   period: string;
+  gracePeriod: string;
+  oracleDuration: string;
+  disputeDuration: string;
   categories?: string[];
   question: string;
   seed: string;
@@ -28,6 +32,9 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     description,
     oracle,
     period,
+    gracePeriod,
+    oracleDuration,
+    disputeDuration,
     categories,
     endpoint,
     seed,
@@ -93,6 +100,12 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     ? { timestamp: period.split(` `).map((x) => +x) }
     : { block: period.split(` `).map((x) => +x) };
 
+  const deadlines: MarketDeadlines = {
+    gracePeriod: gracePeriod,
+    oracleDuration: oracleDuration,
+    disputeDuration: disputeDuration,
+  };
+
   const marketType = { Categorical: metadata.categories.length };
 
   let disputeMechanism = null;
@@ -106,6 +119,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     signer,
     oracle,
     period: marketPeriod,
+    deadlines,
     marketType,
     disputeMechanism,
     swapFee,

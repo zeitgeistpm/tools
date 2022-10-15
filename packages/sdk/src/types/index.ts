@@ -190,6 +190,12 @@ export type MarketEnd = { block: number } | { timestamp: number };
 
 export type MarketCreation = "Permissioned" | "Advised";
 
+export type MarketDeadlines = {
+  gracePeriod: string;
+  oracleDuration: string;
+  disputeDuration: string;
+};
+
 export type MarketTypeOf = { Categorical: number } | { Scalar: number[] };
 
 export type ScoringRule = "CPMM" | "RikiddoSigmoidFeeMarketEma";

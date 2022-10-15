@@ -80,6 +80,9 @@ program
     "Interpret period as a unix timestamp instead of a block number",
     false
   )
+  .option("--grace-period <string>", "Grace Period", "0")
+  .option("--oracle-duration <string>", "Oracle Duration", "60000")
+  .option("--dispute-duration <string>", "Dispute Duration", "20000")
   .option(
     "--authorized <string>",
     "Specify account id which is authorized to handle Market Dispute Mechanism"
@@ -156,6 +159,9 @@ program
     "Interpret period as a unix timestamp instead of a block number",
     false
   )
+  .option("--grace-period <string>", "Grace Period", "0")
+  .option("--oracle-duration <string>", "Oracle Duration", "60000")
+  .option("--dispute-duration <string>", "Dispute Duration", "20000")
   .option(
     "--authorized <string>",
     "Specify account id which is authorized to handle Market Dispute Mechanism"
@@ -221,6 +227,9 @@ program
     "Interpret period as a unix timestamp instead of a block number",
     false
   )
+  .option("--grace-period <string>", "Grace Period", "0")
+  .option("--oracle-duration <string>", "Oracle Duration", "60000")
+  .option("--dispute-duration <string>", "Dispute Duration", "20000")
   .option(
     "--authorized <string>",
     "Specify account id which is authorized to handle Market Dispute Mechanism"

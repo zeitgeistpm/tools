@@ -2,6 +2,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import {
   DecodedMarketMetadata,
   KeyringPairOrExtSigner,
+  MarketDeadlines,
   MarketDisputeMechanism,
   MarketPeriod,
   MarketTypeOf,
@@ -11,6 +12,7 @@ export type CreateCpmmMarketAndDeployAssetsParams = {
   signer: KeyringPairOrExtSigner;
   oracle: string;
   period: MarketPeriod;
+  deadlines: MarketDeadlines;
   metadata: DecodedMarketMetadata;
   marketType: MarketTypeOf;
   disputeMechanism: MarketDisputeMechanism;
@@ -26,6 +28,7 @@ export type CreateMarketParams = {
   signer: KeyringPairOrExtSigner;
   oracle: string;
   period: MarketPeriod;
+  deadlines: MarketDeadlines;
   metadata: DecodedMarketMetadata;
   creationType: string;
   marketType: MarketTypeOf;
