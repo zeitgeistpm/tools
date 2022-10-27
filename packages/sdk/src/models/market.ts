@@ -189,6 +189,23 @@ class Market {
   }
 
   /**
+   * Get timestamp at the start of the market period.
+   */
+  async getStartTimestamp(): Promise<number> {
+    if ("timestamp" in this.period) {
+      return this.period.timestamp[0];
+    }
+
+    const now = parseInt((await this.api.query.timestamp.now()).toString());
+    const head = await this.api.rpc.chain.getHeader();
+    const blockNum = head.number.toNumber();
+    const diffInMs =
+      parseInt(this.api.consts.timestamp.minimumPeriod.toString()) *
+      (this.period.block[0] - blockNum);
+    return now + diffInMs;
+  }
+
+  /**
    * Get pool id to be used for fetching data using `sdk.models.market.getPool()`.
    * Returns null if no swap pool is available for the market
    */
