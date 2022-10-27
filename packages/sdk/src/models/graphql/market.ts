@@ -65,7 +65,7 @@ export type MarketQueryData = {
     };
   };
   period: {
-    block: string | null;
+    block: string[] | null;
     end: string;
     start: string;
     timestamp: string[] | null;
