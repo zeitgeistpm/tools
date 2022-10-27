@@ -183,7 +183,8 @@ class Market {
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
     const diffInMs =
-      2 * parseInt(this.api.consts.timestamp.minimumPeriod.toString()) *
+      2 *
+      parseInt(this.api.consts.timestamp.minimumPeriod.toString()) *
       (this.period.block[1] - blockNum);
     return now + diffInMs;
   }
@@ -200,7 +201,8 @@ class Market {
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
     const diffInMs =
-      2 * parseInt(this.api.consts.timestamp.minimumPeriod.toString()) *
+      2 *
+      parseInt(this.api.consts.timestamp.minimumPeriod.toString()) *
       (this.period.block[0] - blockNum);
     return now + diffInMs;
   }
