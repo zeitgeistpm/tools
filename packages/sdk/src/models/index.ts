@@ -447,9 +447,7 @@ export default class Models {
           where: {
             slug_contains: $marketSlugText
             status_eq: "Active"
-            period: {
-              end_gt: $timestamp
-            }
+            period: { end_gt: $timestamp }
             poolId_gte: 0
             marketId_in: $marketIds
           }
@@ -1132,7 +1130,9 @@ export default class Models {
       orderingStr = ordering === "asc" ? "DESC" : "ASC";
     }
     const orderByQuery =
-      orderBy === "newest" ? `marketId_${orderingStr}` : `period_end_${orderingStr}`;
+      orderBy === "newest"
+        ? `marketId_${orderingStr}`
+        : `period_end_${orderingStr}`;
 
     const variables = {
       statuses,
