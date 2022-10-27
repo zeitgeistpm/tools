@@ -56,7 +56,9 @@ class Market {
   /** IPFS cid for market metadata */
   public metadata?: string;
   /** Timestamp at which market should end */
-  public end: BigInt;
+  public end: string;
+  /** Timestamp at which market starts */
+  public start: string;
   /** Market dispute details */
   public disputeMechanism: MarketDisputeMechanism;
   /** The description of the market. */
@@ -100,6 +102,7 @@ class Market {
       disputeMechanism: this.disputeMechanism,
       outcomeAssets: this.outcomeAssets,
       end: this.end,
+      start: this.start,
       metadata: this.metadata,
     } = market);
 

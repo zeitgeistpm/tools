@@ -5,7 +5,6 @@ export const FRAGMENT_MARKET_DETAILS = gql`
   fragment MarketDetails on Market {
     marketId
     description
-    end
     creator
     creatorFee
     creation
@@ -25,6 +24,8 @@ export const FRAGMENT_MARKET_DETAILS = gql`
     }
     period {
       block
+      end
+      start
       timestamp
     }
     report {
@@ -65,7 +66,9 @@ export type MarketQueryData = {
   };
   period: {
     block: string | null;
-    timestamp: string | null;
+    end: string;
+    start: string;
+    timestamp: string[] | null;
   };
   metadata: string;
   scalarType: ScalarRangeType | null;
@@ -78,7 +81,6 @@ export type MarketQueryData = {
   status: string;
   scoringRule: ScoringRule;
   resolvedOutcome: number | null;
-  end: BigInt;
   oracle: string;
   question: string;
   categories: { ticker: string; name: string; color: string }[];
