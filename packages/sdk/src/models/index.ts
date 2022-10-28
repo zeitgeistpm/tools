@@ -7,7 +7,6 @@ import { Option } from "@polkadot/types";
 import Decimal from "decimal.js";
 
 import {
-  MarketPeriod,
   MarketId,
   MarketResponse,
   KeyringPairOrExtSigner,
@@ -448,7 +447,7 @@ export default class Models {
           where: {
             slug_contains: $marketSlugText
             status_eq: "Active"
-            end_gt: $timestamp
+            period: { end_gt: $timestamp }
             poolId_gte: 0
             marketId_in: $marketIds
           }
@@ -829,14 +828,14 @@ export default class Models {
       }
     }
 
-    const marketPeriod: Partial<MarketPeriod> = {};
+    const marketPeriod = {};
 
     for (const p in period) {
       const val = period[p];
       if (val == null) {
         continue;
       }
-      if (typeof val === "string") {
+      if (["timestamp", "block"].includes(p)) {
         marketPeriod[p] = JSON.parse(`[${val}]`);
       }
     }
@@ -877,7 +876,8 @@ export default class Models {
       data.report != null ? this.api.createType("Report", data.report) : null;
 
     const basicMarketData: MarketResponse = {
-      end: data.end,
+      end: data.period.end,
+      start: data.period.start,
       creation: data.creation,
       creator: data.creator,
       creatorFee: 0,
@@ -1130,7 +1130,9 @@ export default class Models {
       orderingStr = ordering === "asc" ? "DESC" : "ASC";
     }
     const orderByQuery =
-      orderBy === "newest" ? `marketId_${orderingStr}` : `end_${orderingStr}`;
+      orderBy === "newest"
+        ? `marketId_${orderingStr}`
+        : `period_end_${orderingStr}`;
 
     const variables = {
       statuses,

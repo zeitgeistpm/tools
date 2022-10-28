@@ -56,7 +56,9 @@ class Market {
   /** IPFS cid for market metadata */
   public metadata?: string;
   /** Timestamp at which market should end */
-  public end: BigInt;
+  public end: string;
+  /** Timestamp at which market starts */
+  public start: string;
   /** Market dispute details */
   public disputeMechanism: MarketDisputeMechanism;
   /** The description of the market. */
@@ -100,6 +102,7 @@ class Market {
       disputeMechanism: this.disputeMechanism,
       outcomeAssets: this.outcomeAssets,
       end: this.end,
+      start: this.start,
       metadata: this.metadata,
     } = market);
 
@@ -180,8 +183,27 @@ class Market {
     const head = await this.api.rpc.chain.getHeader();
     const blockNum = head.number.toNumber();
     const diffInMs =
+      2 *
       parseInt(this.api.consts.timestamp.minimumPeriod.toString()) *
       (this.period.block[1] - blockNum);
+    return now + diffInMs;
+  }
+
+  /**
+   * Get timestamp at the start of the market period.
+   */
+  async getStartTimestamp(): Promise<number> {
+    if ("timestamp" in this.period) {
+      return this.period.timestamp[0];
+    }
+
+    const now = parseInt((await this.api.query.timestamp.now()).toString());
+    const head = await this.api.rpc.chain.getHeader();
+    const blockNum = head.number.toNumber();
+    const diffInMs =
+      2 *
+      parseInt(this.api.consts.timestamp.minimumPeriod.toString()) *
+      (this.period.block[0] - blockNum);
     return now + diffInMs;
   }
 

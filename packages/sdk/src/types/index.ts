@@ -129,7 +129,8 @@ export type MarketResponse = {
   resolvedOutcome: OutcomeReport | null;
   disputeMechanism: MarketDisputeMechanism;
   outcomeAssets: Asset[];
-  end: BigInt;
+  end: string;
+  start: string;
 };
 
 // The extended market data from which a market may be created.
