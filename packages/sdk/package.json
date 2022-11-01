@@ -17,7 +17,7 @@
   "author": "Zeitgeist PM <contact@zeitgeist.pm>",
   "license": "GPL-3.0",
   "dependencies": {
-    "@polkadot/api": "^9.5.1",
+    "@polkadot/api": "^9.6.2",
     "@polkadot/keyring": "^10.1.11",
     "@polkadot/util": "^10.1.11",
     "@polkadot/util-crypto": "^10.1.11",
