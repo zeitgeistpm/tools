@@ -1,6 +1,6 @@
 {
   "name": "@zeitgeistpm/types",
-  "version": "0.9.1",
+  "version": "0.9.3",
   "description": "Generated types for the Zeitgeist network.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
