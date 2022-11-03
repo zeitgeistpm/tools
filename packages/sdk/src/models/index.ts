@@ -51,7 +51,7 @@ export default class Models {
   private errorTable: ErrorTable;
   private graphQLClient?: GraphQLClient;
 
-  private ipfsClient: IPFS;
+  readonly ipfsClient: IPFS;
   private endpoint: string;
 
   private marketIds: number[];

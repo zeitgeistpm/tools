@@ -109,6 +109,21 @@ export default class IPFS {
     return result;
   }
 
+  async addFile(file: File, onlyHash = false): Promise<string> {
+    const fsEntry = await this.client.add(file, { onlyHash });
+    const cid = fsEntry.cid.toString();
+    const pinToCluster = onlyHash && this.pinToCluster;
+    if (pinToCluster) {
+      try {
+        await this.pinCidToCluster(cid);
+      } catch (error) {
+        console.log(`Failed to publish file on cluster\n ${error}\n`);
+        throw error;
+      }
+    }
+    return cid;
+  }
+
   /**
    * Reads data from a given partial CID.
    * @param partialCid A partial CID without the encoding prefix.
