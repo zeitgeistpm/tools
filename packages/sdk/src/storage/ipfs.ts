@@ -112,7 +112,7 @@ export default class IPFS {
   async addFile(file: File, onlyHash = false): Promise<string> {
     const fsEntry = await this.client.add(file, { onlyHash });
     const cid = fsEntry.cid.toString();
-    const pinToCluster = onlyHash && this.pinToCluster;
+    const pinToCluster = !onlyHash && this.pinToCluster;
     if (pinToCluster) {
       try {
         await this.pinCidToCluster(cid);
