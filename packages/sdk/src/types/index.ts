@@ -299,7 +299,7 @@ export type MarketStatusText =
 
 export type MarketsOrdering = "asc" | "desc";
 
-export type MarketsOrderBy = "newest" | "end";
+export type MarketsOrderBy = "newest" | "end" | "popular";
 
 export type MarketsFilteringOptions = {
   statuses?: MarketStatusText[];
