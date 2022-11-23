@@ -448,7 +448,7 @@ export default class Models {
             slug_contains: $marketSlugText
             status_eq: "Active"
             period: { end_gt: $timestamp }
-            poolId_gte: 0
+            pool: { poolId_gte: 0 }
             marketId_in: $marketIds
           }
           orderBy: marketId_DESC
@@ -982,7 +982,7 @@ export default class Models {
       ${whereCreatorOrOracle}
       creator_eq: $creator
       oracle_eq: $oracle
-      poolId_gte: $minPoolId
+      pool: { poolId_gte: $minPoolId }
       marketId_in: $marketIds
       outcomeAssets_containsAny: $assets
     }`;
