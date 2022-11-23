@@ -15,7 +15,9 @@ export const FRAGMENT_MARKET_DETAILS = gql`
     status
     scoringRule
     resolvedOutcome
-    poolId
+    pool {
+      poolId
+    }
     scalarType
     metadata
     marketType {
@@ -51,7 +53,7 @@ export const FRAGMENT_MARKET_DETAILS = gql`
 
 export type MarketQueryData = {
   marketId: number;
-  poolId: number;
+  pool: { poolId: number };
   marketType: { categorical: string | null; scalar: string | null };
   disputeMechanism: {
     authorized: boolean | null;
