@@ -884,7 +884,7 @@ program
   )
   .addOption(
     new Option("--order-by <string>", "Order markets by paramater")
-      .choices(["newest", "end"])
+      .choices(["newest", "end", "popular"])
       .default("newest")
   )
   .action(

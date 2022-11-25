@@ -448,7 +448,7 @@ export default class Models {
             slug_contains: $marketSlugText
             status_eq: "Active"
             period: { end_gt: $timestamp }
-            poolId_gte: 0
+            pool: { poolId_gte: 0 }
             marketId_in: $marketIds
           }
           orderBy: marketId_DESC
@@ -903,8 +903,8 @@ export default class Models {
       this.api,
       this.errorTable
     );
-    if (data.poolId != null) {
-      market.poolId = data.poolId;
+    if (data.pool.poolId != null) {
+      market.poolId = data.pool.poolId;
     }
     return market;
   }
@@ -982,7 +982,7 @@ export default class Models {
       ${whereCreatorOrOracle}
       creator_eq: $creator
       oracle_eq: $oracle
-      poolId_gte: $minPoolId
+      pool: { poolId_gte: $minPoolId }
       marketId_in: $marketIds
       outcomeAssets_containsAny: $assets
     }`;
@@ -1126,13 +1126,15 @@ export default class Models {
 
     const offset = pageSize ? (pageNumber - 1) * pageSize : 0;
     let orderingStr = ordering.toUpperCase();
+    let orderByQuery = `period_end_${orderingStr}`;
+
     if (orderBy === "newest") {
       orderingStr = ordering === "asc" ? "DESC" : "ASC";
+      orderByQuery = `marketId_${orderingStr}`;
+    } else if (orderBy === "popular") {
+      orderingStr = ordering === "asc" ? "DESC" : "ASC";
+      orderByQuery = `pool_volume_${orderingStr}`;
     }
-    const orderByQuery =
-      orderBy === "newest"
-        ? `marketId_${orderingStr}`
-        : `period_end_${orderingStr}`;
 
     const variables = {
       statuses,
