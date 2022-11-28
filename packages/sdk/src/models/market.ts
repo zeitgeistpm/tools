@@ -890,51 +890,84 @@ class Market {
   /**
    * Rejects the `Proposed` market that is waiting for approval from the advisory committee.
    * @param signer The actual signer provider to sign the transaction.
+   * @param rejectReason Reason for market rejection
    * @param callbackOrPaymentInfo "true" to get txn fee estimation otherwise callback to capture transaction result.
    */
   async reject(
     signer: KeyringPairOrExtSigner,
+    rejectReason: string,
     callbackOrPaymentInfo:
       | ((result: ISubmittableResult, _unsub: () => void) => void)
       | boolean = false
   ): Promise<string> {
-    const tx = this.api.tx.predictionMarkets.rejectMarket(this.marketId);
+    const tx = this.api.tx.predictionMarkets.rejectMarket(
+      this.marketId,
+      rejectReason
+    );
 
-    if (typeof callbackOrPaymentInfo === "boolean" && callbackOrPaymentInfo) {
+    if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       return estimatedFee(tx, signer.address);
     }
+
     const callback =
-      typeof callbackOrPaymentInfo !== "boolean"
+      typeof callbackOrPaymentInfo !== `boolean`
         ? callbackOrPaymentInfo
         : undefined;
 
-    const _callback = (
-      result: ISubmittableResult,
-      _resolve: (value: string | PromiseLike<string>) => void,
-      _unsub: () => void
-    ) => {
-      const { events, status } = result;
-      console.log("status:", status.toHuman());
-
-      if (status.isInBlock) {
-        events.forEach(({ phase, event: { data, method, section } }) => {
-          console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-
-          if (method == "MarketRejected") {
-            _resolve(data[0].toString());
-          }
-          if (method == "ExtrinsicFailed") {
-            _resolve("");
-          }
-
-          unsubOrWarns(_unsub);
-        });
-      }
-    };
-
     return new Promise(async (resolve) => {
-      const sudoTx = await this.api.tx.sudo.sudo(tx);
+      const _callback = (
+        result: ISubmittableResult,
+        _resolve: (value: string | PromiseLike<string>) => void,
+        _unsub: () => void
+      ) => {
+        const { events, status } = result;
 
+        if (status.isInBlock) {
+          console.log(
+            `Transaction included at blockHash ${status.asInBlock}\n`
+          );
+
+          events.forEach(({ event: { data, method, section } }, index) => {
+            console.log(
+              `Event ${index + 1} -> ${section}.${method} :: ${data}`
+            );
+
+            if (method == `MarketRejected`) {
+              console.log(
+                `\x1b[36m%s\x1b[0m`,
+                `\nMarket id ${this.marketId} has been rejected successfully.\n`
+              );
+              _resolve(data[0].toString());
+            } else if (method.includes(`Sudid` || `ExtrinsicFailed`)) {
+              let index: number, error: string;
+              if (method == `Sudid` && data.toJSON()[0].err) {
+                index = data.toJSON()[0].err.module.index;
+                error = data.toJSON()[0].err.module.error;
+              } else if (method == `ExtrinsicFailed`) {
+                index = data.toJSON()[0].module.index;
+                error = data.toJSON()[0].module.error;
+              }
+              try {
+                const { errorName, documentation } = this.errorTable.getEntry(
+                  index,
+                  parseInt(error.substring(2, 4), 16)
+                );
+                console.log(
+                  `\x1b[31m%s\x1b[0m`,
+                  `\n${errorName}: ${documentation}\n`
+                );
+              } catch (err) {
+                console.log(err);
+              } finally {
+                _resolve(``);
+              }
+            }
+            unsubOrWarns(_unsub);
+          });
+        }
+      };
+
+      const sudoTx = this.api.tx.sudo.sudo(tx);
       if (isExtSigner(signer)) {
         const unsub = await sudoTx.signAndSend(
           signer.address,
