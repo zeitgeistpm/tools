@@ -938,12 +938,15 @@ class Market {
                 `\nMarket id ${this.marketId} has been rejected successfully.\n`
               );
               _resolve(data[0].toString());
-            } else if (method.includes(`Sudid` || `ExtrinsicFailed`)) {
+            } else if (
+              (method == `Sudid` && data.toJSON()[0].err) ||
+              method == `ExtrinsicFailed`
+            ) {
               let index: number, error: string;
-              if (method == `Sudid` && data.toJSON()[0].err) {
+              if (method == `Sudid`) {
                 index = data.toJSON()[0].err.module.index;
                 error = data.toJSON()[0].err.module.error;
-              } else if (method == `ExtrinsicFailed`) {
+              } else {
                 index = data.toJSON()[0].module.index;
                 error = data.toJSON()[0].module.error;
               }
