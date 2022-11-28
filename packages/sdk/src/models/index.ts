@@ -438,7 +438,7 @@ export default class Models {
       );
     }
     const query = gql`
-      query markets(
+      query marketsAssets(
         $timestamp: BigInt
         $marketIds: [Int!]
         $marketSlugText: String
@@ -461,7 +461,9 @@ export default class Models {
             color
             img
           }
-          poolId
+          pool {
+            poolId
+          }
           outcomeAssets
         }
       }
@@ -477,7 +479,7 @@ export default class Models {
       markets: {
         outcomeAssets: string[];
         marketId: number;
-        poolId: number;
+        pool: { poolId: number };
         slug: string;
         categories: { ticker: string; name: string; color: string };
       }[];
@@ -489,7 +491,7 @@ export default class Models {
 
     const { markets } = data;
 
-    const poolIds = markets.map((m) => m.poolId);
+    const poolIds = markets.map((m) => m.pool.poolId);
 
     const numPools = poolIds.length;
 
@@ -565,7 +567,7 @@ export default class Models {
       const assetStr = asset.assetId;
       const assetJson = JSON.parse(assetStr);
       const poolId = asset.poolId;
-      const market = markets.find((m) => m.poolId === poolId);
+      const market = markets.find((m) => m.pool.poolId === poolId);
       const pool = pools.find((p) => p.poolId === poolId);
       const { accountId: poolAccount } = pool;
       const catIdx = market.outcomeAssets.findIndex(
