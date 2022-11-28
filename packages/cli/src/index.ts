@@ -778,7 +778,7 @@ program
   );
 
 program
-  .command("rejectMarket <marketId>")
+  .command("rejectMarket <marketId> <reason>")
   .option(
     "--endpoint <string>",
     "The endpoint URL of the API connection",
@@ -789,8 +789,8 @@ program
     "The signer's seed. Must be an ApprovalOrigin",
     "//Alice"
   )
-  .action((marketId: number, opts) =>
-    catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId }))
+  .action((marketId: number, reason: string, opts) =>
+    catchErrorsAndExit(rejectMarket, Object.assign(opts, { marketId, reason }))
   );
 
 program
