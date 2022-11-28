@@ -67,6 +67,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       NotMember: AugmentedError<ApiType>;
       /**
+       * Too many members.
+       **/
+      TooManyMembers: AugmentedError<ApiType>;
+      /**
        * Generic error
        **/
       [key: string]: AugmentedError<ApiType>;
@@ -98,10 +102,6 @@ declare module '@polkadot/api-base/types/errors' {
        * An account attempts to submit a report to an undisputed market.
        **/
       MarketIsNotDisputed: AugmentedError<ApiType>;
-      /**
-       * An unauthorized account attempts to submit a report.
-       **/
-      NotAuthorizedForThisMarket: AugmentedError<ApiType>;
       /**
        * The report does not match the market's type.
        **/
@@ -151,7 +151,7 @@ declare module '@polkadot/api-base/types/errors' {
     };
     bounties: {
       /**
-       * The bounty cannot be closed because it has active child-bounties.
+       * The bounty cannot be closed because it has active child bounties.
        **/
       HasActiveChildBounty: AugmentedError<ApiType>;
       /**
@@ -255,6 +255,10 @@ declare module '@polkadot/api-base/types/errors' {
        * Not a member.
        **/
       NotMember: AugmentedError<ApiType>;
+      /**
+       * Too many members.
+       **/
+      TooManyMembers: AugmentedError<ApiType>;
       /**
        * Generic error
        **/
@@ -396,6 +400,10 @@ declare module '@polkadot/api-base/types/errors' {
        * these are removed, either through `unvote` or `reap_vote`.
        **/
       VotesExist: AugmentedError<ApiType>;
+      /**
+       * Voting period too low
+       **/
+      VotingPeriodLow: AugmentedError<ApiType>;
       /**
        * Invalid upper bound.
        **/
@@ -625,6 +633,22 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       DisputeDurationSmallerThanMinDisputeDuration: AugmentedError<ApiType>;
       /**
+       * Only creator is able to edit the market.
+       **/
+      EditorNotCreator: AugmentedError<ApiType>;
+      /**
+       * EditReason's length greater than MaxEditReasonLen.
+       **/
+      EditReasonLengthExceedsMaxEditReasonLen: AugmentedError<ApiType>;
+      /**
+       * The start of the global dispute for this market happened already.
+       **/
+      GlobalDisputeAlreadyStarted: AugmentedError<ApiType>;
+      /**
+       * The global dispute resolution system is disabled.
+       **/
+      GlobalDisputesDisabled: AugmentedError<ApiType>;
+      /**
        * Specified grace_period is greater than MaxGracePeriod.
        **/
       GracePeriodGreaterThanMaxGracePeriod: AugmentedError<ApiType>;
@@ -636,6 +660,10 @@ declare module '@polkadot/api-base/types/errors' {
        * Sender does not have enough share balance.
        **/
       InsufficientShareBalance: AugmentedError<ApiType>;
+      /**
+       * The action requires another market dispute mechanism.
+       **/
+      InvalidDisputeMechanism: AugmentedError<ApiType>;
       /**
        * Market period is faulty (too short, outside of limits)
        **/
@@ -664,6 +692,14 @@ declare module '@polkadot/api-base/types/errors' {
        * Market is already reported on.
        **/
       MarketAlreadyReported: AugmentedError<ApiType>;
+      /**
+       * Market is not requested for edit.
+       **/
+      MarketEditNotRequested: AugmentedError<ApiType>;
+      /**
+       * Market edit request is already in progress.
+       **/
+      MarketEditRequestAlreadyInProgress: AugmentedError<ApiType>;
       /**
        * Market was expected to be active.
        **/
@@ -701,6 +737,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       MarketStartTooSoon: AugmentedError<ApiType>;
       /**
+       * The maximum number of disputes is needed for this operation.
+       **/
+      MaxDisputesNeeded: AugmentedError<ApiType>;
+      /**
        * The maximum number of disputes has been reached.
        **/
       MaxDisputesReached: AugmentedError<ApiType>;
@@ -732,6 +772,10 @@ declare module '@polkadot/api-base/types/errors' {
        * Submitted outcome does not match market type.
        **/
       OutcomeMismatch: AugmentedError<ApiType>;
+      /**
+       * RejectReason's length greater than MaxRejectReasonLen.
+       **/
+      RejectReasonLengthExceedsMaxRejectReasonLen: AugmentedError<ApiType>;
       /**
        * The report is not coming from designated oracle.
        **/
@@ -1168,6 +1212,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       NotMember: AugmentedError<ApiType>;
       /**
+       * Too many members.
+       **/
+      TooManyMembers: AugmentedError<ApiType>;
+      /**
        * Generic error
        **/
       [key: string]: AugmentedError<ApiType>;
@@ -1209,6 +1257,11 @@ declare module '@polkadot/api-base/types/errors' {
     };
     treasury: {
       /**
+       * The spend origin is valid but the amount it is allowed to spend is lower than the
+       * amount to be spent.
+       **/
+      InsufficientPermission: AugmentedError<ApiType>;
+      /**
        * Proposer's balance is too low.
        **/
       InsufficientProposersBalance: AugmentedError<ApiType>;
@@ -1216,6 +1269,10 @@ declare module '@polkadot/api-base/types/errors' {
        * No proposal or bounty at that index.
        **/
       InvalidIndex: AugmentedError<ApiType>;
+      /**
+       * Proposal has not been approved.
+       **/
+      ProposalNotApproved: AugmentedError<ApiType>;
       /**
        * Too many approvals in the queue.
        **/
