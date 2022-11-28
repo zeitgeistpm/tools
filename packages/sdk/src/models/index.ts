@@ -905,7 +905,7 @@ export default class Models {
       this.api,
       this.errorTable
     );
-    if (data.pool.poolId != null) {
+    if (data.pool != null) {
       market.poolId = data.pool.poolId;
     }
     return market;
