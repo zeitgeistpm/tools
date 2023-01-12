@@ -818,7 +818,7 @@ export default class Models {
   }
 
   private constructMarketFromQueryData(data: MarketQueryData): Market {
-    const { marketType, period, marketId, deadlines } = data;
+    const { marketType, period, marketId } = data;
 
     for (const type in marketType) {
       const val = marketType[type];
