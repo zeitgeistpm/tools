@@ -38,15 +38,16 @@ export const FRAGMENT_MARKET_DETAILS = gql`
       at
       by
     }
-    disputeMechanism {
-      Authorized: authorized
-      Court: court
-      SimpleDisputes: simpleDisputes
-    }
+    disputeMechanism
     categories {
       ticker
       name
       color
+    }
+    deadlines {
+      gracePeriod
+      oracleDuration
+      disputeDuration
     }
   }
 `;
@@ -55,11 +56,7 @@ export type MarketQueryData = {
   marketId: number;
   pool: { poolId: number } | null;
   marketType: { categorical: string | null; scalar: string | null };
-  disputeMechanism: {
-    authorized: boolean | null;
-    court: boolean | null;
-    simpleDisputes: boolean | null;
-  };
+  disputeMechanism: string;
   report: {
     outcome: {
       categorical: string | null;
@@ -86,4 +83,9 @@ export type MarketQueryData = {
   oracle: string;
   question: string;
   categories: { ticker: string; name: string; color: string }[];
+  deadlines: {
+    gracePeriod: string;
+    oracleDuration: string;
+    disputeDuration: string;
+  };
 };
