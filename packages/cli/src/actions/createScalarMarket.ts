@@ -15,10 +15,9 @@ type Options = {
   advised: boolean;
   seed: string;
   timestamp: boolean;
-  authorized: string;
-  court: boolean;
   cpmm: boolean;
   metadata: DecodedMarketMetadata;
+  disputeMechanism: string;
 };
 
 const createScalarMarket = async (opts: Options): Promise<void> => {
@@ -33,10 +32,9 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     endpoint,
     seed,
     timestamp,
-    authorized,
-    court,
     cpmm,
     metadata,
+    disputeMechanism,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -62,13 +60,6 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     oracleDuration: oracleDuration,
     disputeDuration: disputeDuration,
   };
-
-  let disputeMechanism = null;
-  if (authorized) {
-    disputeMechanism = { Authorized: authorized };
-  } else {
-    disputeMechanism = court ? { Court: null } : { SimpleDisputes: null };
-  }
 
   const marketId = await sdk.models.createMarket({
     signer,

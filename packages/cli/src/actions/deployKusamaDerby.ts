@@ -43,9 +43,7 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
       },
       creationType: `Permissionless`,
       marketType: { Categorical: 8 },
-      disputeMechanism: {
-        authorized: `5D2L4ghyiYE8p2z7VNJo9JYwRuc8uzPWtMBqdVyvjRcsnw4P`,
-      },
+      disputeMechanism: `Authorized`,
       scoringRule: `CPMM`,
       callbackOrPaymentInfo: false,
     });

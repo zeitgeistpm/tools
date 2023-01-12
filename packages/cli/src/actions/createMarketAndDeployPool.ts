@@ -18,12 +18,11 @@ type Options = {
   question: string;
   seed: string;
   timestamp: boolean;
-  authorized: string;
-  court: boolean;
   swapFee: string;
   amount: string;
   weights: string;
   estimateFee: boolean;
+  disputeMechanism: string;
 };
 
 const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
@@ -40,12 +39,11 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     seed,
     question,
     timestamp,
-    authorized,
-    court,
     swapFee,
     amount,
     weights,
     estimateFee,
+    disputeMechanism,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -107,13 +105,6 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
   };
 
   const marketType = { Categorical: metadata.categories.length };
-
-  let disputeMechanism = null;
-  if (authorized) {
-    disputeMechanism = { Authorized: authorized };
-  } else {
-    disputeMechanism = court ? { Court: null } : { SimpleDisputes: null };
-  }
 
   const res = await sdk.models.createCpmmMarketAndDeployAssets({
     signer,
