@@ -63,7 +63,7 @@ program
 
 program
   .command(
-    "createMarketAndDeployPool <slug> <description> <oracle> <period> <question> <swapFee> <amount>"
+    "createMarketAndDeployPool <slug> <description> <oracle> <period> <question> <swapFee> <amount> <disputeMechanism>"
   )
   .option(
     "-c --categories [categories...]",
@@ -111,6 +111,7 @@ program
       question: string,
       swapFee: string,
       amount: string,
+      disputeMechanism: string,
       opts: {
         endpoint: string;
         seed: string;
@@ -131,13 +132,14 @@ program
           question,
           swapFee,
           amount,
+          disputeMechanism,
         })
       )
   );
 
 program
   .command(
-    "createCategoricalMarket <slug> <description> <oracle> <period> <question>"
+    "createCategoricalMarket <slug> <description> <oracle> <period> <question> <disputeMechanism>"
   )
   .option(
     "--advised",
@@ -163,15 +165,6 @@ program
   .option("--oracle-duration <string>", "Oracle Duration", "60000")
   .option("--dispute-duration <string>", "Dispute Duration", "20000")
   .option(
-    "--authorized <string>",
-    "Specify account id which is authorized to handle Market Dispute Mechanism"
-  )
-  .option(
-    "--court",
-    "Use Court instead of Simple Disputes as Market Dispute Mechanism",
-    false
-  )
-  .option(
     "--cpmm",
     "Use cpmm as a scoring rule instead of RikiddoSigmoidFeeMarketEma",
     false
@@ -188,25 +181,33 @@ program
       oracle: string,
       period: string,
       question: string,
+      disputeMechanism: string,
       opts: {
         endpoint: string;
         seed: string;
         categories: string[];
         advised: boolean;
         timestamp: boolean;
-        authorized: string;
-        court: boolean;
         cpmm: boolean;
       }
     ) =>
       catchErrorsAndExit(
         createCategoricalMarket,
-        Object.assign(opts, { slug, description, oracle, period, question })
+        Object.assign(opts, {
+          slug,
+          description,
+          oracle,
+          period,
+          question,
+          disputeMechanism,
+        })
       )
   );
 
 program
-  .command("createScalarMarket <title> <description> <oracle> <period>")
+  .command(
+    "createScalarMarket <title> <description> <oracle> <period> <disputeMechanism>"
+  )
   .option(
     "--advised",
     "Create Advised market instead of Permissionless market",
@@ -231,15 +232,6 @@ program
   .option("--oracle-duration <string>", "Oracle Duration", "60000")
   .option("--dispute-duration <string>", "Dispute Duration", "20000")
   .option(
-    "--authorized <string>",
-    "Specify account id which is authorized to handle Market Dispute Mechanism"
-  )
-  .option(
-    "--court",
-    "Use Court instead of Simple Disputes as Market Dispute Mechanism",
-    false
-  )
-  .option(
     "--cpmm",
     "Use cpmm as a scoring rule instead of RikiddoSigmoidFeeMarketEma",
     false
@@ -250,6 +242,7 @@ program
       description: string,
       oracle: string,
       period: string,
+      disputeMechanism: string,
       opts: {
         endpoint: string;
         seed: string;
@@ -263,7 +256,13 @@ program
     ) =>
       catchErrorsAndExit(
         createScalarMarket,
-        Object.assign(opts, { title, description, oracle, period })
+        Object.assign(opts, {
+          title,
+          description,
+          oracle,
+          period,
+          disputeMechanism,
+        })
       )
   );
 

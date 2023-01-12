@@ -19,10 +19,9 @@ type Options = {
   advised: boolean;
   seed: string;
   timestamp: boolean;
-  authorized: string;
-  court: boolean;
   cpmm: boolean;
   estimateFee: boolean;
+  disputeMechanism: string;
 };
 
 const createCategoricalMarket = async (opts: Options): Promise<void> => {
@@ -40,10 +39,9 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     seed,
     question,
     timestamp,
-    authorized,
-    court,
     cpmm,
     estimateFee,
+    disputeMechanism,
   } = opts;
 
   const sdk = await SDK.initialize(endpoint);
@@ -103,13 +101,6 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     oracleDuration: oracleDuration,
     disputeDuration: disputeDuration,
   };
-
-  let disputeMechanism = null;
-  if (authorized) {
-    disputeMechanism = { Authorized: authorized };
-  } else {
-    disputeMechanism = court ? { Court: null } : { SimpleDisputes: null };
-  }
 
   const res = await sdk.models.createMarket({
     signer,

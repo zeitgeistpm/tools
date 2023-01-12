@@ -15,8 +15,8 @@ import {
   CategoryMetadata,
   OutcomeReport,
   ScoringRule,
-  MarketDisputeMechanism,
   ScalarRangeType,
+  MarketDeadlines,
 } from "../types";
 import { estimatedFee, isExtSigner, unsubOrWarns } from "../util";
 import { Asset, MarketType, Pool } from "@zeitgeistpm/types/dist/interfaces";
@@ -59,8 +59,8 @@ class Market {
   public end: string;
   /** Timestamp at which market starts */
   public start: string;
-  /** Market dispute details */
-  public disputeMechanism: MarketDisputeMechanism;
+  /** The type of market dispute */
+  public disputeMechanism: string;
   /** The description of the market. */
   public description: string;
   /** The market question. */
@@ -69,6 +69,8 @@ class Market {
   public outcomeAssets: Asset[];
   /** Market tags */
   public tags: string[];
+  /** Deadlines for the market represented in blocks */
+  public deadlines: MarketDeadlines;
 
   public confidentialId?: string;
   /** The image for the market. */
@@ -104,6 +106,7 @@ class Market {
       end: this.end,
       start: this.start,
       metadata: this.metadata,
+      deadlines: this.deadlines,
     } = market);
 
     ({

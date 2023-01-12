@@ -818,7 +818,7 @@ export default class Models {
   }
 
   private constructMarketFromQueryData(data: MarketQueryData): Market {
-    const { marketType, period, disputeMechanism, marketId } = data;
+    const { marketType, period, marketId } = data;
 
     for (const type in marketType) {
       const val = marketType[type];
@@ -831,7 +831,6 @@ export default class Models {
     }
 
     const marketPeriod = {};
-
     for (const p in period) {
       const val = period[p];
       if (val == null) {
@@ -839,15 +838,6 @@ export default class Models {
       }
       if (["timestamp", "block"].includes(p)) {
         marketPeriod[p] = JSON.parse(`[${val}]`);
-      }
-    }
-
-    for (const dispMech in disputeMechanism) {
-      const val = disputeMechanism[dispMech];
-      if (val == null) {
-        delete disputeMechanism[dispMech];
-      } else {
-        disputeMechanism[dispMech] = val;
       }
     }
 
@@ -888,14 +878,13 @@ export default class Models {
       status: data.status,
       outcomeAssets,
       marketType: marketTypeAsType,
-      disputeMechanism: this.api
-        .createType("MarketDisputeMechanism", disputeMechanism)
-        .toJSON(),
+      disputeMechanism: data.disputeMechanism,
       report: marketReport,
       period: this.api.createType("MarketPeriod", marketPeriod).toJSON(),
       //@ts-ignore
       resolvedOutcome: data.resolvedOutcome,
       metadata: data.metadata,
+      deadlines: data.deadlines,
     };
 
     const market = new Market(
