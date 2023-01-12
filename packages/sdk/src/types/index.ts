@@ -127,10 +127,11 @@ export type MarketResponse = {
   status: string;
   report: Report | null;
   resolvedOutcome: OutcomeReport | null;
-  disputeMechanism: MarketDisputeMechanism;
+  disputeMechanism: string;
   outcomeAssets: Asset[];
   end: string;
   start: string;
+  deadlines: MarketDeadlines;
 };
 
 // The extended market data from which a market may be created.
@@ -147,13 +148,14 @@ export type ExtendedMarketResponse = {
   report: Report | null;
   categories: string[] | null;
   resolvedOutcome: OutcomeReport | null;
-  disputeMechanism: MarketDisputeMechanism;
+  disputeMechanism: string;
   // new ones
   marketId: number;
   title: string;
   description: string;
   metadataString: string;
   outcomeAssets: Asset[];
+  deadlines: MarketDeadlines;
 };
 
 // The extended market data from which a market may be created.
@@ -175,6 +177,7 @@ export type FilteredMarketResponse = {
   description?: string;
   metadataString?: string;
   outcomeAssets?: Asset[];
+  deadlines?: MarketDeadlines;
 };
 
 export type Report = {
@@ -200,17 +203,6 @@ export type MarketDeadlines = {
 export type MarketTypeOf = { Categorical: number } | { Scalar: number[] };
 
 export type ScoringRule = "CPMM" | "RikiddoSigmoidFeeMarketEma";
-
-export type AuthorisedDisputeMechanism = { authorized: string };
-
-export type CourtDisputeMechanism = { Court: null };
-
-export type SimpleDisputeMechanism = { SimpleDisputes: null };
-
-export type MarketDisputeMechanism =
-  | AuthorisedDisputeMechanism
-  | CourtDisputeMechanism
-  | SimpleDisputeMechanism;
 
 export type MarketDispute = {
   at: number;
@@ -332,5 +324,3 @@ export type ActiveAssetsResponse = {
   qty: string;
   price: number;
 }[];
-
-export * from "./guards";

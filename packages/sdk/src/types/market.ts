@@ -3,7 +3,6 @@ import {
   DecodedMarketMetadata,
   KeyringPairOrExtSigner,
   MarketDeadlines,
-  MarketDisputeMechanism,
   MarketPeriod,
   MarketTypeOf,
 } from ".";
@@ -15,7 +14,7 @@ export type CreateCpmmMarketAndDeployAssetsParams = {
   deadlines: MarketDeadlines;
   metadata: DecodedMarketMetadata;
   marketType: MarketTypeOf;
-  disputeMechanism: MarketDisputeMechanism;
+  disputeMechanism: string;
   swapFee: string;
   amount: string;
   weights: string[];
@@ -32,7 +31,7 @@ export type CreateMarketParams = {
   metadata: DecodedMarketMetadata;
   creationType: string;
   marketType: MarketTypeOf;
-  disputeMechanism: MarketDisputeMechanism;
+  disputeMechanism: string;
   scoringRule: string;
   callbackOrPaymentInfo:
     | ((result: ISubmittableResult, _unsub: () => void) => void)
