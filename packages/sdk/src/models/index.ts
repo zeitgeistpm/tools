@@ -128,6 +128,7 @@ export default class Models {
   /**
    * Creates a market using CPMM scoring rule, buys a complete set of the assets used and deploys the funds.
    * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction
+   * @param {string} params.baseAsset The base asset in the market swap pool (usually a currency)
    * @param {string} params.oracle The address that will be responsible for reporting the market
    * @param {MarketPeriod} params.period Start and end block numbers or milliseconds since epoch
    * @param {MarketDeadlines} params.deadlines Market deadlines represented in blocks
@@ -144,6 +145,7 @@ export default class Models {
   ): Promise<boolean | string> {
     const {
       signer,
+      baseAsset,
       oracle,
       period,
       deadlines,
@@ -159,6 +161,7 @@ export default class Models {
     // don't add metadata to ipfs if we're only estimating fees
     if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
+        baseAsset,
         oracle,
         period,
         deadlines,
@@ -182,6 +185,7 @@ export default class Models {
     const multihash = { Sha3_384: cid.multihash };
 
     const tx = this.api.tx.predictionMarkets.createCpmmMarketAndDeployAssets(
+      baseAsset,
       oracle,
       period,
       deadlines,
@@ -280,6 +284,7 @@ export default class Models {
   /**
    * Creates a new categorical or scalar market with the given parameters.
    * @param {KeyringPairOrExtSigner} params.signer The actual signer provider to sign the transaction.
+   * @param {string} params.baseAsset The base asset in the market swap pool (usually a currency)
    * @param {string} params.oracle The address that will be responsible for reporting the market.
    * @param {MarketPeriod} params.period Start and end block numbers or milliseconds since epoch.
    * @param {MarketDeadlines} params.deadlines Market deadlines represented in blocks
@@ -294,6 +299,7 @@ export default class Models {
   async createMarket(params: CreateMarketParams): Promise<string> {
     const {
       signer,
+      baseAsset,
       oracle,
       period,
       deadlines,
@@ -307,6 +313,7 @@ export default class Models {
     // don't add metadata to ipfs if we're only estimating fees
     if (typeof callbackOrPaymentInfo === `boolean` && callbackOrPaymentInfo) {
       const tx = this.api.tx.predictionMarkets.createMarket(
+        baseAsset,
         oracle,
         period,
         deadlines,
@@ -328,6 +335,7 @@ export default class Models {
     const multihash = { Sha3_384: cid.multihash };
 
     const tx = this.api.tx.predictionMarkets.createMarket(
+      baseAsset,
       oracle,
       period,
       deadlines,

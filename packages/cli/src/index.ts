@@ -65,6 +65,7 @@ program
   .command(
     "createMarketAndDeployPool <slug> <description> <oracle> <period> <question> <swapFee> <amount> <disputeMechanism>"
   )
+  .option("--base-asset <string>", "Base asset in the market", "Ztg")
   .option(
     "-c --categories [categories...]",
     "A space-separated strings for names of categories for the market"
@@ -120,6 +121,7 @@ program
         authorized: string;
         court: boolean;
         weights: string;
+        baseAsset: string;
       }
     ) =>
       catchErrorsAndExit(
@@ -141,6 +143,7 @@ program
   .command(
     "createCategoricalMarket <slug> <description> <oracle> <period> <question> <disputeMechanism>"
   )
+  .option("--base-asset <string>", "Base asset in the market", "Ztg")
   .option(
     "--advised",
     "Create Advised market instead of Permissionless market",
@@ -189,6 +192,7 @@ program
         advised: boolean;
         timestamp: boolean;
         cpmm: boolean;
+        baseAsset: string;
       }
     ) =>
       catchErrorsAndExit(
@@ -208,6 +212,7 @@ program
   .command(
     "createScalarMarket <title> <description> <oracle> <period> <disputeMechanism>"
   )
+  .option("--base-asset <string>", "Base asset in the market", "Ztg")
   .option(
     "--advised",
     "Create Advised market instead of Permissionless market",
@@ -252,6 +257,7 @@ program
         authorized: string;
         court: boolean;
         cpmm: boolean;
+        baseAsset: string;
       }
     ) =>
       catchErrorsAndExit(

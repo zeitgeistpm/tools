@@ -19,6 +19,7 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
   for (let i = 0; i < 3; i++) {
     const marketId = await sdk.models.createMarket({
       signer,
+      baseAsset: `Ztg`,
       oracle: `5D2L4ghyiYE8p2z7VNJo9JYwRuc8uzPWtMBqdVyvjRcsnw4P`,
       period: { timestamp: [1620504000000, 1620604000000] },
       deadlines: {
