@@ -9,6 +9,7 @@ type Options = {
   endpoint: string;
   slug: string;
   description: string;
+  baseAsset: string;
   oracle: string;
   period: string;
   gracePeriod: string;
@@ -29,6 +30,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
   const {
     slug,
     description,
+    baseAsset,
     oracle,
     period,
     gracePeriod,
@@ -108,6 +110,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
 
   const res = await sdk.models.createCpmmMarketAndDeployAssets({
     signer,
+    baseAsset,
     oracle,
     period: marketPeriod,
     deadlines,

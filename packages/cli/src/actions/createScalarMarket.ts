@@ -6,6 +6,7 @@ import {
 
 type Options = {
   endpoint: string;
+  baseAsset: string;
   oracle: string;
   period: string;
   gracePeriod: string;
@@ -22,6 +23,7 @@ type Options = {
 
 const createScalarMarket = async (opts: Options): Promise<void> => {
   const {
+    baseAsset,
     oracle,
     period,
     gracePeriod,
@@ -63,6 +65,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
 
   const marketId = await sdk.models.createMarket({
     signer,
+    baseAsset,
     oracle,
     period: marketPeriod,
     deadlines,
