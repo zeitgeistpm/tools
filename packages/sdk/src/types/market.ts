@@ -9,6 +9,7 @@ import {
 
 export type CreateCpmmMarketAndDeployAssetsParams = {
   signer: KeyringPairOrExtSigner;
+  baseAsset: string;
   oracle: string;
   period: MarketPeriod;
   deadlines: MarketDeadlines;
@@ -25,6 +26,7 @@ export type CreateCpmmMarketAndDeployAssetsParams = {
 
 export type CreateMarketParams = {
   signer: KeyringPairOrExtSigner;
+  baseAsset: string;
   oracle: string;
   period: MarketPeriod;
   deadlines: MarketDeadlines;

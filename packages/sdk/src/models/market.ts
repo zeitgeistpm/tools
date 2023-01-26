@@ -35,6 +35,8 @@ class Market {
   public creation: MarketCreation;
   /** The creator's fee. */
   public creatorFee: number;
+  /** The base asset in the market swap pool (usually a currency) */
+  public baseAsset: string;
   /** The oracle that is designated to report on the market. */
   public oracle: string;
   /** The period block or timestamp for this market. */
@@ -94,6 +96,7 @@ class Market {
       creator: this.creator,
       creation: this.creation,
       creatorFee: this.creatorFee,
+      baseAsset: this.baseAsset,
       oracle: this.oracle,
       period: this.period,
       scoringRule: this.scoringRule,

@@ -119,6 +119,7 @@ export type MarketResponse = {
   creator: string;
   creation: MarketCreation;
   creatorFee: number;
+  baseAsset: string;
   oracle: string;
   metadata?: string;
   marketType: MarketType;
