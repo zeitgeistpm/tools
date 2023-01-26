@@ -103,6 +103,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       MarketIsNotDisputed: AugmentedError<ApiType>;
       /**
+       * Only one dispute is allowed.
+       **/
+      OnlyOneDisputeAllowed: AugmentedError<ApiType>;
+      /**
        * The report does not match the market's type.
        **/
       OutcomeMismatch: AugmentedError<ApiType>;
@@ -475,6 +479,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       InvalidTarget: AugmentedError<ApiType>;
       /**
+       * The provided judgement was for a different identity.
+       **/
+      JudgementForDifferentIdentity: AugmentedError<ApiType>;
+      /**
        * Judgement given.
        **/
       JudgementGiven: AugmentedError<ApiType>;
@@ -661,6 +669,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       InsufficientShareBalance: AugmentedError<ApiType>;
       /**
+       * Provided base_asset is not allowed to be used as base_asset.
+       **/
+      InvalidBaseAsset: AugmentedError<ApiType>;
+      /**
        * The action requires another market dispute mechanism.
        **/
       InvalidDisputeMechanism: AugmentedError<ApiType>;
@@ -692,6 +704,10 @@ declare module '@polkadot/api-base/types/errors' {
        * Market is already reported on.
        **/
       MarketAlreadyReported: AugmentedError<ApiType>;
+      /**
+       * The market duration is longer than allowed.
+       **/
+      MarketDurationTooLong: AugmentedError<ApiType>;
       /**
        * Market is not requested for edit.
        **/
@@ -745,6 +761,10 @@ declare module '@polkadot/api-base/types/errors' {
        **/
       MaxDisputesReached: AugmentedError<ApiType>;
       /**
+       * Tried to settle missing bond.
+       **/
+      MissingBond: AugmentedError<ApiType>;
+      /**
        * Can not report before market.deadlines.grace_period is ended.
        **/
       NotAllowedToReportYet: AugmentedError<ApiType>;
@@ -792,6 +812,10 @@ declare module '@polkadot/api-base/types/errors' {
        * The post dispatch should never be None.
        **/
       UnexpectedNoneInPostInfo: AugmentedError<ApiType>;
+      /**
+       * A foreign asset in not registered in AssetRegistry.
+       **/
+      UnregisteredForeignAsset: AugmentedError<ApiType>;
       /**
        * The weights length has to be equal to the assets length.
        **/
