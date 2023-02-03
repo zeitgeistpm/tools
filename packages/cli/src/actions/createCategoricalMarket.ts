@@ -112,7 +112,7 @@ const createCategoricalMarket = async (opts: Options): Promise<void> => {
     deadlines,
     metadata,
     creationType: advised ? `Advised` : `Permissionless`,
-    marketType: { Categorical: categoriesMeta.length },
+    marketType: { categorical: categoriesMeta.length },
     disputeMechanism,
     scoringRule: cpmm ? `CPMM` : `RikiddoSigmoidFeeMarketEma`,
     callbackOrPaymentInfo: estimateFee,

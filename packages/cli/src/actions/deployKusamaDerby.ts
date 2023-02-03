@@ -43,7 +43,7 @@ const deployKusamaDerby = async (opts: Options): Promise<void> => {
         question: `who will win?`,
       },
       creationType: `Permissionless`,
-      marketType: { Categorical: 8 },
+      marketType: { categorical: 8 },
       disputeMechanism: `authorized`,
       scoringRule: `CPMM`,
       callbackOrPaymentInfo: false,
