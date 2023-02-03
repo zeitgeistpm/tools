@@ -862,7 +862,7 @@ export default class Models {
       marketType.categorical != null
         ? this.api.createType("MarketType", marketType)
         : this.api.createType("MarketType", {
-            scalar: marketType.scalar.split(","),
+            scalar: marketType.scalar,
           });
 
     const outcomeAssets = this.createAssetsForMarket(
