@@ -201,7 +201,7 @@ export type MarketDeadlines = {
   disputeDuration: string;
 };
 
-export type MarketTypeOf = { Categorical: number } | { Scalar: number[] };
+export type MarketTypeOf = { categorical: number } | { scalar: string[] };
 
 export type ScoringRule = "CPMM" | "RikiddoSigmoidFeeMarketEma";
 
