@@ -106,7 +106,7 @@ const createMarketAndDeployPool = async (opts: Options): Promise<void> => {
     disputeDuration: disputeDuration,
   };
 
-  const marketType = { Categorical: metadata.categories.length };
+  const marketType = { categorical: metadata.categories.length };
 
   const res = await sdk.models.createCpmmMarketAndDeployAssets({
     signer,

@@ -12,7 +12,7 @@ type Options = {
   gracePeriod: string;
   oracleDuration: string;
   disputeDuration: string;
-  bounds?: number[];
+  bounds?: string[];
   advised: boolean;
   seed: string;
   timestamp: boolean;
@@ -71,7 +71,7 @@ const createScalarMarket = async (opts: Options): Promise<void> => {
     deadlines,
     metadata,
     creationType: advised ? `Advised` : `Permissionless`,
-    marketType: { Scalar: bounds ? bounds : [0, 100] },
+    marketType: { scalar: bounds ? bounds : ["0", "100"] },
     disputeMechanism,
     scoringRule: cpmm ? `CPMM` : `RikiddoSigmoidFeeMarketEma`,
     callbackOrPaymentInfo: false,

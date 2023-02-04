@@ -55,7 +55,7 @@ export const FRAGMENT_MARKET_DETAILS = gql`
 export type MarketQueryData = {
   marketId: number;
   pool: { poolId: number } | null;
-  marketType: { categorical: string | null; scalar: string | null };
+  marketType: { categorical: string | null; scalar: string[] | null };
   disputeMechanism: string;
   report: {
     outcome: {
