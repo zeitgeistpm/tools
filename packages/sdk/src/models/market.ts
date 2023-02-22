@@ -73,6 +73,8 @@ class Market {
   public tags: string[];
   /** Deadlines for the market represented in blocks */
   public deadlines: MarketDeadlines;
+  /** The type of market metadata */
+  public __meta?: string;
 
   public confidentialId?: string;
   /** The image for the market. */
@@ -113,6 +115,7 @@ class Market {
     } = market);
 
     ({
+      __meta: this.__meta,
       slug: this.slug,
       question: this.question,
       description: this.description,
