@@ -4,6 +4,8 @@ import { Asset, MarketType } from "@zeitgeistpm/types/dist/interfaces/index";
 
 // The possible fields available on the decoded market metadata.
 export type DecodedMarketMetadata = {
+  // The type of metadata
+  __meta?: string;
   // The short name for the market, ex. 'TEAM 1 v.s TEAM 2'.
   slug: string;
   // The question for the market, capped at 160 chars.
